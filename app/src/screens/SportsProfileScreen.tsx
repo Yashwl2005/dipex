@@ -15,6 +15,13 @@ export default function SportsProfileScreen() {
 
     const [selectedLevel, setSelectedLevel] = useState('State');
     const [years, setYears] = useState(2);
+    const [selectedSport, setSelectedSport] = useState('Athletics');
+
+    const sportsList = [
+        'Athletics', 'Swimming', 'Gymnastics', 'Weightlifting',
+        'Boxing', 'Wrestling', 'Archery', 'Shooting'
+    ];
+    const [isDropdownVisible, setDropdownVisible] = useState(false);
 
     const levels = [
         { id: 'Beginner', title: 'Beginner', icon: 'school', iconType: 'Ionicons' },
@@ -53,13 +60,35 @@ export default function SportsProfileScreen() {
                 {/* Form Section */}
                 <View style={styles.section}>
                     <Text style={styles.label}>Primary Sport</Text>
-                    <TouchableOpacity style={styles.dropdownInput}>
+                    <TouchableOpacity
+                        style={styles.dropdownInput}
+                        onPress={() => setDropdownVisible(!isDropdownVisible)}
+                    >
                         <View style={styles.leftRow}>
-                            <MaterialCommunityIcons name="gymnastics" size={24} color={Colors.primary} />
-                            <Text style={styles.placeholderText}>Athletics</Text>
+                            <MaterialCommunityIcons name="run" size={24} color={Colors.primary} />
+                            <Text style={styles.placeholderText}>{selectedSport}</Text>
                         </View>
-                        <Ionicons name="chevron-down" size={20} color={Colors.textSecondary} />
+                        <Ionicons name={isDropdownVisible ? "chevron-up" : "chevron-down"} size={20} color={Colors.textSecondary} />
                     </TouchableOpacity>
+
+                    {isDropdownVisible && (
+                        <View style={styles.dropdownList}>
+                            {sportsList.map(sport => (
+                                <TouchableOpacity
+                                    key={sport}
+                                    style={styles.dropdownItem}
+                                    onPress={() => {
+                                        setSelectedSport(sport);
+                                        setDropdownVisible(false);
+                                    }}
+                                >
+                                    <Text style={[styles.dropdownItemText, selectedSport === sport && { color: Colors.primary, fontWeight: 'bold' }]}>
+                                        {sport}
+                                    </Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                    )}
                 </View>
 
                 <View style={styles.section}>
@@ -145,12 +174,17 @@ export default function SportsProfileScreen() {
                                 email: registrationData.email || `athlete${Math.floor(Math.random() * 10000)}@example.com`,
                                 password: registrationData.password || 'password123',
                                 role: 'athlete',
-                                dateOfBirth: registrationData.dateOfBirth,
-                                sport: 'Athletics'
+                                gender: registrationData.gender || 'male',
+                                address: registrationData.address || '',
+                                state: registrationData.state || '',
+                                dateOfBirth: registrationData.dateOfBirth ? new Date(registrationData.dateOfBirth.split('/').reverse().join('-')).toISOString() : null,
+                                sports: [selectedSport]
                             });
                             const token = res.data.token;
                             if (token) {
                                 await AsyncStorage.setItem('userToken', token);
+                                await AsyncStorage.setItem('userName', res.data.name || registrationData.name || '');
+                                await AsyncStorage.setItem('userSports', JSON.stringify(res.data.sports || [selectedSport]));
                             }
                             navigation.navigate('SelectTest');
                         } catch (err: any) {
@@ -262,6 +296,23 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#111827',
         marginLeft: 12,
+    },
+    dropdownList: {
+        marginTop: 8,
+        backgroundColor: Colors.white,
+        borderWidth: 1,
+        borderColor: '#E5E7EB',
+        borderRadius: 12,
+        overflow: 'hidden',
+    },
+    dropdownItem: {
+        padding: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: '#F3F4F6',
+    },
+    dropdownItemText: {
+        fontSize: 16,
+        color: '#4B5563',
     },
     levelGrid: {
         flexDirection: 'row',

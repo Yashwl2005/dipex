@@ -1,9 +1,8 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Replace with your local machine's IP address (ipconfig/ifconfig) if testing on physical device
-// Using Localtunnel proxy to bypass Windows Firewall Port 5000 restrictions on physical Wi-Fi
-const BASE_URL = 'https://little-suits-take.loca.lt/api';
+// Using local IP address for physical device testing
+const BASE_URL = 'http://192.168.31.124:5000/api';
 
 const apiClient: AxiosInstance = axios.create({
     baseURL: BASE_URL,

@@ -12,7 +12,9 @@ export const SubmissionReview = () => {
             try {
                 // In a real app, you'd get the submission ID from the URL params
                 // For this demo, we'll just fetch the first pending submission
-                const res = await api.get('/admin/submissions?status=pending');
+                const sportsStr = localStorage.getItem('sports');
+                const sports = sportsStr ? JSON.parse(sportsStr).join(',') : '';
+                const res = await api.get(`/admin/submissions?status=pending&sports=${sports}`);
                 if (res.data.length > 0) {
                     setSubmission(res.data[0]);
                 }

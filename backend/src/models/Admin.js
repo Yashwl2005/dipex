@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-const UserSchema = new mongoose.Schema({
+const AdminSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -17,28 +17,23 @@ const UserSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['athlete', 'coach', 'admin'],
-    default: 'athlete',
+    default: 'admin',
   },
-  dateOfBirth: {
-    type: Date,
-  },
-  gender: {
+  adminLevel: {
     type: String,
-    enum: ['male', 'female', 'other'],
+    enum: ['superadmin', 'regional', 'evaluator'],
+    default: 'evaluator'
   },
-  height: { type: Number }, // in cm
-  weight: { type: Number }, // in kg
-  address: { type: String },
-  state: { type: String },
-  sports: { type: [String], default: [] },
-  overallScore: { type: Number, default: 0 },
+  sports: {
+    type: [String],
+    default: []
+  }
 }, {
   timestamps: true,
 });
 
 // Password Hash middleware
-UserSchema.pre('save', async function (next) {
+AdminSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     return next();
   }
@@ -47,8 +42,8 @@ UserSchema.pre('save', async function (next) {
 });
 
 // Match password
-UserSchema.methods.matchPassword = async function (enteredPassword) {
+AdminSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model('Admin', AdminSchema);

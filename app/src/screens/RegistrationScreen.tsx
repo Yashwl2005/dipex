@@ -3,6 +3,8 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, SafeAr
 import { Colors, Spacing } from '../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { Platform, Modal } from 'react-native';
 
 export default function RegistrationScreen() {
     const navigation = useNavigation<any>();
@@ -12,10 +14,32 @@ export default function RegistrationScreen() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [dob, setDob] = useState('');
+    const [gender, setGender] = useState('');
+    const [address, setAddress] = useState('');
+    const [stateRegion, setStateRegion] = useState('');
+    const [date, setDate] = useState(new Date());
+    const [showDatePicker, setShowDatePicker] = useState(false);
+
+    const onDateChangeAndroid = (event: any, selectedDate?: Date) => {
+        setShowDatePicker(false);
+        if (event.type === 'set' && selectedDate) {
+            setDate(selectedDate);
+            const formattedDate = `${selectedDate.getDate().toString().padStart(2, '0')}/${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}/${selectedDate.getFullYear()}`;
+            setDob(formattedDate);
+        }
+    };
+
+    const onDateChangeIos = (event: any, selectedDate?: Date) => {
+        if (selectedDate) {
+            setDate(selectedDate);
+            const formattedDate = `${selectedDate.getDate().toString().padStart(2, '0')}/${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}/${selectedDate.getFullYear()}`;
+            setDob(formattedDate);
+        }
+    };
 
     const handleNext = () => {
-        if (!name || !email || !password) {
-            Alert.alert("Required Fields", "Please enter your Name, Email, and Password.");
+        if (!name || !email || !password || !gender || !stateRegion) {
+            Alert.alert("Required Fields", "Please fill in all mandatory fields, including State/Region.");
             return;
         }
 
@@ -24,7 +48,10 @@ export default function RegistrationScreen() {
                 name,
                 email,
                 password,
-                dateOfBirth: dob
+                dateOfBirth: dob,
+                gender,
+                address,
+                state: stateRegion
             }
         });
     };
@@ -99,17 +126,88 @@ export default function RegistrationScreen() {
                     <View style={styles.row}>
                         <View style={[styles.inputGroup, { flex: 2, marginRight: 10 }]}>
                             <Text style={styles.label}>Date of Birth</Text>
-                            <View style={styles.inputView}>
+                            <TouchableOpacity style={styles.inputView} onPress={() => setShowDatePicker(true)}>
                                 <TextInput
                                     style={styles.flexInput}
-                                    placeholder="mm/dd/yyyy"
+                                    placeholder="DD/MM/YYYY"
                                     placeholderTextColor={Colors.textPlaceholder}
                                     value={dob}
-                                    onChangeText={setDob}
+                                    editable={false}
+                                    pointerEvents="none"
                                 />
                                 <Ionicons name="calendar-outline" size={20} color={Colors.textSecondary} />
+                            </TouchableOpacity>
+
+                            {showDatePicker && Platform.OS === 'android' && (
+                                <DateTimePicker
+                                    value={date}
+                                    mode="date"
+                                    display="default"
+                                    onChange={onDateChangeAndroid}
+                                    maximumDate={new Date()}
+                                />
+                            )}
+
+                            {showDatePicker && Platform.OS === 'ios' && (
+                                <Modal transparent animationType="slide" visible={showDatePicker}>
+                                    <View style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                                        <View style={{ backgroundColor: 'white', padding: 20, borderTopLeftRadius: 20, borderTopRightRadius: 20 }}>
+                                            <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 10 }}>
+                                                <TouchableOpacity onPress={() => setShowDatePicker(false)}>
+                                                    <Text style={{ color: Colors.primary, fontSize: 16, fontWeight: 'bold' }}>Done</Text>
+                                                </TouchableOpacity>
+                                            </View>
+                                            <DateTimePicker
+                                                value={date}
+                                                mode="date"
+                                                display="spinner"
+                                                onChange={onDateChangeIos}
+                                                maximumDate={new Date()}
+                                            />
+                                        </View>
+                                    </View>
+                                </Modal>
+                            )}
+                        </View>
+
+                        <View style={[styles.inputGroup, { flex: 2 }]}>
+                            <Text style={styles.label}>Gender <Text style={styles.required}>*</Text></Text>
+                            <View style={{ flexDirection: 'row', gap: 6 }}>
+                                {['Male', 'Female', 'Other'].map(g => (
+                                    <TouchableOpacity
+                                        key={g}
+                                        style={{ flex: 1, height: 50, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: gender === g ? Colors.primary : '#D1D5DB', borderRadius: 8, backgroundColor: gender === g ? '#F0F5FF' : Colors.white }}
+                                        onPress={() => setGender(g.toLowerCase())}
+                                    >
+                                        <Text style={{ color: gender === g.toLowerCase() ? Colors.primary : Colors.textPrimary, fontWeight: gender === g.toLowerCase() ? 'bold' : '600', fontSize: 13 }}>{g}</Text>
+                                    </TouchableOpacity>
+                                ))}
                             </View>
                         </View>
+                    </View>
+
+                    <View style={styles.inputGroup}>
+                        <Text style={styles.label}>Full Address (Optional)</Text>
+                        <TextInput
+                            style={[styles.input, { height: 80, textAlignVertical: 'top' }]}
+                            placeholder="Enter your complete residential address"
+                            placeholderTextColor={Colors.textPlaceholder}
+                            multiline
+                            numberOfLines={3}
+                            value={address}
+                            onChangeText={setAddress}
+                        />
+                    </View>
+
+                    <View style={styles.inputGroup}>
+                        <Text style={styles.label}>State / Region <Text style={styles.required}>*</Text></Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="e.g. Haryana, Maharashtra"
+                            placeholderTextColor={Colors.textPlaceholder}
+                            value={stateRegion}
+                            onChangeText={setStateRegion}
+                        />
                     </View>
 
                     <View style={styles.inputGroup}>
@@ -138,6 +236,13 @@ export default function RegistrationScreen() {
                     <Text style={styles.nextText}>Next Step</Text>
                     <Ionicons name="arrow-forward" size={20} color={Colors.white} />
                 </TouchableOpacity>
+
+                <View style={{ flexDirection: 'row', justifyContent: 'center', marginBottom: 40 }}>
+                    <Text style={{ fontSize: 14, color: Colors.textSecondary }}>Already have an account? </Text>
+                    <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                        <Text style={{ fontSize: 14, fontWeight: 'bold', color: Colors.primary }}>Log In</Text>
+                    </TouchableOpacity>
+                </View>
             </ScrollView>
         </SafeAreaView>
     );

@@ -1,15 +1,38 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity, SafeAreaView } from 'react-native';
 import { Colors, Spacing } from '../constants/theme';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function HomeScreen() {
+    const [userName, setUserName] = useState('Rahul Kumar');
+    const [userSport, setUserSport] = useState('Boxing');
+
+    useEffect(() => {
+        const loadProfileData = async () => {
+            try {
+                const name = await AsyncStorage.getItem('userName');
+                const sportsStr = await AsyncStorage.getItem('userSports');
+                if (name) setUserName(name);
+                if (sportsStr) {
+                    const sports = JSON.parse(sportsStr);
+                    if (sports && sports.length > 0) {
+                        setUserSport(sports[0]); // display primary sport
+                    }
+                }
+            } catch (err) {
+                console.log('Error loading profile data:', err);
+            }
+        };
+        loadProfileData();
+    }, []);
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
                 <View>
                     <Text style={styles.headerSubtitle}>SAI TALENT ASSESSMENT</Text>
-                    <Text style={styles.headerTitle}>Welcome, Rahul</Text>
+                    <Text style={styles.headerTitle}>Welcome, {userName.split(' ')[0]}</Text>
                 </View>
                 <TouchableOpacity style={styles.notificationBtn}>
                     <Ionicons name="notifications" size={24} color="#374151" />
@@ -28,7 +51,7 @@ export default function HomeScreen() {
                             </View>
                         </View>
                     </View>
-                    <Text style={styles.profileName}>Rahul Kumar</Text>
+                    <Text style={styles.profileName}>{userName}</Text>
                     <Text style={styles.verifiedTag}>Verified Athlete</Text>
                     <View style={styles.idBadge}>
                         <Text style={styles.idText}>ID: SAI-2023-8892</Text>
@@ -43,7 +66,7 @@ export default function HomeScreen() {
                         </View>
                         <View style={[styles.statItem, styles.statBorder]}>
                             <Text style={styles.statLabel}>SPORT</Text>
-                            <Text style={styles.statValue}>Boxing</Text>
+                            <Text style={styles.statValue} numberOfLines={1}>{userSport}</Text>
                         </View>
                         <View style={styles.statItem}>
                             <Text style={styles.statLabel}>STATE</Text>

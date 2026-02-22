@@ -23,7 +23,9 @@ export const Dashboard = () => {
 
     const loadStats = async () => {
         try {
-            const res = await api.get('/admin/dashboard');
+            const sportsStr = localStorage.getItem('sports');
+            const sports = sportsStr ? JSON.parse(sportsStr).join(',') : '';
+            const res = await api.get(`/admin/dashboard?sports=${sports}`);
             setStats(res.data);
         } catch (e) {
             console.error(e);

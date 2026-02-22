@@ -1,11 +1,20 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, UserCheck, Activity, FileText, Settings, ShieldCheck } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { LayoutDashboard, Users, UserCheck, Activity, FileText, Settings, ShieldCheck, LogOut, UserPlus } from 'lucide-react';
 import './Sidebar.css';
 
 export const Sidebar = ({ type = 'light' }) => {
     const location = useLocation();
+    const navigate = useNavigate();
     const isDark = type === 'dark';
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
+        localStorage.removeItem('name');
+        localStorage.removeItem('sports');
+        navigate('/auth');
+    };
 
     const menuItems = isDark ? [
         { path: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -13,21 +22,32 @@ export const Sidebar = ({ type = 'light' }) => {
         { path: '/shortlisted', label: 'Shortlisted Athletes', icon: UserCheck },
         { path: '/reports', label: 'Reports', icon: FileText },
         { path: '/settings', label: 'Settings', icon: Settings },
+        { path: '/auth', label: 'New Admin Sign Up', icon: UserPlus },
     ] : [
         { path: '/', label: 'Dashboard', icon: LayoutDashboard },
         { path: '/athletes', label: 'Athletes', icon: Users },
         { path: '/analytics', label: 'Analytics', icon: Activity },
         { path: '/compliance', label: 'Compliance', icon: ShieldCheck },
         { path: '/settings', label: 'Settings', icon: Settings },
+        { path: '/auth', label: 'New Admin Sign Up', icon: UserPlus },
     ];
 
+    const adminName = localStorage.getItem('name') || 'Admin User';
+    let adminRole = 'Authority';
+    try {
+        const sports = JSON.parse(localStorage.getItem('sports'));
+        if (sports && sports.length > 0) {
+            adminRole = sports.join(', ');
+        }
+    } catch { }
+
     const adminInfo = isDark ? {
-        name: 'Admin User',
-        email: 'admin@sai.gov.in',
+        name: adminName,
+        email: adminRole,
         avatarBg: '#ffb800'
     } : {
-        name: 'Admin User',
-        email: 'Central Office',
+        name: adminName,
+        email: adminRole,
         avatarBg: '#ff7f50'
     };
 
@@ -73,12 +93,23 @@ export const Sidebar = ({ type = 'light' }) => {
 
             <div className="sidebar-footer">
                 {isDark && <div className="logged-in-label">LOGGED IN AS</div>}
-                <div className="admin-profile">
-                    <div className="admin-avatar" style={{ backgroundColor: adminInfo.avatarBg }}></div>
-                    <div className="admin-info">
-                        <div className="admin-name">{adminInfo.name}</div>
-                        <div className="admin-role">{adminInfo.email}</div>
+                <div className="admin-profile" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div className="admin-avatar" style={{ backgroundColor: adminInfo.avatarBg }}></div>
+                        <div className="admin-info">
+                            <div className="admin-name">{adminInfo.name}</div>
+                            <div className="admin-role">{adminInfo.email}</div>
+                        </div>
                     </div>
+                    <button
+                        onClick={handleLogout}
+                        style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '6px', borderRadius: '4px', transition: 'background 0.2s' }}
+                        title="Logout"
+                        onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#fee2e2'}
+                        onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                    >
+                        <LogOut size={20} />
+                    </button>
                 </div>
             </div>
         </aside>

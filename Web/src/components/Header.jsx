@@ -26,8 +26,15 @@ export const Header = () => {
                 </button>
                 <div className="user-profile">
                     <div className="user-text">
-                        <strong>Arjun Singh</strong>
-                        <span>Chief Reviewer</span>
+                        <strong>{localStorage.getItem('name') || 'Admin User'}</strong>
+                        <span>{(() => {
+                            try {
+                                const sports = JSON.parse(localStorage.getItem('sports'));
+                                return sports && sports.length > 0 ? sports.join(', ') : 'Authority';
+                            } catch {
+                                return 'Authority';
+                            }
+                        })()}</span>
                     </div>
                     <div className="user-avatar" style={{ backgroundColor: '#ff9478' }}>
                         <img src="https://i.pravatar.cc/150?img=11" alt="Arjun Singh" />

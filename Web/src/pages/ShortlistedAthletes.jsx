@@ -10,7 +10,9 @@ export const ShortlistedAthletes = () => {
     useEffect(() => {
         const fetchAthletes = async () => {
             try {
-                const res = await api.get('/admin/athletes');
+                const sportsStr = localStorage.getItem('sports');
+                const sports = sportsStr ? JSON.parse(sportsStr).join(',') : '';
+                const res = await api.get(`/admin/athletes?sports=${sports}`);
                 setAthletes(res.data);
             } catch (err) {
                 console.error(err);

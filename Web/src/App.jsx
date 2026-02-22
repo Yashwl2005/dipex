@@ -3,9 +3,11 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Dashboard } from './pages/Dashboard';
 import { ShortlistedAthletes } from './pages/ShortlistedAthletes';
 import { SubmissionReview } from './pages/SubmissionReview';
+import { Auth } from './pages/Auth';
+
+import { Athletes } from './pages/Athletes';
 
 // Placeholder empty components to prevent crashes
-const AthletesPlaceholder = () => <div className="p-8">Athletes Management coming soon...</div>;
 const ReportsPlaceholder = () => <div className="p-8">Reports coming soon...</div>;
 const SettingsPlaceholder = () => <div className="p-8">Settings coming soon...</div>;
 const AnalyticsPlaceholder = () => <div className="p-8">Analytics coming soon...</div>;
@@ -15,8 +17,9 @@ function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/auth" element={<Auth />} />
         <Route path="/" element={<Dashboard />} />
-        <Route path="/athletes" element={<AthletesPlaceholder />} />
+        <Route path="/athletes" element={<Athletes />} />
         <Route path="/analytics" element={<AnalyticsPlaceholder />} />
         <Route path="/compliance" element={<CompliancePlaceholder />} />
         <Route path="/shortlisted" element={<ShortlistedAthletes />} />

@@ -7,11 +7,19 @@ const Achievement = require('../models/Achievement');
 // @access  Public (mock admin)
 exports.getDashboardStats = async (req, res) => {
   try {
-    const totalAthletes = await User.countDocuments({ role: 'athlete' });
-    const pendingEvaluations = await FitnessTest.countDocuments({ status: 'pending' });
+    const sportsFilter = req.query.sports ? req.query.sports.split(',') : [];
+    const query = sportsFilter.length > 0 ? { role: 'athlete', sports: { $in: sportsFilter } } : { role: 'athlete' };
+
+    const totalAthletes = await User.countDocuments(query);
+    const athletes = await User.find(query, '_id overallScore');
+    const athleteIds = athletes.map(a => a._id);
+
+    const pendingEvaluations = await FitnessTest.countDocuments({ 
+        status: 'pending',
+        user: { $in: athleteIds }
+    });
     
     // Calculate aggregate score
-    const athletes = await User.find({ role: 'athlete' }, 'overallScore');
     const validScores = athletes.filter(a => a.overallScore > 0);
     const avgScore = validScores.length 
       ? validScores.reduce((acc, a) => acc + a.overallScore, 0) / validScores.length 
@@ -33,7 +41,10 @@ exports.getDashboardStats = async (req, res) => {
 // @access  Public (mock admin)
 exports.getShortlistedAthletes = async (req, res) => {
   try {
-    const athletes = await User.find({ role: 'athlete' })
+    const sportsFilter = req.query.sports ? req.query.sports.split(',') : [];
+    const query = sportsFilter.length > 0 ? { role: 'athlete', sports: { $in: sportsFilter } } : { role: 'athlete' };
+
+    const athletes = await User.find(query)
       .sort({ overallScore: -1 })
       .limit(100);
     res.json(athletes);
@@ -47,8 +58,16 @@ exports.getShortlistedAthletes = async (req, res) => {
 // @access  Public (mock admin)
 exports.getSubmissions = async (req, res) => {
   try {
-    const tests = await FitnessTest.find({ status: 'pending' })
-      .populate('user', 'name email sport overallScore gender dateOfBirth')
+    const sportsFilter = req.query.sports ? req.query.sports.split(',') : [];
+    const userQuery = sportsFilter.length > 0 ? { role: 'athlete', sports: { $in: sportsFilter } } : { role: 'athlete' };
+    const validUsers = await User.find(userQuery, '_id');
+    const validUserIds = validUsers.map(u => u._id);
+
+    const tests = await FitnessTest.find({ 
+        status: 'pending',
+        user: { $in: validUserIds }
+    })
+      .populate('user', 'name email sports overallScore gender dateOfBirth')
       .sort({ dateTaken: -1 });
     res.json(tests);
   } catch (error) {

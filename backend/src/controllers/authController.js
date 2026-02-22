@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Admin = require('../models/Admin');
 const jwt = require('jsonwebtoken');
 
 // Generate JWT Token
@@ -12,9 +13,20 @@ const generateToken = (id) => {
 // @route   POST /api/auth/register
 // @access  Public
 exports.registerUser = async (req, res) => {
-  const { name, email, password, role, dateOfBirth, gender, height, weight, sport } = req.body;
+  const { name, email, password, role, dateOfBirth, gender, height, weight, sports, address, state } = req.body;
 
   try {
+    if (role === 'admin') {
+      const adminExists = await Admin.findOne({ email });
+      if (adminExists) return res.status(400).json({ message: 'Admin already exists' });
+      
+      const admin = await Admin.create({ name, email, password, role, sports });
+      return res.status(201).json({
+        _id: admin.id, name: admin.name, email: admin.email, role: admin.role, sports: admin.sports,
+        token: generateToken(admin.id),
+      });
+    }
+
     const userExists = await User.findOne({ email });
 
     if (userExists) {
@@ -22,23 +34,12 @@ exports.registerUser = async (req, res) => {
     }
 
     const user = await User.create({
-      name,
-      email,
-      password,
-      role,
-      dateOfBirth,
-      gender,
-      height,
-      weight,
-      sport,
+      name, email, password, role, dateOfBirth, gender, height, weight, sports, address, state
     });
 
     if (user) {
       res.status(201).json({
-        _id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
+        _id: user.id, name: user.name, email: user.email, role: user.role,
         token: generateToken(user.id),
       });
     } else {
@@ -56,14 +57,21 @@ exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    // Check in Admin collection first
+    const admin = await Admin.findOne({ email });
+    if (admin && (await admin.matchPassword(password))) {
+      return res.json({
+        _id: admin.id, name: admin.name, email: admin.email, role: admin.role, sports: admin.sports,
+        token: generateToken(admin.id),
+      });
+    }
+
+    // Check in User collection next
     const user = await User.findOne({ email });
 
     if (user && (await user.matchPassword(password))) {
       res.json({
-        _id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
+        _id: user.id, name: user.name, email: user.email, role: user.role,
         token: generateToken(user.id),
       });
     } else {

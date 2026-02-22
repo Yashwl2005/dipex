@@ -17,15 +17,16 @@ import TestInstructionsScreen from './src/screens/TestInstructionsScreen';
 import UploadingDataScreen from './src/screens/UploadingDataScreen';
 import UploadAssessmentScreen from './src/screens/UploadAssessmentScreen';
 
+import LoginScreen from './src/screens/LoginScreen';
+
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
     <Provider store={store}>
       <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Registration">
-          {/* <Stack.Screen name="Splash" component={SplashScreen} /> */}
-          {/* <Stack.Screen name="LanguageSelection" component={LanguageSelectionScreen} /> */}
+        <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Login">
+          <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Registration" component={RegistrationScreen} />
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="UploadAchievements" component={UploadAchievementsScreen} />
