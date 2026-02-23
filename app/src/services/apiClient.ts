@@ -9,7 +9,24 @@ const apiClient: AxiosInstance = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
-    timeout: 10000,
+    timeout: 60000, // Increased timeout to 60s for video uploads
+    transformRequest: [function (data, headers) {
+        // Handle React Native FormData
+        if (data && data._parts) {
+            if (headers) {
+                delete headers['Content-Type'];
+            }
+            return data;
+        }
+        // Handle standard FormData
+        if (typeof FormData !== 'undefined' && data instanceof FormData) {
+            if (headers) {
+                delete headers['Content-Type'];
+            }
+            return data;
+        }
+        return JSON.stringify(data);
+    }],
 });
 
 // Request Interceptor
@@ -19,6 +36,10 @@ apiClient.interceptors.request.use(
             const token = await AsyncStorage.getItem('userToken');
             if (token) {
                 config.headers.Authorization = `Bearer ${token}`;
+            }
+            // Explicitly handle Content-Type for FormData
+            if (config.data && config.data._parts) {
+                config.headers['Content-Type'] = 'multipart/form-data';
             }
         } catch (e) {
             console.warn('Error reading token', e);

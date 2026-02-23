@@ -75,39 +75,20 @@ export const SubmissionReview = () => {
             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 380px', gap: '24px', alignItems: 'start' }}>
                 {/* Left Column - Video Player */}
                 <div>
-                    <div style={{ width: '100%', aspectRatio: '16/9', backgroundColor: '#1e293b', borderRadius: '12px', overflow: 'hidden', position: 'relative', backgroundImage: 'url("https://images.unsplash.com/photo-1552674605-db6ffd4facb5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80")', backgroundSize: 'cover', backgroundPosition: 'center' }}>
-                        {/* Video Overlay Darkener */}
-                        <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.3)' }}></div>
-
-                        {/* Play Button Center */}
-                        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '64px', height: '64px', backgroundColor: 'rgba(43, 43, 133, 0.9)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
-                            <Play fill="white" stroke="none" size={28} style={{ marginLeft: '4px' }} />
-                        </div>
-
-                        {/* Video Controls Bottom */}
-                        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '24px', background: 'linear-gradient(transparent, rgba(0,0,0,0.8))' }}>
-                            {/* Progress Bar */}
-                            <div style={{ width: '100%', height: '4px', backgroundColor: 'rgba(255,255,255,0.3)', borderRadius: '2px', marginBottom: '16px', position: 'relative' }}>
-                                <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '45%', backgroundColor: '#4f46e5', borderRadius: '2px' }}></div>
-                                <div style={{ position: 'absolute', top: '-4px', left: '45%', width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#ffffff', transform: 'translateX(-50%)' }}></div>
+                    <div style={{ width: '100%', aspectRatio: '16/9', backgroundColor: '#1e293b', borderRadius: '12px', overflow: 'hidden', position: 'relative' }}>
+                        {submission.videoProofUrl ? (
+                            <video
+                                src={submission.videoProofUrl}
+                                controls
+                                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                            >
+                                Your browser does not support the video tag.
+                            </video>
+                        ) : (
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', color: '#64748b' }}>
+                                No video proof provided for this submission.
                             </div>
-                            <div className="flex justify-between items-center text-white" style={{ fontSize: '14px' }}>
-                                <div className="flex items-center gap-6">
-                                    <SkipBack size={20} fill="white" />
-                                    <Play size={24} fill="white" />
-                                    <SkipForward size={20} fill="white" />
-                                    <div className="flex items-center gap-2">
-                                        <Volume2 size={20} />
-                                        <span>01:42 / 03:55</span>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-6">
-                                    <span style={{ backgroundColor: 'rgba(255,255,255,0.2)', padding: '4px 8px', borderRadius: '4px', fontWeight: 'bold', fontSize: '12px' }}>1x</span>
-                                    <Settings size={20} />
-                                    <Maximize size={20} />
-                                </div>
-                            </div>
-                        </div>
+                        )}
                     </div>
 
                     {/* Video Tools Bar */}

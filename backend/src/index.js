@@ -13,6 +13,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+  require('fs').appendFileSync('debug.log', `[${new Date().toISOString()}] ${req.method} ${req.originalUrl}\n`);
+  next();
+});
+
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/achievements', require('./routes/achievementRoutes'));
@@ -22,6 +28,14 @@ app.use('/api/admin', require('./routes/adminRoutes'));
 // Basic Route
 app.get('/', (req, res) => {
   res.send('API is running...');
+});
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+  const errMessage = `[${new Date().toISOString()}] ERROR: ${err.stack || err.message}\n`;
+  console.error(errMessage);
+  require('fs').appendFileSync('debug.log', errMessage);
+  res.status(500).json({ message: err.message || 'Server Error' });
 });
 
 // Port

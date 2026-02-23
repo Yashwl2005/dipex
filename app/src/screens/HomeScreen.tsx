@@ -3,8 +3,10 @@ import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity, SafeAreaVi
 import { Colors, Spacing } from '../constants/theme';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
 export default function HomeScreen() {
+    const navigation = useNavigation<any>();
     const [userName, setUserName] = useState('Rahul Kumar');
     const [userSport, setUserSport] = useState('Boxing');
 
@@ -88,7 +90,7 @@ export default function HomeScreen() {
                 </View>
 
                 {/* Start Fitness Test */}
-                <TouchableOpacity style={styles.fitnessButton}>
+                <TouchableOpacity style={styles.fitnessButton} onPress={() => navigation.navigate('SelectTest')}>
                     <View style={styles.fitnessLeft}>
                         <View style={styles.timerIconBox}>
                             <Ionicons name="timer" size={30} color={Colors.white} />
@@ -103,7 +105,7 @@ export default function HomeScreen() {
 
                 {/* Grid Actions */}
                 <View style={styles.gridContainer}>
-                    <TouchableOpacity style={styles.gridCard}>
+                    <TouchableOpacity style={styles.gridCard} onPress={() => navigation.navigate('UploadAchievements')}>
                         <View style={styles.iconCircleBlue}>
                             <Ionicons name="document-text" size={24} color={Colors.primary} />
                         </View>

@@ -89,14 +89,14 @@ exports.evaluateSubmission = async (req, res) => {
 
         test.status = status; // 'approved' or 'rejected'
         if (score !== undefined) {
-             test.score = score;
+             test.score = Number(score);
         }
         await test.save();
 
         // Update overall user score average if approved
         if (status === 'approved' && test.score) {
              const userTests = await FitnessTest.find({ user: test.user, status: 'approved' });
-             const totalScore = userTests.reduce((acc, t) => acc + (t.score || 0), 0);
+             const totalScore = userTests.reduce((acc, t) => acc + (Number(t.score) || 0), 0);
              const newAvg = (totalScore / userTests.length) || 0;
              
              await User.findByIdAndUpdate(test.user, { overallScore: newAvg });
@@ -104,6 +104,7 @@ exports.evaluateSubmission = async (req, res) => {
 
         res.json({ message: 'Evaluation updated', test });
     } catch (error) {
+        console.error("Evaluation Error:", error);
         res.status(500).json({ message: error.message });
     }
 };

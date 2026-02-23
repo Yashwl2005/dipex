@@ -1,14 +1,46 @@
-import React from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, SafeAreaView, Dimensions, ImageBackground } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, SafeAreaView, Dimensions, ImageBackground, Alert, ActivityIndicator, Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Colors, Spacing } from '../constants/theme';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import apiClient from '../services/apiClient';
+import * as ImagePicker from 'expo-image-picker';
 
 const { width } = Dimensions.get('window');
 
 export default function UploadAssessmentScreen() {
     const navigation = useNavigation<any>();
+    const [videoUri, setVideoUri] = useState<string | null>(null);
+    const [isUploading, setIsUploading] = useState(false);
+
+    const pickVideo = async (source: 'camera' | 'gallery') => {
+        try {
+            let result;
+            if (source === 'camera') {
+                await ImagePicker.requestCameraPermissionsAsync();
+                result = await ImagePicker.launchCameraAsync({
+                    mediaTypes: ['videos'],
+                    allowsEditing: true,
+                    quality: 1,
+                });
+            } else {
+                await ImagePicker.requestMediaLibraryPermissionsAsync();
+                result = await ImagePicker.launchImageLibraryAsync({
+                    mediaTypes: ['videos'],
+                    allowsEditing: true,
+                    quality: 1,
+                });
+            }
+
+            if (!result.canceled && result.assets && result.assets.length > 0) {
+                setVideoUri(result.assets[0].uri);
+            }
+        } catch (error) {
+            Alert.alert('Error', 'Failed to pick video');
+            console.error(error);
+        }
+    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -29,14 +61,14 @@ export default function UploadAssessmentScreen() {
 
                 {/* Upload Options */}
                 <View style={styles.optionsRow}>
-                    <TouchableOpacity style={styles.optionCard} activeOpacity={0.7}>
+                    <TouchableOpacity style={styles.optionCard} activeOpacity={0.7} onPress={() => pickVideo('camera')}>
                         <View style={styles.iconCircleRecord}>
                             <Ionicons name="videocam" size={24} color={Colors.primary} />
                         </View>
                         <Text style={styles.optionText}>Record Video</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={styles.optionCard} activeOpacity={0.7}>
+                    <TouchableOpacity style={styles.optionCard} activeOpacity={0.7} onPress={() => pickVideo('gallery')}>
                         <View style={styles.iconCircleGallery}>
                             <Ionicons name="images" size={24} color="#9333EA" />
                         </View>
@@ -50,39 +82,48 @@ export default function UploadAssessmentScreen() {
                 {/* Video Preview Section */}
                 <View style={styles.previewHeader}>
                     <Text style={styles.previewTitle}>Video Preview</Text>
-                    <TouchableOpacity style={styles.removeButton}>
-                        <Ionicons name="trash-outline" size={16} color={Colors.error} />
-                        <Text style={styles.removeText}>Remove</Text>
-                    </TouchableOpacity>
+                    {videoUri && (
+                        <TouchableOpacity style={styles.removeButton} onPress={() => setVideoUri(null)}>
+                            <Ionicons name="trash-outline" size={16} color={Colors.error} />
+                            <Text style={styles.removeText}>Remove</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
 
                 {/* Video Player Mockup */}
                 <View style={styles.videoPlayerContainer}>
-                    <ImageBackground
-                        source={{ uri: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' }}
-                        style={styles.videoBackground}
-                        imageStyle={styles.videoBackgroundImage}
-                    >
-                        <View style={styles.videoOverlay}>
-                            {/* Play Button */}
-                            <TouchableOpacity style={styles.playButtonWrapper}>
-                                <View style={styles.playButtonCircle}>
-                                    <Ionicons name="play" size={28} color={Colors.white} style={styles.playIcon} />
-                                </View>
-                            </TouchableOpacity>
+                    {videoUri ? (
+                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#000' }}>
+                            <Ionicons name="videocam" size={48} color={Colors.white} />
+                            <Text style={{ color: Colors.white, marginTop: 10 }}>Video Selected</Text>
+                        </View>
+                    ) : (
+                        <ImageBackground
+                            source={{ uri: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80' }}
+                            style={styles.videoBackground}
+                            imageStyle={styles.videoBackgroundImage}
+                        >
+                            <View style={styles.videoOverlay}>
+                                {/* Play Button Mockup */}
+                                <TouchableOpacity style={styles.playButtonWrapper}>
+                                    <View style={styles.playButtonCircle}>
+                                        <Ionicons name="play" size={28} color={Colors.white} style={styles.playIcon} />
+                                    </View>
+                                </TouchableOpacity>
 
-                            {/* Progress & Controls */}
-                            <View style={styles.controlsContainer}>
-                                <View style={styles.progressBarTrack}>
-                                    <View style={[styles.progressBarFill, { width: '30%' }]} />
-                                </View>
-                                <View style={styles.controlsRow}>
-                                    <Text style={styles.timeText}>00:12 / 00:45</Text>
-                                    <Ionicons name="expand" size={18} color={Colors.white} />
+                                {/* Progress & Controls Mockup */}
+                                <View style={styles.controlsContainer}>
+                                    <View style={styles.progressBarTrack}>
+                                        <View style={[styles.progressBarFill, { width: '0%' }]} />
+                                    </View>
+                                    <View style={styles.controlsRow}>
+                                        <Text style={styles.timeText}>00:00 / 00:00</Text>
+                                        <Ionicons name="expand" size={18} color={Colors.white} />
+                                    </View>
                                 </View>
                             </View>
-                        </View>
-                    </ImageBackground>
+                        </ImageBackground>
+                    )}
                 </View>
 
                 {/* Video Metadata Tags */}
@@ -98,7 +139,7 @@ export default function UploadAssessmentScreen() {
                 </View>
 
                 {/* Error Banner */}
-                <View style={styles.errorBanner}>
+                {/* <View style={styles.errorBanner}>
                     <Ionicons name="alert-circle" size={20} color={Colors.error} style={styles.errorIcon} />
                     <View style={styles.errorTextContent}>
                         <Text style={styles.errorTitle}>Video is too short</Text>
@@ -106,7 +147,7 @@ export default function UploadAssessmentScreen() {
                             The assessment requires a minimum video length of 15 seconds. Please record a longer clip.
                         </Text>
                     </View>
-                </View>
+                </View> */}
 
             </ScrollView>
 
@@ -114,30 +155,80 @@ export default function UploadAssessmentScreen() {
                 <TouchableOpacity
                     style={styles.retakeButton}
                     activeOpacity={0.7}
+                    onPress={() => pickVideo('camera')}
                 >
                     <Text style={styles.retakeButtonText}>Retake Video</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    style={styles.confirmButton}
+                    style={[styles.confirmButton, (!videoUri || isUploading) && { opacity: 0.5 }]}
+                    disabled={!videoUri || isUploading}
                     onPress={async () => {
+                        if (!videoUri) {
+                            Alert.alert('Error', 'Please select a video first');
+                            return;
+                        }
+
+                        setIsUploading(true);
                         try {
-                            await apiClient.post('/fitness/upload', {
-                                testName: '100m Sprint',
-                                score: 0, // Pending AI evaluation
-                                metrics: { duration: 12 },
-                                dateTaken: new Date().toISOString(),
-                                videoProofUrl: 'https://example.com/mock-video.mp4'
+                            const formData = new FormData();
+
+                            // Ensure URI has file:// prefix for Android
+                            let fileUri = videoUri;
+                            if (Platform.OS === 'android' && !fileUri.startsWith('file://')) {
+                                fileUri = `file://${fileUri}`;
+                            }
+
+                            // Append the video file
+                            const filename = videoUri.split('/').pop() || 'video.mp4';
+                            const match = /\.(\w+)$/.exec(filename);
+                            const type = match ? `video/${match[1]}` : `video/mp4`;
+
+                            formData.append('video', {
+                                uri: fileUri,
+                                name: filename,
+                                type: type,
+                            } as any);
+
+                            // Append other fields
+                            formData.append('testName', '100m Sprint');
+                            formData.append('score', '0');
+                            formData.append('metrics', JSON.stringify({ duration: 12 }));
+                            formData.append('dateTaken', new Date().toISOString());
+
+                            // Use native fetch instead of Axios to avoid the React Native Android FormData boundary stripping bug
+                            const token = await AsyncStorage.getItem('userToken');
+                            const response = await fetch('http://192.168.31.124:5000/api/fitness', {
+                                method: 'POST',
+                                headers: {
+                                    'Authorization': `Bearer ${token}`,
+                                    // Do NOT set Content-Type here, let fetch generate the boundary
+                                },
+                                body: formData,
                             });
+
+                            if (!response.ok) {
+                                const errorData = await response.json();
+                                throw new Error(errorData.message || 'Upload failed');
+                            }
+
+                            Alert.alert('Success', 'Assessment uploaded successfully!');
                             navigation.navigate('UploadingData');
-                        } catch (err) {
+                        } catch (err: any) {
                             console.error('Upload failed:', err);
-                            navigation.navigate('UploadingData');
+                            console.error('Upload failed full trace:', JSON.stringify(err));
+                            Alert.alert('Upload Failed', err.message || 'Something went wrong');
+                        } finally {
+                            setIsUploading(false);
                         }
                     }}
                     activeOpacity={0.8}
                 >
-                    <Text style={styles.confirmButtonText}>Confirm Submission</Text>
+                    {isUploading ? (
+                        <ActivityIndicator color={Colors.white} />
+                    ) : (
+                        <Text style={styles.confirmButtonText}>Confirm Submission</Text>
+                    )}
                 </TouchableOpacity>
             </View>
         </SafeAreaView>

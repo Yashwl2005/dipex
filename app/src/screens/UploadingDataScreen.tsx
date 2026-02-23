@@ -1,11 +1,57 @@
-import React from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, SafeAreaView, Dimensions } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, SafeAreaView, Dimensions, Animated, Easing } from 'react-native';
 import { Colors, Spacing } from '../constants/theme';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 export default function UploadingDataScreen() {
     const navigation = useNavigation<any>();
+
+    // Animation States
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [currentStep, setCurrentStep] = useState(1); // 1: Uploading, 2: AI Verification, 3: Success
+    const pulseAnim = React.useRef(new Animated.Value(1)).current;
+
+    useEffect(() => {
+        // Start pulse animation
+        Animated.loop(
+            Animated.sequence([
+                Animated.timing(pulseAnim, {
+                    toValue: 1.2,
+                    duration: 1000,
+                    easing: Easing.inOut(Easing.ease),
+                    useNativeDriver: true,
+                }),
+                Animated.timing(pulseAnim, {
+                    toValue: 1,
+                    duration: 1000,
+                    easing: Easing.inOut(Easing.ease),
+                    useNativeDriver: true,
+                })
+            ])
+        ).start();
+
+        // Simulate Upload Progress
+        let progress = 0;
+        const uploadInterval = setInterval(() => {
+            progress += Math.floor(Math.random() * 10) + 5;
+            if (progress > 100) progress = 100;
+
+            setUploadProgress(progress);
+
+            if (progress === 100) {
+                clearInterval(uploadInterval);
+                setCurrentStep(2);
+
+                // Simulate AI Verification taking 3 seconds
+                setTimeout(() => {
+                    setCurrentStep(3);
+                }, 3000);
+            }
+        }, 300);
+
+        return () => clearInterval(uploadInterval);
+    }, []);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -31,14 +77,24 @@ export default function UploadingDataScreen() {
 
                 {/* Main Illustration */}
                 <View style={styles.illustrationContainer}>
-                    <View style={styles.pulseRing}>
-                        <View style={styles.iconCircle}>
-                            <MaterialCommunityIcons name="head-lightbulb" size={40} color={Colors.white} />
+                    <Animated.View style={[styles.pulseRing, { transform: [{ scale: currentStep === 3 ? 1 : pulseAnim }] }]}>
+                        <View style={[styles.iconCircle, currentStep === 3 && { backgroundColor: Colors.success }]}>
+                            {currentStep === 3 ? (
+                                <Ionicons name="checkmark-sharp" size={40} color={Colors.white} />
+                            ) : (
+                                <MaterialCommunityIcons name="head-lightbulb" size={40} color={Colors.white} />
+                            )}
                         </View>
-                    </View>
-                    <Text style={styles.mainTitle}>Analyzing Form...</Text>
+                    </Animated.View>
+                    <Text style={styles.mainTitle}>
+                        {currentStep === 1 && 'Uploading Video...'}
+                        {currentStep === 2 && 'Analyzing Form...'}
+                        {currentStep === 3 && 'Analysis Complete!'}
+                    </Text>
                     <Text style={styles.subtitle}>
-                        AI is processing biomechanics from the recorded session.
+                        {currentStep === 1 && 'Securely transferring your video to our servers.'}
+                        {currentStep === 2 && 'AI is processing biomechanics from the recorded session.'}
+                        {currentStep === 3 && 'Your assessment has been successfully submitted.'}
                     </Text>
                 </View>
 
@@ -65,18 +121,21 @@ export default function UploadingDataScreen() {
                 <View style={styles.progressCard}>
                     {/* Step 1 */}
                     <View style={styles.stepRow}>
-                        <View style={styles.stepIconContainerActive}>
-                            <Ionicons name="cloud-upload" size={20} color={Colors.white} />
+                        <View style={currentStep >= 1 ? styles.stepIconContainerActive : styles.stepIconContainerPending}>
+                            <Ionicons name="cloud-upload" size={20} color={currentStep >= 1 ? Colors.white : '#9CA3AF'} />
                         </View>
                         <View style={styles.stepContent}>
                             <View style={styles.stepTitleRow}>
-                                <Text style={styles.stepTitleActive}>Uploading Video</Text>
-                                <Text style={styles.percentageText}>45%</Text>
+                                <Text style={currentStep >= 1 ? styles.stepTitleActive : styles.stepTitlePending}>Uploading Video</Text>
+                                {currentStep === 1 && <Text style={styles.percentageText}>{uploadProgress}%</Text>}
                             </View>
-                            <View style={styles.progressBarBg}>
-                                <View style={[styles.progressBarFill, { width: '45%' }]} />
-                            </View>
-                            <Text style={styles.stepSubtitleActive}>Est. time remaining: 2m 30s</Text>
+                            {currentStep === 1 && (
+                                <View style={styles.progressBarBg}>
+                                    <View style={[styles.progressBarFill, { width: `${uploadProgress}%` }]} />
+                                </View>
+                            )}
+                            {currentStep === 1 && <Text style={styles.stepSubtitleActive}>Please wait while we upload...</Text>}
+                            {currentStep > 1 && <Text style={styles.stepSubtitleActive}>Upload Complete</Text>}
                         </View>
                     </View>
 
@@ -85,12 +144,14 @@ export default function UploadingDataScreen() {
 
                     {/* Step 2 */}
                     <View style={styles.stepRow}>
-                        <View style={styles.stepIconContainerPending}>
-                            <MaterialCommunityIcons name="robot-outline" size={20} color="#9CA3AF" />
+                        <View style={currentStep >= 2 ? styles.stepIconContainerActive : styles.stepIconContainerPending}>
+                            <MaterialCommunityIcons name="robot-outline" size={20} color={currentStep >= 2 ? Colors.white : '#9CA3AF'} />
                         </View>
                         <View style={styles.stepContent}>
-                            <Text style={styles.stepTitlePending}>AI Verification</Text>
-                            <Text style={styles.stepSubtitlePending}>Waiting for upload...</Text>
+                            <Text style={currentStep >= 2 ? styles.stepTitleActive : styles.stepTitlePending}>AI Verification</Text>
+                            {currentStep === 1 && <Text style={styles.stepSubtitlePending}>Waiting for upload...</Text>}
+                            {currentStep === 2 && <Text style={styles.stepSubtitleActive}>Analyzing biomechanics...</Text>}
+                            {currentStep > 2 && <Text style={styles.stepSubtitleActive}>Verification Complete</Text>}
                         </View>
                     </View>
 
@@ -99,24 +160,33 @@ export default function UploadingDataScreen() {
 
                     {/* Step 3 */}
                     <View style={styles.stepRow}>
-                        <View style={styles.stepIconContainerPending}>
-                            <Ionicons name="checkmark-circle" size={20} color="#9CA3AF" />
+                        <View style={currentStep >= 3 ? [styles.stepIconContainerActive, { backgroundColor: Colors.success }] : styles.stepIconContainerPending}>
+                            <Ionicons name="checkmark-circle" size={20} color={currentStep >= 3 ? Colors.white : '#9CA3AF'} />
                         </View>
                         <View style={styles.stepContent}>
-                            <Text style={styles.stepTitlePending}>Submission Successful</Text>
+                            <Text style={currentStep >= 3 ? styles.stepTitleActive : styles.stepTitlePending}>Submission Successful</Text>
                         </View>
                     </View>
                 </View>
             </ScrollView>
 
             <View style={styles.bottomFooter}>
-                <TouchableOpacity
-                    style={styles.disabledButton}
-                    disabled={true}
-                >
-                    <Ionicons name="refresh" size={20} color="#9CA3AF" style={styles.spinnerIcon} />
-                    <Text style={styles.disabledButtonText}>Please wait...</Text>
-                </TouchableOpacity>
+                {currentStep === 3 ? (
+                    <TouchableOpacity
+                        style={styles.activeButton}
+                        onPress={() => navigation.navigate('Home')}
+                    >
+                        <Text style={styles.activeButtonText}>Back to Dashboard</Text>
+                    </TouchableOpacity>
+                ) : (
+                    <TouchableOpacity
+                        style={styles.disabledButton}
+                        disabled={true}
+                    >
+                        <Ionicons name="refresh" size={20} color="#9CA3AF" style={styles.spinnerIcon} />
+                        <Text style={styles.disabledButtonText}>Please wait...</Text>
+                    </TouchableOpacity>
+                )}
             </View>
         </SafeAreaView>
     );
@@ -382,6 +452,20 @@ const styles = StyleSheet.create({
     },
     disabledButtonText: {
         color: '#6B7280',
+        fontSize: 16,
+        fontWeight: '700',
+    },
+    activeButton: {
+        backgroundColor: Colors.primary,
+        flexDirection: 'row',
+        height: 56,
+        borderRadius: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+    },
+    activeButtonText: {
+        color: Colors.white,
         fontSize: 16,
         fontWeight: '700',
     },
