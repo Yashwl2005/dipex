@@ -1,6 +1,26 @@
 const User = require('../models/User');
 const Admin = require('../models/Admin');
 const jwt = require('jsonwebtoken');
+const cloudinary = require('cloudinary').v2;
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+const uploadBufferToCloudinary = (buffer, folder) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { resource_type: 'auto', folder },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result);
+      }
+    );
+    uploadStream.end(buffer);
+  });
+};
 
 // Generate JWT Token
 const generateToken = (id) => {
@@ -13,9 +33,37 @@ const generateToken = (id) => {
 // @route   POST /api/auth/register
 // @access  Public
 exports.registerUser = async (req, res) => {
-  const { name, email, password, role, dateOfBirth, gender, height, weight, sports, address, state } = req.body;
+  const { name, email, password, role, dateOfBirth, gender, height, weight, sports, specificEvent, address, state } = req.body;
+  let { aadhaarCardUrl, dobCertificateUrl, profilePhotoUrl, competitionVideoUrl } = req.body;
 
   try {
+    if (req.files) {
+      if (req.files.profilePhoto && req.files.profilePhoto.length > 0) {
+        const result = await uploadBufferToCloudinary(req.files.profilePhoto[0].buffer, 'dipex/profiles');
+        profilePhotoUrl = result.secure_url;
+      }
+      if (req.files.aadhaarCard && req.files.aadhaarCard.length > 0) {
+        const result = await uploadBufferToCloudinary(req.files.aadhaarCard[0].buffer, 'dipex/documents');
+        aadhaarCardUrl = result.secure_url;
+      }
+      if (req.files.dobCertificate && req.files.dobCertificate.length > 0) {
+        const result = await uploadBufferToCloudinary(req.files.dobCertificate[0].buffer, 'dipex/documents');
+        dobCertificateUrl = result.secure_url;
+      }
+      if (req.files.competitionVideo && req.files.competitionVideo.length > 0) {
+        const videoResult = await new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream(
+                { resource_type: 'video', folder: 'dipex/videos' },
+                (err, res) => {
+                    if (err) reject(err);
+                    else resolve(res);
+                }
+            );
+            stream.end(req.files.competitionVideo[0].buffer);
+        });
+        competitionVideoUrl = videoResult.secure_url;
+      }
+    }
     if (role === 'admin') {
       const adminExists = await Admin.findOne({ email });
       if (adminExists) return res.status(400).json({ message: 'Admin already exists' });
@@ -34,7 +82,7 @@ exports.registerUser = async (req, res) => {
     }
 
     const user = await User.create({
-      name, email, password, role, dateOfBirth, gender, height, weight, sports, address, state
+      name, email, password, role, dateOfBirth, gender, height, weight, sports, address, state, aadhaarCardUrl, dobCertificateUrl, profilePhotoUrl, competitionVideoUrl
     });
 
     if (user) {
@@ -90,6 +138,27 @@ exports.getUserProfile = async (req, res) => {
     const user = await User.findById(req.user._id).select('-password');
     if (user) {
       res.json(user);
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Mark user test as submitted
+// @route   PUT /api/auth/submit-test
+// @access  Private
+exports.submitUserTest = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (user) {
+      user.isTestSubmitted = true;
+      if (user.evaluationStatus === 'rejected') {
+          user.evaluationStatus = 'pending';
+      }
+      await user.save();
+      res.json({ message: 'Test submitted successfully', isTestSubmitted: user.isTestSubmitted, evaluationStatus: user.evaluationStatus });
     } else {
       res.status(404).json({ message: 'User not found' });
     }

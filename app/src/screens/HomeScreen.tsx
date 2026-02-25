@@ -3,31 +3,143 @@ import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity, SafeAreaVi
 import { Colors, Spacing } from '../constants/theme';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import api from '../services/apiClient';
 
 export default function HomeScreen() {
     const navigation = useNavigation<any>();
-    const [userName, setUserName] = useState('Rahul Kumar');
-    const [userSport, setUserSport] = useState('Boxing');
+    const [userName, setUserName] = useState('Athlete');
+    const [userSport, setUserSport] = useState('-');
+    const [hasUnread, setHasUnread] = useState(false);
+    const [evalStatus, setEvalStatus] = useState('pending');
+    const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
+    const [overallScore, setOverallScore] = useState<number | null>(null);
 
-    useEffect(() => {
-        const loadProfileData = async () => {
-            try {
-                const name = await AsyncStorage.getItem('userName');
-                const sportsStr = await AsyncStorage.getItem('userSports');
-                if (name) setUserName(name);
-                if (sportsStr) {
-                    const sports = JSON.parse(sportsStr);
-                    if (sports && sports.length > 0) {
-                        setUserSport(sports[0]); // display primary sport
-                    }
+    useFocusEffect(
+        React.useCallback(() => {
+            const checkUnread = async () => {
+                try {
+                    const res = await api.get('/notifications');
+                    const unread = res.data.some((n: any) => !n.isRead);
+                    setHasUnread(unread);
+                } catch (err) {
+                    console.log('Error checking notifications:', err);
                 }
-            } catch (err) {
-                console.log('Error loading profile data:', err);
-            }
-        };
-        loadProfileData();
-    }, []);
+            };
+            checkUnread();
+        }, [])
+    );
+
+    useFocusEffect(
+        React.useCallback(() => {
+            const loadProfileData = async () => {
+                try {
+                    // Fetch full profile from DB instead of just relying on local storage
+                    const res = await api.get('/auth/me');
+                    if (res.data) {
+                        setUserName(res.data.name);
+                        setEvalStatus(res.data.evaluationStatus);
+                        if (res.data.profilePhotoUrl) {
+                            setProfilePhotoUrl(res.data.profilePhotoUrl);
+                        }
+                        if (res.data.sports && res.data.sports.length > 0) {
+                            setUserSport(res.data.sports[0]); // display primary sport
+                        }
+                        if (res.data.overallScore !== undefined && res.data.overallScore !== null) {
+                            setOverallScore(res.data.overallScore);
+                        }
+                    }
+                } catch (err) {
+                    console.log('Error loading profile data:', err);
+                }
+            };
+            loadProfileData();
+        }, [])
+    );
+
+    const getStatusDisplay = () => {
+        if (evalStatus === 'approved') return { label: 'Approved Athlete', color: Colors.success };
+        if (evalStatus === 'rejected') return { label: 'Profile Rejected', color: Colors.error };
+        return { label: 'Verification Pending', color: '#F59E0B' };
+    };
+
+    const statusDisp = getStatusDisplay();
+
+    const handleSignOut = async () => {
+        try {
+            await AsyncStorage.removeItem('userToken');
+            await AsyncStorage.removeItem('userData');
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'Login' }],
+            });
+        } catch (error) {
+            console.error('Error signing out:', error);
+        }
+    };
+
+    // Helper to format dynamic relative time
+    const getTimeAgo = (date: Date) => {
+        const now = new Date();
+        const diffMs = now.getTime() - date.getTime();
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHrs = Math.floor(diffMins / 60);
+        const diffDays = Math.floor(diffHrs / 24);
+
+        if (diffMins < 1) return 'Just now';
+        if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? 's' : ''} ago`;
+        if (diffHrs < 24) return `${diffHrs} hour${diffHrs > 1 ? 's' : ''} ago`;
+        if (diffDays === 1) return 'Yesterday';
+        if (diffDays < 7) return `${diffDays} days ago`;
+
+        // If older than a week, show actual date
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    };
+
+    // Comprehensive announcements data with actual Dates
+    // Using actual recent timestamps to simulate real data aging
+    const announcementsData = [
+        {
+            id: 1,
+            title: 'Khelo India Selection Trials 2026',
+            description: 'The national selection trials for the upcoming Khelo India Youth Games will commence on the 15th of next month. All registered athletes in Athletics and Swimming must ensure their profiles are 100% complete.',
+            postedAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago from current app load
+            type: 'trial',
+            iconName: 'flag',
+            iconColor: '#F59E0B',
+            bgColor: '#FEF3C7',
+        },
+        {
+            id: 2,
+            title: 'New Scholarship Opportunities',
+            description: 'The Sports Authority of India (SAI) has announced 500 new grassroots scholarships for U-17 athletes. Ensure your fitness assessment videos are uploaded before the end of the quarter to be considered.',
+            postedAt: new Date(Date.now() - 26 * 60 * 60 * 1000), // ~1 day ago
+            type: 'scholarship',
+            iconName: 'school',
+            iconColor: '#10B981',
+            bgColor: '#D1FAE5',
+        },
+        {
+            id: 3,
+            title: 'Mandatory Equipment Check',
+            description: 'New standard guidelines for protective gear in Boxing and Taekwondo have been published. Please review the updated sports guidelines under your profile to avoid disqualification during trials.',
+            postedAt: new Date(Date.now() - 3.5 * 24 * 60 * 60 * 1000), // ~3.5 days ago
+            type: 'update',
+            iconName: 'shield-checkmark',
+            iconColor: '#3B82F6',
+            bgColor: '#DBEAFE',
+        },
+        {
+            id: 4,
+            title: 'National Assessment Camp',
+            description: 'Selected candidates from the Northern zone will be invited to the New Delhi Regional Center for a 3-day high-performance assessment camp. Invitations will be sent via notifications.',
+            postedAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000), // ~8 days ago
+            type: 'camp',
+            iconName: 'fitness',
+            iconColor: '#8B5CF6',
+            bgColor: '#EDE9FE',
+        }
+    ];
 
     return (
         <SafeAreaView style={styles.container}>
@@ -36,10 +148,22 @@ export default function HomeScreen() {
                     <Text style={styles.headerSubtitle}>SAI TALENT ASSESSMENT</Text>
                     <Text style={styles.headerTitle}>Welcome, {userName.split(' ')[0]}</Text>
                 </View>
-                <TouchableOpacity style={styles.notificationBtn}>
-                    <Ionicons name="notifications" size={24} color="#374151" />
-                    <View style={styles.dot} />
-                </TouchableOpacity>
+                <View style={styles.headerRight}>
+                    <TouchableOpacity
+                        style={styles.notificationBtn}
+                        onPress={() => navigation.navigate('Notifications')}
+                    >
+                        <Ionicons name="notifications" size={24} color="#374151" />
+                        {hasUnread && <View style={styles.dot} />}
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={styles.signOutBtn}
+                        onPress={handleSignOut}
+                    >
+                        <Ionicons name="log-out-outline" size={24} color={Colors.error} />
+                    </TouchableOpacity>
+                </View>
             </View>
 
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
@@ -47,46 +171,66 @@ export default function HomeScreen() {
                 <View style={styles.profileCard}>
                     <View style={styles.avatarContainer}>
                         <View style={styles.avatar}>
-                            <Ionicons name="person" size={50} color="#D1D5DB" />
-                            <View style={styles.checkIcon}>
-                                <Ionicons name="checkmark-circle" size={20} color={Colors.success} />
+                            {profilePhotoUrl ? (
+                                <Image source={{ uri: profilePhotoUrl }} style={styles.profileImage} />
+                            ) : (
+                                <Ionicons name="person" size={50} color="#D1D5DB" />
+                            )}
+                            <View style={[styles.checkIcon, { backgroundColor: statusDisp.color }]}>
+                                <Ionicons name={evalStatus === 'approved' ? 'checkmark-circle' : (evalStatus === 'rejected' ? 'close-circle' : 'time')} size={20} color={Colors.white} />
                             </View>
                         </View>
                     </View>
                     <Text style={styles.profileName}>{userName}</Text>
-                    <Text style={styles.verifiedTag}>Verified Athlete</Text>
+                    <Text style={[styles.verifiedTag, { color: statusDisp.color }]}>{statusDisp.label}</Text>
                     <View style={styles.idBadge}>
-                        <Text style={styles.idText}>ID: SAI-2023-8892</Text>
+                        <Text style={styles.idText}>ID: SAI-PROFILE</Text>
                     </View>
 
                     <View style={styles.divider} />
 
                     <View style={styles.statsRow}>
                         <View style={styles.statItem}>
-                            <Text style={styles.statLabel}>AGE</Text>
-                            <Text style={styles.statValue}>17</Text>
+                            <Text style={styles.statLabel}>STATUS</Text>
+                            <Text style={[styles.statValue, { color: statusDisp.color, textTransform: 'capitalize' }]}>{evalStatus}</Text>
                         </View>
                         <View style={[styles.statItem, styles.statBorder]}>
                             <Text style={styles.statLabel}>SPORT</Text>
                             <Text style={styles.statValue} numberOfLines={1}>{userSport}</Text>
                         </View>
                         <View style={styles.statItem}>
-                            <Text style={styles.statLabel}>STATE</Text>
-                            <Text style={styles.statValue}>HR</Text>
+                            <Text style={styles.statLabel}>DOCS</Text>
+                            <Text style={styles.statValue}>-</Text>
                         </View>
+                    </View>
+                </View>
+
+                {/* Scoreboard Widget */}
+                <View style={styles.scoreboardCard}>
+                    <View style={styles.scoreLeft}>
+                        <Text style={styles.scoreTitle}>SAI Athletic Index</Text>
+                        <Text style={styles.scoreSubtitle}>Overall Performance Score</Text>
+                    </View>
+                    <View style={styles.scoreRight}>
+                        <Text style={styles.scoreValue}>{overallScore !== null ? Number(overallScore).toFixed(1) : '-'}</Text>
+                        <Text style={styles.scoreMax}>/ 25</Text>
                     </View>
                 </View>
 
                 {/* Profile Completion */}
                 <View style={styles.completionCard}>
                     <View style={styles.completionHeader}>
-                        <Text style={styles.cardTitle}>Profile Completion</Text>
-                        <Text style={styles.percentText}>75%</Text>
+                        <Text style={styles.cardTitle}>Global Evaluation</Text>
+                        <Text style={[styles.percentText, { color: statusDisp.color }]}>{evalStatus.toUpperCase()}</Text>
                     </View>
                     <View style={styles.progressContainer}>
-                        <View style={[styles.progressFill, { width: '75%' }]} />
+                        <View style={[styles.progressFill, { width: evalStatus === 'approved' ? '100%' : (evalStatus === 'rejected' ? '100%' : '50%'), backgroundColor: statusDisp.color }]} />
                     </View>
-                    <Text style={styles.suggestionText}>Complete your profile to apply for national schemes.</Text>
+                    <Text style={styles.suggestionText}>
+                        {evalStatus === 'approved' ? 'Your profile has been approved! You are ready for national schemes.' :
+                            evalStatus === 'rejected' ? 'Your profile was rejected. Please review official feedback in notifications.' :
+                                'Your profile is currently under review by evaluators.'}
+                    </Text>
                 </View>
 
                 {/* Start Fitness Test */}
@@ -96,8 +240,10 @@ export default function HomeScreen() {
                             <Ionicons name="timer" size={30} color={Colors.white} />
                         </View>
                         <View>
-                            <Text style={styles.fitnessTitle}>Start Fitness Test</Text>
-                            <Text style={styles.fitnessSubtitle}>Battery of tests pending</Text>
+                            <Text style={styles.fitnessTitle}>Assessments</Text>
+                            <Text style={styles.fitnessSubtitle}>
+                                {evalStatus === 'approved' ? 'Profile verified.' : 'Upload assessments to get verified.'}
+                            </Text>
                         </View>
                     </View>
                     <Ionicons name="chevron-forward" size={24} color={Colors.white} />
@@ -111,7 +257,7 @@ export default function HomeScreen() {
                         </View>
                         <Text style={styles.gridTitle}>Upload Certificates</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.gridCard}>
+                    <TouchableOpacity style={styles.gridCard} onPress={() => navigation.navigate('Submissions')}>
                         <View style={styles.iconCircleLightBlue}>
                             <MaterialCommunityIcons name="history" size={24} color={Colors.primary} />
                         </View>
@@ -119,24 +265,26 @@ export default function HomeScreen() {
                     </TouchableOpacity>
                 </View>
 
-                {/* Announcements */}
+                {/* Announcements Feed */}
                 <View style={styles.announcementHeader}>
-                    <Text style={styles.cardTitle}>Announcements</Text>
+                    <Text style={styles.cardTitle}>Latest Updates & News</Text>
                     <TouchableOpacity>
-                        <Text style={styles.viewAll}>View All</Text>
+                        <Text style={styles.viewAll}>Filter</Text>
                     </TouchableOpacity>
                 </View>
 
-                <View style={styles.announcementCard}>
-                    <View style={styles.annIconBox}>
-                        <Ionicons name="megaphone" size={24} color="#F59E0B" />
+                {announcementsData.map((announcement) => (
+                    <View key={announcement.id} style={styles.announcementCard}>
+                        <View style={[styles.annIconBox, { backgroundColor: announcement.bgColor }]}>
+                            <Ionicons name={announcement.iconName as any} size={24} color={announcement.iconColor} />
+                        </View>
+                        <View style={styles.annContent}>
+                            <Text style={styles.annTitle}>{announcement.title}</Text>
+                            <Text style={styles.annDesc} numberOfLines={3}>{announcement.description}</Text>
+                            <Text style={styles.annTime}>{getTimeAgo(announcement.postedAt)}</Text>
+                        </View>
                     </View>
-                    <View style={styles.annContent}>
-                        <Text style={styles.annTitle}>Khelo India Selection Trials</Text>
-                        <Text style={styles.annDesc} numberOfLines={2}>Selection trials for the upcoming national games will begin from next Monday in...</Text>
-                        <Text style={styles.annTime}>2 hours ago</Text>
-                    </View>
-                </View>
+                ))}
             </ScrollView>
 
             {/* Bottom Nav Placeholder */}
@@ -147,15 +295,15 @@ export default function HomeScreen() {
                     </View>
                     <Text style={[styles.navText, { color: Colors.primary }]}>Home</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem}>
+                <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('SelectTest')}>
                     <Ionicons name="timer-outline" size={24} color={Colors.textSecondary} />
                     <Text style={styles.navText}>Tests</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem}>
+                <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Submissions')}>
                     <Ionicons name="folder-outline" size={24} color={Colors.textSecondary} />
                     <Text style={styles.navText}>Submissions</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem}>
+                <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('SportsProfile')}>
                     <Ionicons name="person-outline" size={24} color={Colors.textSecondary} />
                     <Text style={styles.navText}>Profile</Text>
                 </TouchableOpacity>
@@ -187,11 +335,22 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: Colors.textPrimary,
     },
+    headerRight: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+    },
     notificationBtn: {
         padding: 8,
         borderRadius: 8,
         backgroundColor: '#F3F4F6',
         position: 'relative',
+    },
+    signOutBtn: {
+        padding: 8,
+        borderRadius: 8,
+        backgroundColor: '#FEE2E2', // light red background
+        marginLeft: 4,
     },
     dot: {
         position: 'absolute',
@@ -231,6 +390,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         position: 'relative',
+    },
+    profileImage: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 50,
+        resizeMode: 'cover',
     },
     checkIcon: {
         position: 'absolute',
@@ -291,6 +456,51 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         color: Colors.textPrimary,
+    },
+    scoreboardCard: {
+        backgroundColor: '#1E1B4B', // Dark indigo/navy for premium feel
+        borderRadius: 20,
+        padding: 24,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 20,
+        shadowColor: '#1E1B4B',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.3,
+        shadowRadius: 12,
+        elevation: 8,
+    },
+    scoreLeft: {
+        flex: 1,
+    },
+    scoreTitle: {
+        color: '#E0E7FF',
+        fontSize: 14,
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
+        letterSpacing: 1,
+        marginBottom: 4,
+    },
+    scoreSubtitle: {
+        color: '#818CF8',
+        fontSize: 12,
+    },
+    scoreRight: {
+        flexDirection: 'row',
+        alignItems: 'baseline',
+    },
+    scoreValue: {
+        color: Colors.white,
+        fontSize: 42,
+        fontWeight: '900',
+        lineHeight: 48,
+    },
+    scoreMax: {
+        color: '#A5B4FC',
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginLeft: 4,
     },
     completionCard: {
         backgroundColor: '#EFF6FF', // Light blue
@@ -422,6 +632,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         borderWidth: 1,
         borderColor: '#F3F4F6',
+        marginBottom: 12,
     },
     annIconBox: {
         width: 48,
@@ -439,11 +650,12 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         color: Colors.textPrimary,
+        marginBottom: 4,
     },
     annDesc: {
         fontSize: 14,
         color: Colors.textSecondary,
-        marginTop: 4,
+        lineHeight: 20,
     },
     annTime: {
         fontSize: 12,

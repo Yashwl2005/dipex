@@ -1,10 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const { registerUser, loginUser, getUserProfile } = require('../controllers/authController');
+const { registerUser, loginUser, getUserProfile, submitUserTest } = require('../controllers/authController');
 const { protect } = require('../middleware/authMiddleware');
+const multer = require('multer');
 
-router.post('/register', registerUser);
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
+router.post('/register', upload.fields([{ name: 'aadhaarCard', maxCount: 1 }, { name: 'dobCertificate', maxCount: 1 }, { name: 'profilePhoto', maxCount: 1 }, { name: 'competitionVideo', maxCount: 1 }]), registerUser);
 router.post('/login', loginUser);
 router.get('/me', protect, getUserProfile);
+router.put('/submit-test', protect, submitUserTest);
 
 module.exports = router;

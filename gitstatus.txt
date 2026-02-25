@@ -1,0 +1,59 @@
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   Web/src/App.jsx
+	modified:   Web/src/components/Sidebar.jsx
+	modified:   Web/src/pages/Athletes.jsx
+	modified:   Web/src/pages/Auth.jsx
+	modified:   Web/src/pages/Dashboard.css
+	modified:   Web/src/pages/Dashboard.jsx
+	modified:   Web/src/pages/Evaluations.jsx
+	modified:   Web/src/pages/ShortlistedAthletes.jsx
+	modified:   Web/src/pages/SubmissionReview.jsx
+	modified:   app/App.tsx
+	modified:   app/package-lock.json
+	modified:   app/package.json
+	modified:   app/src/hooks/useRedux.ts
+	modified:   app/src/screens/HomeScreen.tsx
+	modified:   app/src/screens/LoginScreen.tsx
+	modified:   app/src/screens/RegistrationScreen.tsx
+	modified:   app/src/screens/SelectTestScreen.tsx
+	modified:   app/src/screens/SportsProfileScreen.tsx
+	modified:   app/src/screens/TestInstructionsScreen.tsx
+	modified:   app/src/screens/UploadAchievementsScreen.tsx
+	modified:   app/src/screens/UploadAssessmentScreen.tsx
+	modified:   app/src/services/apiClient.ts
+	modified:   backend/src/controllers/achievementController.js
+	modified:   backend/src/controllers/adminController.js
+	modified:   backend/src/controllers/authController.js
+	modified:   backend/src/index.js
+	modified:   backend/src/middleware/authMiddleware.js
+	modified:   backend/src/middleware/upload.js
+	modified:   backend/src/models/User.js
+	modified:   backend/src/routes/achievementRoutes.js
+	modified:   backend/src/routes/adminRoutes.js
+	modified:   backend/src/routes/authRoutes.js
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	Web/src/pages/AthleteDetail.jsx
+	app/errors.log
+	app/findText.js
+	app/src/screens/NotificationsScreen.tsx
+	app/src/screens/SubmissionsScreen.tsx
+	backend/debug.log
+	backend/fixVideos.js
+	backend/reset-master-admin.js
+	backend/src/controllers/notificationController.js
+	backend/src/models/Notification.js
+	backend/src/routes/notificationRoutes.js
+	backend/test-urls.js
+	backend/testVideos.js
+	backend/urls-output.txt
+	backend/urls.json
+	gitstatus.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")

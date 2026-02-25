@@ -17,7 +17,7 @@ export const Auth = () => {
     const navigate = useNavigate();
 
     const sportsOptions = [
-        'Athletics', 'Swimming', 'Gymnastics', 'Weightlifting',
+        'All', 'Athletics', 'Swimming', 'Gymnastics', 'Weightlifting',
         'Boxing', 'Wrestling', 'Archery', 'Shooting'
     ];
 
@@ -55,7 +55,7 @@ export const Auth = () => {
                 navigate('/');
             } else {
                 if (formData.sports.length === 0) {
-                    setError('Please select at least one sport to evaluate.');
+                    setError('Please select at least one sport to evaluate, or select "All".');
                     return;
                 }
                 const res = await api.post('/auth/register', {
@@ -138,7 +138,7 @@ export const Auth = () => {
                                 {sportsOptions.map(sport => (
                                     <label
                                         key={sport}
-                                        className={`sport-checkbox ${formData.sports.includes(sport) ? 'selected' : ''}`}
+                                        className={`sport-checkbox ${formData.sports.includes(sport) ? 'selected' : ''} ${sport === 'All' ? 'master-admin-checkbox' : ''}`}
                                     >
                                         <input
                                             type="checkbox"

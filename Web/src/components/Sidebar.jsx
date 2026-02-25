@@ -18,19 +18,13 @@ export const Sidebar = ({ type = 'light' }) => {
 
     const menuItems = isDark ? [
         { path: '/', label: 'Dashboard', icon: LayoutDashboard },
-        { path: '/evaluations', label: 'Video Evaluations', icon: Activity },
         { path: '/athletes', label: 'Athlete Management', icon: Users },
         { path: '/shortlisted', label: 'Shortlisted Athletes', icon: UserCheck },
         { path: '/reports', label: 'Reports', icon: FileText },
-        { path: '/settings', label: 'Settings', icon: Settings },
         { path: '/auth', label: 'New Admin Sign Up', icon: UserPlus },
     ] : [
         { path: '/', label: 'Dashboard', icon: LayoutDashboard },
-        { path: '/evaluations', label: 'Evaluations', icon: Activity },
         { path: '/athletes', label: 'Athletes', icon: Users },
-        { path: '/analytics', label: 'Analytics', icon: Activity },
-        { path: '/compliance', label: 'Compliance', icon: ShieldCheck },
-        { path: '/settings', label: 'Settings', icon: Settings },
         { path: '/auth', label: 'New Admin Sign Up', icon: UserPlus },
     ];
 
@@ -79,7 +73,6 @@ export const Sidebar = ({ type = 'light' }) => {
                     // For prototype: matching exact paths since they are placeholders
                     const isActive = location.pathname === item.path ||
                         (item.path === '/shortlisted' && location.pathname.includes('/shortlisted')) ||
-                        (item.path === '/evaluations' && location.pathname.includes('/review')) ||
                         (item.path === '/analytics' && location.pathname === '/'); // highlight analytics on dashboard somewhat?
 
                     // Let's rely on exact matches or simple logic

@@ -24,6 +24,7 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/achievements', require('./routes/achievementRoutes'));
 app.use('/api/fitness', require('./routes/fitnessRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
+app.use('/api/notifications', require('./routes/notificationRoutes'));
 
 // Basic Route
 app.get('/', (req, res) => {

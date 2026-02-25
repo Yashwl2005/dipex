@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, SafeAreaView, Dimensions, Alert } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, SafeAreaView, Dimensions, Alert, Platform, Image } from 'react-native';
 import { Colors, Spacing } from '../constants/theme';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import apiClient from '../services/apiClient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as ImagePicker from 'expo-image-picker';
 
 const { width } = Dimensions.get('window');
 
@@ -16,12 +17,28 @@ export default function SportsProfileScreen() {
     const [selectedLevel, setSelectedLevel] = useState('State');
     const [years, setYears] = useState(2);
     const [selectedSport, setSelectedSport] = useState('Athletics');
+    const [selectedEvent, setSelectedEvent] = useState('100m Sprint');
+    const [isSportDropdownVisible, setSportDropdownVisible] = useState(false);
+    const [isEventDropdownVisible, setEventDropdownVisible] = useState(false);
 
     const sportsList = [
         'Athletics', 'Swimming', 'Gymnastics', 'Weightlifting',
         'Boxing', 'Wrestling', 'Archery', 'Shooting'
     ];
-    const [isDropdownVisible, setDropdownVisible] = useState(false);
+
+    const specificEventsMapping: { [key: string]: string[] } = {
+        'Athletics': ['100m Sprint', '200m Sprint', '400m Run', '800m Run', 'Long Jump', 'High Jump', 'Shot Put'],
+        'Swimming': ['50m Freestyle', '100m Freestyle', '100m Backstroke', '100m Breaststroke', '100m Butterfly'],
+        'Gymnastics': ['Floor Exercise', 'Pommel Horse', 'Still Rings', 'Vault', 'Parallel Bars', 'Horizontal Bar'],
+        'Weightlifting': ['All'],
+        'Boxing': ['Light Flyweight', 'Lightweight', 'Welterweight', 'Middleweight', 'Heavyweight'],
+        'Wrestling': ['Freestyle 57kg', 'Freestyle 65kg', 'Freestyle 74kg', 'Greco-Roman 60kg', 'Greco-Roman 77kg'],
+        'Archery': ['Recurve Individual', 'Compound Individual'],
+        'Shooting': ['10m Air Rifle', '50m Rifle 3 Positions', '10m Air Pistol', '25m Rapid Fire Pistol']
+    };
+
+    // Get events for currently selected sport, or a generic fallback
+    const availableEvents = specificEventsMapping[selectedSport] || ['General'];
 
     const levels = [
         { id: 'Beginner', title: 'Beginner', icon: 'school', iconType: 'Ionicons' },
@@ -62,16 +79,16 @@ export default function SportsProfileScreen() {
                     <Text style={styles.label}>Primary Sport</Text>
                     <TouchableOpacity
                         style={styles.dropdownInput}
-                        onPress={() => setDropdownVisible(!isDropdownVisible)}
+                        onPress={() => setSportDropdownVisible(!isSportDropdownVisible)}
                     >
                         <View style={styles.leftRow}>
                             <MaterialCommunityIcons name="run" size={24} color={Colors.primary} />
                             <Text style={styles.placeholderText}>{selectedSport}</Text>
                         </View>
-                        <Ionicons name={isDropdownVisible ? "chevron-up" : "chevron-down"} size={20} color={Colors.textSecondary} />
+                        <Ionicons name={isSportDropdownVisible ? "chevron-up" : "chevron-down"} size={20} color={Colors.textSecondary} />
                     </TouchableOpacity>
 
-                    {isDropdownVisible && (
+                    {isSportDropdownVisible && (
                         <View style={styles.dropdownList}>
                             {sportsList.map(sport => (
                                 <TouchableOpacity
@@ -79,7 +96,9 @@ export default function SportsProfileScreen() {
                                     style={styles.dropdownItem}
                                     onPress={() => {
                                         setSelectedSport(sport);
-                                        setDropdownVisible(false);
+                                        // Update event dropdown to default first option of new sport
+                                        setSelectedEvent(specificEventsMapping[sport]?.[0] || 'General');
+                                        setSportDropdownVisible(false);
                                     }}
                                 >
                                     <Text style={[styles.dropdownItemText, selectedSport === sport && { color: Colors.primary, fontWeight: 'bold' }]}>
@@ -91,15 +110,37 @@ export default function SportsProfileScreen() {
                     )}
                 </View>
 
-                <View style={styles.section}>
+                <View style={[styles.section, { zIndex: 10 }]}>
                     <Text style={styles.label}>Specific Event / Position</Text>
-                    <TouchableOpacity style={styles.dropdownInput}>
+                    <TouchableOpacity
+                        style={styles.dropdownInput}
+                        onPress={() => setEventDropdownVisible(!isEventDropdownVisible)}
+                    >
                         <View style={styles.leftRow}>
-                            <MaterialCommunityIcons name="run" size={24} color={'#9CA3AF'} />
-                            <Text style={styles.placeholderText}>Select event (e.g. 100m Sprint)</Text>
+                            <MaterialCommunityIcons name="medal-outline" size={24} color={Colors.primary} />
+                            <Text style={styles.placeholderText}>{selectedEvent}</Text>
                         </View>
-                        <Ionicons name="chevron-down" size={20} color={Colors.textSecondary} />
+                        <Ionicons name={isEventDropdownVisible ? "chevron-up" : "chevron-down"} size={20} color={Colors.textSecondary} />
                     </TouchableOpacity>
+
+                    {isEventDropdownVisible && (
+                        <View style={styles.dropdownList}>
+                            {availableEvents.map(event => (
+                                <TouchableOpacity
+                                    key={event}
+                                    style={styles.dropdownItem}
+                                    onPress={() => {
+                                        setSelectedEvent(event);
+                                        setEventDropdownVisible(false);
+                                    }}
+                                >
+                                    <Text style={[styles.dropdownItemText, selectedEvent === event && { color: Colors.primary, fontWeight: 'bold' }]}>
+                                        {event}
+                                    </Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                    )}
                 </View>
 
                 <View style={styles.section}>
@@ -168,23 +209,100 @@ export default function SportsProfileScreen() {
                 <TouchableOpacity
                     style={styles.saveButton}
                     onPress={async () => {
+
                         try {
-                            const res = await apiClient.post('/auth/register', {
-                                name: registrationData.name || `Athlete ${Math.floor(Math.random() * 10000)}`,
-                                email: registrationData.email || `athlete${Math.floor(Math.random() * 10000)}@example.com`,
-                                password: registrationData.password || 'password123',
-                                role: 'athlete',
-                                gender: registrationData.gender || 'male',
-                                address: registrationData.address || '',
-                                state: registrationData.state || '',
-                                dateOfBirth: registrationData.dateOfBirth ? new Date(registrationData.dateOfBirth.split('/').reverse().join('-')).toISOString() : null,
-                                sports: [selectedSport]
+                            const formData = new FormData();
+
+                            formData.append('name', registrationData.name || `Athlete ${Math.floor(Math.random() * 10000)}`);
+                            formData.append('email', registrationData.email || `athlete${Math.floor(Math.random() * 10000)}@example.com`);
+                            formData.append('password', registrationData.password || 'password123');
+                            formData.append('role', 'athlete');
+                            formData.append('gender', registrationData.gender || 'male');
+                            if (registrationData.height) formData.append('height', registrationData.height);
+                            if (registrationData.weight) formData.append('weight', registrationData.weight);
+                            formData.append('address', registrationData.address || '');
+                            formData.append('state', registrationData.state || '');
+
+                            if (registrationData.dateOfBirth) {
+                                formData.append('dateOfBirth', new Date(registrationData.dateOfBirth.split('/').reverse().join('-')).toISOString());
+                            }
+
+                            // It's a single sport right now from selectedSport
+                            formData.append('sports', selectedSport);
+
+                            // Let's also append the specific event as a standard field
+                            formData.append('specificEvent', selectedEvent);
+
+
+                            if (registrationData.aadhaarUri) {
+                                const adFileUrl = registrationData.aadhaarUri;
+                                const filename = adFileUrl.split('/').pop() || 'aadhaar.jpg';
+                                const match = /\.(\w+)$/.exec(filename);
+                                const type = match ? `image/${match[1]}` : `image/jpeg`;
+
+                                formData.append('aadhaarCard', {
+                                    uri: Platform.OS === 'android' && !adFileUrl.startsWith('file://') ? `file://${adFileUrl}` : adFileUrl,
+                                    name: filename,
+                                    type,
+                                } as any);
+                            }
+
+                            if (registrationData.dobUri) {
+                                const dobFileUrl = registrationData.dobUri;
+                                const filename = dobFileUrl.split('/').pop() || 'dob.jpg';
+                                const match = /\.(\w+)$/.exec(filename);
+                                const type = match ? `image/${match[1]}` : `image/jpeg`;
+
+                                formData.append('dobCertificate', {
+                                    uri: Platform.OS === 'android' && !dobFileUrl.startsWith('file://') ? `file://${dobFileUrl}` : dobFileUrl,
+                                    name: filename,
+                                    type,
+                                } as any);
+                            }
+
+                            // Append Optional Competition Video
+                            if (registrationData.competitionVideoUri) {
+                                const videoObjUrl = registrationData.competitionVideoUri;
+                                const filename = videoObjUrl.split('/').pop() || 'competition.mp4';
+                                const match = /\.(\w+)$/.exec(filename);
+                                const type = match ? `video/${match[1]}` : `video/mp4`;
+
+                                formData.append('competitionVideo', {
+                                    uri: Platform.OS === 'android' && !videoObjUrl.startsWith('file://') ? `file://${videoObjUrl}` : videoObjUrl,
+                                    name: filename,
+                                    type,
+                                } as any);
+                            }
+
+                            // Append Profile Photo
+                            if (registrationData.profilePhotoUri) {
+                                const filename = registrationData.profilePhotoUri.split('/').pop() || 'profile.jpg';
+                                const match = /\.(\w+)$/.exec(filename);
+                                const type = match ? `image/${match[1]}` : `image/jpeg`;
+
+                                formData.append('profilePhoto', {
+                                    uri: Platform.OS === 'android' && !registrationData.profilePhotoUri.startsWith('file://') ? `file://${registrationData.profilePhotoUri}` : registrationData.profilePhotoUri,
+                                    name: filename,
+                                    type,
+                                } as any);
+                            }
+
+                            const response = await fetch(`${apiClient.defaults.baseURL}/auth/register`, {
+                                method: 'POST',
+                                body: formData,
                             });
-                            const token = res.data.token;
-                            if (token) {
-                                await AsyncStorage.setItem('userToken', token);
-                                await AsyncStorage.setItem('userName', res.data.name || registrationData.name || '');
-                                await AsyncStorage.setItem('userSports', JSON.stringify(res.data.sports || [selectedSport]));
+
+                            if (!response.ok) {
+                                const errorData = await response.json();
+                                throw new Error(errorData.message || 'Registration failed');
+                            }
+
+                            const resData = await response.json();
+
+                            if (resData.token) {
+                                await AsyncStorage.setItem('userToken', resData.token);
+                                await AsyncStorage.setItem('userName', resData.name || registrationData.name || '');
+                                await AsyncStorage.setItem('userSports', JSON.stringify(resData.sports || [selectedSport]));
                             }
                             navigation.navigate('SelectTest');
                         } catch (err: any) {
@@ -276,6 +394,44 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         color: '#1F2937',
         marginBottom: 10,
+    },
+    photoUploadContainer: {
+        alignItems: 'center',
+        marginVertical: 10,
+    },
+    photoUploadCircle: {
+        width: 120,
+        height: 120,
+        borderRadius: 60,
+        backgroundColor: '#F0F5FF',
+        borderWidth: 2,
+        borderColor: Colors.primary,
+        borderStyle: 'dashed',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden', // Ensures the image respects the border radius
+    },
+    profileImage: {
+        width: 120,
+        height: 120,
+        borderRadius: 60,
+        resizeMode: 'cover',
+    },
+    photoUploadText: {
+        marginTop: 8,
+        fontSize: 12,
+        color: Colors.primary,
+        fontWeight: '600',
+    },
+    photoSelectedContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    photoSelectedText: {
+        marginTop: 4,
+        fontSize: 11,
+        color: Colors.success,
+        fontWeight: '600',
     },
     dropdownInput: {
         flexDirection: 'row',

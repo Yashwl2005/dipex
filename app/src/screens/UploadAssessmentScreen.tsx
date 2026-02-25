@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, ScrollView, TouchableOpacity, SafeAreaView, Dim
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Colors, Spacing } from '../constants/theme';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import apiClient from '../services/apiClient';
 import * as ImagePicker from 'expo-image-picker';
 
@@ -11,8 +11,13 @@ const { width } = Dimensions.get('window');
 
 export default function UploadAssessmentScreen() {
     const navigation = useNavigation<any>();
+    const route = useRoute<any>();
     const [videoUri, setVideoUri] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState(false);
+
+    // Get test info from previous screen
+    const testId = route.params?.testId || 'Unknown Test';
+    const testName = route.params?.testName || 'Fitness Test';
 
     const pickVideo = async (source: 'camera' | 'gallery') => {
         try {
@@ -56,7 +61,7 @@ export default function UploadAssessmentScreen() {
                 {/* Title & Description */}
                 <Text style={styles.mainTitle}>Record or Upload</Text>
                 <Text style={styles.subtitle}>
-                    Submit your performance video for the 100m sprint assessment. Ensure good lighting.
+                    Submit your performance video for the {testName} assessment. Ensure good lighting.
                 </Text>
 
                 {/* Upload Options */}
@@ -191,18 +196,16 @@ export default function UploadAssessmentScreen() {
                             } as any);
 
                             // Append other fields
-                            formData.append('testName', '100m Sprint');
+                            formData.append('testName', testName);
                             formData.append('score', '0');
                             formData.append('metrics', JSON.stringify({ duration: 12 }));
                             formData.append('dateTaken', new Date().toISOString());
 
-                            // Use native fetch instead of Axios to avoid the React Native Android FormData boundary stripping bug
                             const token = await AsyncStorage.getItem('userToken');
-                            const response = await fetch('http://192.168.31.124:5000/api/fitness', {
+                            const response = await fetch(`${apiClient.defaults.baseURL}/fitness`, {
                                 method: 'POST',
                                 headers: {
-                                    'Authorization': `Bearer ${token}`,
-                                    // Do NOT set Content-Type here, let fetch generate the boundary
+                                    'Authorization': `Bearer ${token}`
                                 },
                                 body: formData,
                             });
@@ -212,8 +215,16 @@ export default function UploadAssessmentScreen() {
                                 throw new Error(errorData.message || 'Upload failed');
                             }
 
+                            // Update local completed tests array
+                            const storedStr = await AsyncStorage.getItem('completedTests');
+                            let completed = storedStr ? JSON.parse(storedStr) : [];
+                            if (!completed.includes(testId)) {
+                                completed.push(testId);
+                                await AsyncStorage.setItem('completedTests', JSON.stringify(completed));
+                            }
+
                             Alert.alert('Success', 'Assessment uploaded successfully!');
-                            navigation.navigate('UploadingData');
+                            navigation.navigate('SelectTest');
                         } catch (err: any) {
                             console.error('Upload failed:', err);
                             console.error('Upload failed full trace:', JSON.stringify(err));

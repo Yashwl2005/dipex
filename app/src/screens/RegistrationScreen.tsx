@@ -4,7 +4,8 @@ import { Colors, Spacing } from '../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Platform, Modal } from 'react-native';
+import { Platform, Modal, Image } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 
 export default function RegistrationScreen() {
     const navigation = useNavigation<any>();
@@ -17,8 +18,55 @@ export default function RegistrationScreen() {
     const [gender, setGender] = useState('');
     const [address, setAddress] = useState('');
     const [stateRegion, setStateRegion] = useState('');
+    const [height, setHeight] = useState('');
+    const [weight, setWeight] = useState('');
     const [date, setDate] = useState(new Date());
     const [showDatePicker, setShowDatePicker] = useState(false);
+
+    // Document state
+    const [aadhaarUri, setAadhaarUri] = useState<string | null>(null);
+    const [dobUri, setDobUri] = useState<string | null>(null);
+    const [profilePhotoUri, setProfilePhotoUri] = useState<string | null>(null);
+    const [competitionVideoUri, setCompetitionVideoUri] = useState<string | null>(null);
+
+    const pickVideo = async () => {
+        try {
+            await ImagePicker.requestMediaLibraryPermissionsAsync();
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ['videos'],
+                videoMaxDuration: 120, // 2-minute max length limit
+                allowsEditing: true,
+                quality: 0.8,
+            });
+
+            if (!result.canceled && result.assets && result.assets.length > 0) {
+                setCompetitionVideoUri(result.assets[0].uri);
+            }
+        } catch (error) {
+            Alert.alert('Error', 'Failed to pick competition video');
+        }
+    };
+
+    const pickImage = async (setImage: (uri: string) => void, isProfile: boolean = false) => {
+        try {
+            await ImagePicker.requestMediaLibraryPermissionsAsync();
+            const options: ImagePicker.ImagePickerOptions = {
+                mediaTypes: ['images'],
+                allowsEditing: true,
+                quality: 0.8,
+            };
+            if (isProfile) {
+                options.aspect = [1, 1];
+            }
+            const result = await ImagePicker.launchImageLibraryAsync(options);
+
+            if (!result.canceled && result.assets && result.assets.length > 0) {
+                setImage(result.assets[0].uri);
+            }
+        } catch (error) {
+            Alert.alert('Error', 'Failed to pick image');
+        }
+    };
 
     const onDateChangeAndroid = (event: any, selectedDate?: Date) => {
         setShowDatePicker(false);
@@ -38,8 +86,8 @@ export default function RegistrationScreen() {
     };
 
     const handleNext = () => {
-        if (!name || !email || !password || !gender || !stateRegion) {
-            Alert.alert("Required Fields", "Please fill in all mandatory fields, including State/Region.");
+        if (!name || !email || !password || !gender || !height || !weight || !stateRegion || !aadhaarUri || (!dob && !dobUri) || !profilePhotoUri) {
+            Alert.alert("Required Fields", "Please fill in all mandatory fields, including Height, Weight, Profile Photo, State/Region, and required documents.");
             return;
         }
 
@@ -50,8 +98,14 @@ export default function RegistrationScreen() {
                 password,
                 dateOfBirth: dob,
                 gender,
+                height,
+                weight,
                 address,
-                state: stateRegion
+                state: stateRegion,
+                aadhaarUri,
+                dobUri,
+                profilePhotoUri,
+                competitionVideoUri
             }
         });
     };
@@ -74,15 +128,17 @@ export default function RegistrationScreen() {
                     <Text style={styles.stepText}>Step 1 of 3: Personal Details</Text>
                 </View>
 
+                {/* Profile Photo Upload */}
                 <View style={styles.photoContainer}>
-                    <View style={styles.photoCircle}>
-                        <Ionicons name="person" size={60} color="#D1D5DB" />
-                        <TouchableOpacity style={styles.cameraIcon}>
-                            <Ionicons name="camera" size={20} color={Colors.white} />
-                        </TouchableOpacity>
-                    </View>
-                    <TouchableOpacity>
-                        <Text style={styles.uploadText}>Upload Profile Photo</Text>
+                    <TouchableOpacity style={styles.photoUploadCircle} onPress={() => pickImage(setProfilePhotoUri, true)}>
+                        {profilePhotoUri ? (
+                            <Image source={{ uri: profilePhotoUri }} style={styles.profileImage} />
+                        ) : (
+                            <>
+                                <Ionicons name="camera" size={36} color={Colors.primary} />
+                                <Text style={styles.photoUploadText}>Upload Photo</Text>
+                            </>
+                        )}
                     </TouchableOpacity>
                 </View>
 
@@ -186,6 +242,32 @@ export default function RegistrationScreen() {
                         </View>
                     </View>
 
+                    <View style={styles.row}>
+                        <View style={[styles.inputGroup, { flex: 1, marginRight: 10 }]}>
+                            <Text style={styles.label}>Height (cm) <Text style={styles.required}>*</Text></Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="e.g. 175"
+                                placeholderTextColor={Colors.textPlaceholder}
+                                keyboardType="numeric"
+                                value={height}
+                                onChangeText={setHeight}
+                            />
+                        </View>
+
+                        <View style={[styles.inputGroup, { flex: 1 }]}>
+                            <Text style={styles.label}>Weight (kg) <Text style={styles.required}>*</Text></Text>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="e.g. 70"
+                                placeholderTextColor={Colors.textPlaceholder}
+                                keyboardType="numeric"
+                                value={weight}
+                                onChangeText={setWeight}
+                            />
+                        </View>
+                    </View>
+
                     <View style={styles.inputGroup}>
                         <Text style={styles.label}>Full Address (Optional)</Text>
                         <TextInput
@@ -208,6 +290,56 @@ export default function RegistrationScreen() {
                             value={stateRegion}
                             onChangeText={setStateRegion}
                         />
+                    </View>
+
+                    {/* Document Upload section */}
+                    <Text style={[styles.label, { marginTop: 10, fontSize: 16 }]}>Document Uploads</Text>
+
+                    <View style={styles.inputGroup}>
+                        <Text style={styles.label}>Aadhaar Card <Text style={styles.required}>*</Text></Text>
+                        <TouchableOpacity style={styles.uploadArea} onPress={() => pickImage(setAadhaarUri)}>
+                            {aadhaarUri ? (
+                                <Image source={{ uri: aadhaarUri }} style={styles.previewImage} />
+                            ) : (
+                                <View style={styles.uploadPlaceholder}>
+                                    <Ionicons name="cloud-upload-outline" size={32} color={Colors.primary} />
+                                    <Text style={styles.uploadTextDark}>Upload Aadhaar</Text>
+                                </View>
+                            )}
+                        </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.inputGroup}>
+                        <Text style={styles.label}>Date of Birth Certificate <Text style={styles.required}>*</Text></Text>
+                        <TouchableOpacity style={styles.uploadArea} onPress={() => pickImage(setDobUri)}>
+                            {dobUri ? (
+                                <Image source={{ uri: dobUri }} style={styles.previewImage} />
+                            ) : (
+                                <View style={styles.uploadPlaceholder}>
+                                    <Ionicons name="cloud-upload-outline" size={32} color={Colors.primary} />
+                                    <Text style={styles.uploadTextDark}>Upload DOB Certificate</Text>
+                                </View>
+                            )}
+                        </TouchableOpacity>
+                    </View>
+
+                    <View style={styles.inputGroup}>
+                        <Text style={styles.label}>Sports/Competition Video (Optional)</Text>
+                        <TouchableOpacity style={styles.uploadArea} onPress={pickVideo}>
+                            {competitionVideoUri ? (
+                                <View style={styles.uploadPlaceholder}>
+                                    <Ionicons name="videocam" size={32} color={Colors.success} />
+                                    <Text style={[styles.uploadTextDark, { color: Colors.success, marginTop: 4 }]}>Video Selected</Text>
+                                    <Text style={{ fontSize: 10, color: Colors.textSecondary, marginTop: 4 }}>Tap to change</Text>
+                                </View>
+                            ) : (
+                                <View style={styles.uploadPlaceholder}>
+                                    <Ionicons name="videocam-outline" size={32} color={Colors.primary} />
+                                    <Text style={styles.uploadTextDark}>Upload Video</Text>
+                                    <Text style={{ fontSize: 10, color: Colors.textSecondary, marginTop: 4 }}>Max 2 mins (Optional)</Text>
+                                </View>
+                            )}
+                        </TouchableOpacity>
                     </View>
 
                     <View style={styles.inputGroup}>
@@ -294,35 +426,29 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 30,
     },
-    photoCircle: {
+    photoUploadCircle: {
         width: 120,
         height: 120,
         borderRadius: 60,
-        backgroundColor: Colors.white,
+        backgroundColor: '#F0F5FF',
         borderWidth: 2,
-        borderColor: '#D1D5DB',
+        borderColor: Colors.primary,
         borderStyle: 'dashed',
         alignItems: 'center',
         justifyContent: 'center',
-        position: 'relative',
+        overflow: 'hidden',
     },
-    cameraIcon: {
-        position: 'absolute',
-        bottom: 0,
-        right: 0,
-        backgroundColor: Colors.primary,
-        width: 36,
-        height: 36,
-        borderRadius: 18,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderWidth: 3,
-        borderColor: Colors.white,
+    profileImage: {
+        width: 120,
+        height: 120,
+        borderRadius: 60,
+        resizeMode: 'cover',
     },
-    uploadText: {
-        marginTop: 12,
+    photoUploadText: {
+        marginTop: 8,
+        fontSize: 12,
         color: Colors.primary,
-        fontWeight: 'bold',
+        fontWeight: '600',
     },
     form: {
         marginBottom: 20,
@@ -428,5 +554,29 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         marginRight: 8,
+    },
+    uploadArea: {
+        borderWidth: 1,
+        borderColor: '#D1D5DB',
+        borderStyle: 'dashed',
+        borderRadius: 8,
+        height: 120,
+        backgroundColor: '#F9FAFB',
+        overflow: 'hidden',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    uploadPlaceholder: {
+        alignItems: 'center',
+    },
+    uploadTextDark: {
+        marginTop: 8,
+        color: Colors.textSecondary,
+        fontWeight: '600',
+    },
+    previewImage: {
+        width: '100%',
+        height: '100%',
+        resizeMode: 'cover',
     },
 });

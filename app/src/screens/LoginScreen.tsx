@@ -96,12 +96,18 @@ export default function LoginScreen() {
                     {!loading && <Ionicons name="arrow-forward" size={20} color={Colors.white} />}
                 </TouchableOpacity>
 
-                <View style={styles.registerContainer}>
-                    <Text style={styles.registerText}>Don't have an account? </Text>
-                    <TouchableOpacity onPress={() => navigation.navigate('Registration')}>
-                        <Text style={styles.registerLink}>Register Now</Text>
-                    </TouchableOpacity>
+                <View style={styles.dividerContainer}>
+                    <View style={styles.divider} />
+                    <Text style={styles.dividerText}>OR</Text>
+                    <View style={styles.divider} />
                 </View>
+
+                <TouchableOpacity
+                    style={styles.signupButton}
+                    onPress={() => navigation.navigate('Registration')}
+                >
+                    <Text style={styles.signupText}>Sign Up</Text>
+                </TouchableOpacity>
             </View>
         </SafeAreaView>
     );
@@ -203,18 +209,35 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginRight: 8,
     },
-    registerContainer: {
+    dividerContainer: {
         flexDirection: 'row',
-        justifyContent: 'center',
         alignItems: 'center',
+        marginBottom: 24,
     },
-    registerText: {
-        fontSize: 14,
+    divider: {
+        flex: 1,
+        height: 1,
+        backgroundColor: '#E5E7EB',
+    },
+    dividerText: {
+        marginHorizontal: 16,
         color: Colors.textSecondary,
+        fontWeight: '600',
     },
-    registerLink: {
-        fontSize: 14,
-        fontWeight: 'bold',
+    signupButton: {
+        backgroundColor: Colors.white,
+        flexDirection: 'row',
+        height: 56,
+        borderRadius: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 24,
+        borderWidth: 2,
+        borderColor: Colors.primary,
+    },
+    signupText: {
         color: Colors.primary,
+        fontSize: 16,
+        fontWeight: 'bold',
     },
 });

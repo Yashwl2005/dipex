@@ -24,13 +24,13 @@ export const ShortlistedAthletes = () => {
     const avgScore = athletes.length ? (athletes.reduce((acc, a) => acc + (a.overallScore || 0), 0) / athletes.length).toFixed(1) : 0;
 
     return (
-        <Layout sidebarType="dark">
+        <Layout sidebarType="light">
             <div className="flex justify-between items-center mb-6">
                 <div>
                     <div className="text-xs font-bold mb-2 flex items-center gap-2" style={{ color: '#2b2b85', letterSpacing: '1px' }}>
                         <MapPin size={16} /> NATIONAL TRAINING CAMP
                     </div>
-                    <h1 className="text-3xl font-bold mb-1" style={{ color: '#0f172a' }}>Shortlisted Athletes</h1>
+                    <h1 className="text-3xl font-bold mb-1 text-main">Shortlisted Athletes</h1>
                     <p className="text-muted text-sm" style={{ maxWidth: '600px', lineHeight: '1.5' }}>Manage and export top-performing athletes selected for the upcoming national development programs based on recent trial scores.</p>
                 </div>
                 <div className="flex gap-4 items-center">

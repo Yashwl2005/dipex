@@ -2,13 +2,18 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, SafeAreaView, Dimensions } from 'react-native';
 import { Colors, Spacing } from '../constants/theme';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 
 export default function TestInstructionsScreen() {
     const navigation = useNavigation<any>();
+    const route = useRoute<any>();
     const [isConfirmed, setIsConfirmed] = useState(false);
+
+    // Get test info from previous screen
+    const testId = route.params?.testId || 'Unknown Test';
+    const testName = route.params?.testName || 'Fitness Test';
 
     return (
         <SafeAreaView style={styles.container}>
@@ -17,7 +22,7 @@ export default function TestInstructionsScreen() {
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
                     <Ionicons name="arrow-back" size={24} color={Colors.textPrimary} />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Test Instructions</Text>
+                <Text style={styles.headerTitle}>{testName} Instructions</Text>
             </View>
 
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
@@ -111,7 +116,7 @@ export default function TestInstructionsScreen() {
                         styles.startButton,
                         !isConfirmed && styles.startButtonDisabled
                     ]}
-                    onPress={() => isConfirmed && navigation.navigate('UploadAssessment')}
+                    onPress={() => isConfirmed && navigation.navigate('UploadAssessment', { testId, testName })}
                     activeOpacity={isConfirmed ? 0.8 : 1}
                     disabled={!isConfirmed}
                 >

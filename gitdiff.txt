@@ -1,0 +1,3645 @@
+diff --git a/Web/src/App.jsx b/Web/src/App.jsx
+index 6a8ca92..d58da6c 100644
+--- a/Web/src/App.jsx
++++ b/Web/src/App.jsx
+@@ -6,14 +6,12 @@ import { SubmissionReview } from './pages/SubmissionReview';
+ import { Auth } from './pages/Auth';
+ 
+ import { Athletes } from './pages/Athletes';
++import { AthleteDetail } from './pages/AthleteDetail';
+ 
+ import { Evaluations } from './pages/Evaluations';
+ 
+ // Placeholder empty components to prevent crashes
+ const ReportsPlaceholder = () => <div className="p-8">Reports coming soon...</div>;
+-const SettingsPlaceholder = () => <div className="p-8">Settings coming soon...</div>;
+-const AnalyticsPlaceholder = () => <div className="p-8">Analytics coming soon...</div>;
+-const CompliancePlaceholder = () => <div className="p-8">Compliance coming soon...</div>;
+ 
+ function App() {
+   return (
+@@ -22,13 +20,11 @@ function App() {
+         <Route path="/auth" element={<Auth />} />
+         <Route path="/" element={<Dashboard />} />
+         <Route path="/athletes" element={<Athletes />} />
+-        <Route path="/analytics" element={<AnalyticsPlaceholder />} />
+-        <Route path="/compliance" element={<CompliancePlaceholder />} />
++        <Route path="/athletes/:id" element={<AthleteDetail />} />
+         <Route path="/evaluations" element={<Evaluations />} />
+         <Route path="/shortlisted" element={<ShortlistedAthletes />} />
+         <Route path="/reports" element={<ReportsPlaceholder />} />
+-        <Route path="/settings" element={<SettingsPlaceholder />} />
+-        <Route path="/review" element={<SubmissionReview />} />
++        <Route path="/review/:id" element={<SubmissionReview />} />
+       </Routes>
+     </Router>
+   );
+diff --git a/Web/src/components/Sidebar.jsx b/Web/src/components/Sidebar.jsx
+index b1c64ae..18f43d9 100644
+--- a/Web/src/components/Sidebar.jsx
++++ b/Web/src/components/Sidebar.jsx
+@@ -22,15 +22,11 @@ export const Sidebar = ({ type = 'light' }) => {
+         { path: '/athletes', label: 'Athlete Management', icon: Users },
+         { path: '/shortlisted', label: 'Shortlisted Athletes', icon: UserCheck },
+         { path: '/reports', label: 'Reports', icon: FileText },
+-        { path: '/settings', label: 'Settings', icon: Settings },
+         { path: '/auth', label: 'New Admin Sign Up', icon: UserPlus },
+     ] : [
+         { path: '/', label: 'Dashboard', icon: LayoutDashboard },
+         { path: '/evaluations', label: 'Evaluations', icon: Activity },
+         { path: '/athletes', label: 'Athletes', icon: Users },
+-        { path: '/analytics', label: 'Analytics', icon: Activity },
+-        { path: '/compliance', label: 'Compliance', icon: ShieldCheck },
+-        { path: '/settings', label: 'Settings', icon: Settings },
+         { path: '/auth', label: 'New Admin Sign Up', icon: UserPlus },
+     ];
+ 
+diff --git a/Web/src/pages/Athletes.jsx b/Web/src/pages/Athletes.jsx
+index 4576a33..864f233 100644
+--- a/Web/src/pages/Athletes.jsx
++++ b/Web/src/pages/Athletes.jsx
+@@ -1,10 +1,12 @@
+ import React, { useState, useEffect } from 'react';
++import { useNavigate } from 'react-router-dom';
+ import { Layout } from '../components/Layout';
+-import { Users, Search, Filter } from 'lucide-react';
++import { Users, Search, Filter, MoreVertical, Eye } from 'lucide-react';
+ import './Dashboard.css'; // Reusing dashboard styles for consistency
+ import api from '../api';
+ 
+ export const Athletes = () => {
++    const navigate = useNavigate();
+     const [athletes, setAthletes] = useState([]);
+     const [loading, setLoading] = useState(true);
+ 
+@@ -48,17 +50,18 @@ export const Athletes = () => {
+                 </div>
+             </div>
+ 
+-            <div className="card" style={{ padding: '0', overflow: 'hidden' }}>
++            <div className="card" style={{ padding: '0', overflow: 'hidden', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025)' }}>
+                 <div style={{ overflowX: 'auto' }}>
+-                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '14px' }}>
++                    <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0, textAlign: 'left', fontSize: '14px' }}>
+                         <thead>
+-                            <tr style={{ color: '#64748b', fontSize: '12px', borderBottom: '1px solid #e2e8f0', backgroundColor: '#f8fafc' }}>
+-                                <th style={{ padding: '16px 24px', fontWeight: 'bold' }}>ATHLETE ID</th>
+-                                <th style={{ padding: '16px 24px', fontWeight: 'bold' }}>PROFILE</th>
+-                                <th style={{ padding: '16px 24px', fontWeight: 'bold' }}>PRIMARY SPORT</th>
+-                                <th style={{ padding: '16px 24px', fontWeight: 'bold' }}>GENDER</th>
+-                                <th style={{ padding: '16px 24px', fontWeight: 'bold' }}>OVERALL SCORE</th>
+-                                <th style={{ padding: '16px 24px', fontWeight: 'bold', textAlign: 'center' }}>ACTION</th>
++                            <tr style={{ color: '#475569', fontSize: '12px', backgroundColor: '#f8fafc', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
++                                <th style={{ padding: '16px 24px', fontWeight: 'bold', borderBottom: '2px solid #e2e8f0' }}>Athlete ID</th>
++                                <th style={{ padding: '16px 24px', fontWeight: 'bold', borderBottom: '2px solid #e2e8f0' }}>Profile</th>
++                                <th style={{ padding: '16px 24px', fontWeight: 'bold', borderBottom: '2px solid #e2e8f0' }}>Primary Sport</th>
++                                <th style={{ padding: '16px 24px', fontWeight: 'bold', borderBottom: '2px solid #e2e8f0' }}>Gender</th>
++                                <th style={{ padding: '16px 24px', fontWeight: 'bold', borderBottom: '2px solid #e2e8f0' }}>Status</th>
++                                <th style={{ padding: '16px 24px', fontWeight: 'bold', borderBottom: '2px solid #e2e8f0' }}>Overall Score</th>
++                                <th style={{ padding: '16px 24px', fontWeight: 'bold', borderBottom: '2px solid #e2e8f0', textAlign: 'right' }}>Actions</th>
+                             </tr>
+                         </thead>
+                         <tbody>
+@@ -73,38 +76,59 @@ export const Athletes = () => {
+                             ) : (
+                                 athletes.map((athlete) => (
+                                     <tr key={athlete._id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+-                                        <td style={{ padding: '16px 24px', color: '#64748b', fontFamily: 'monospace' }}>
+-                                            {athlete._id.substring(0, 8).toUpperCase()}
++                                        <td style={{ padding: '16px 24px', color: '#64748b', fontFamily: 'monospace', fontWeight: '500' }}>
++                                            #{athlete._id.substring(0, 6).toUpperCase()}
+                                         </td>
+                                         <td style={{ padding: '16px 24px' }}>
+                                             <div className="flex items-center gap-3">
+-                                                <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#e0e7ff', color: '#3730a3', display: 'flex', alignItems: 'center', justifyItems: 'center', fontWeight: 'bold', fontSize: '14px' }}>
++                                                <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#e0e7ff', color: '#3730a3', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '14px', border: '2px solid white', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+                                                     {athlete.name?.substring(0, 1).toUpperCase() || 'A'}
+                                                 </div>
+                                                 <div>
+-                                                    <div className="font-bold text-main">{athlete.name}</div>
+-                                                    <div className="text-xs text-muted">{athlete.email}</div>
++                                                    <div className="font-bold text-main" style={{ fontSize: '15px' }}>{athlete.name}</div>
++                                                    <div className="text-xs text-muted" style={{ marginTop: '2px' }}>{athlete.email}</div>
+                                                 </div>
+                                             </div>
+                                         </td>
+                                         <td style={{ padding: '16px 24px' }}>
+-                                            <span style={{ backgroundColor: '#f1f5f9', color: '#0f172a', padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>
++                                            <span style={{ backgroundColor: '#f1f5f9', color: '#0f172a', padding: '6px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: '600', letterSpacing: '0.3px' }}>
+                                                 {athlete.sports && athlete.sports.length > 0 ? athlete.sports.join(', ') : 'Not assigned'}
+                                             </span>
+                                         </td>
+-                                        <td style={{ padding: '16px 24px', textTransform: 'capitalize' }}>
++                                        <td style={{ padding: '16px 24px', textTransform: 'capitalize', color: '#475569', fontWeight: '500' }}>
+                                             {athlete.gender || 'N/A'}
+                                         </td>
+                                         <td style={{ padding: '16px 24px' }}>
+-                                            <div className="flex items-center gap-2">
+-                                                <div style={{ fontWeight: 'bold', color: '#2b2b85' }}>{athlete.overallScore || 0}</div>
+-                                                <div style={{ width: '60px', height: '6px', backgroundColor: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
+-                                                    <div style={{ width: `${athlete.overallScore || 0}%`, height: '100%', backgroundColor: '#2b2b85' }}></div>
++                                            <div style={{ display: 'inline-flex', alignItems: 'center' }}>
++                                                <div style={{
++                                                    width: '8px', height: '8px', borderRadius: '50%', marginRight: '8px',
++                                                    backgroundColor: athlete.evaluationStatus === 'approved' ? '#16a34a' : athlete.evaluationStatus === 'rejected' ? '#dc2626' : '#d97706'
++                                                }}></div>
++                                                <span style={{
++                                                    color: athlete.evaluationStatus === 'approved' ? '#15803d' : athlete.evaluationStatus === 'rejected' ? '#b91c1c' : '#b45309',
++                                                    fontSize: '13px', fontWeight: '600', textTransform: 'capitalize'
++                                                }}>
++                                                    {athlete.evaluationStatus || 'Pending'}
++                                                </span>
++                                            </div>
++                                        </td>
++                                        <td style={{ padding: '16px 24px' }}>
++                                            <div className="flex items-center gap-3">
++                                                <div style={{ fontWeight: '700', color: '#1e293b', width: '30px' }}>{athlete.overallScore ? Number(athlete.overallScore).toFixed(1) : '0.0'}</div>
++                                                <div style={{ width: '80px', height: '8px', backgroundColor: '#f1f5f9', borderRadius: '4px', overflow: 'hidden' }}>
++                                                    <div style={{ width: `${athlete.overallScore || 0}%`, height: '100%', backgroundColor: '#3b82f6', borderRadius: '4px' }}></div>
+                                                 </div>
+                                             </div>
+                                         </td>
+-                                        <td style={{ padding: '16px 24px', textAlign: 'center' }}>
+-                                            <button style={{ color: '#3b82f6', fontWeight: 'bold', fontSize: '13px' }}>View Details</button>
++                                        <td style={{ padding: '16px 24px', textAlign: 'right' }}>
++                                            <button
++                                                onClick={() => navigate(`/athletes/${athlete._id}`)}
++                                                className="btn-secondary flex items-center gap-2"
++                                                style={{ padding: '6px 12px', fontSize: '12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
++                                            >
++                                                <Eye size={14} />
++                                                View Details
++                                            </button>
+                                         </td>
+                                     </tr>
+                                 ))
+diff --git a/Web/src/pages/Auth.jsx b/Web/src/pages/Auth.jsx
+index edb48dd..e6cc725 100644
+--- a/Web/src/pages/Auth.jsx
++++ b/Web/src/pages/Auth.jsx
+@@ -17,7 +17,7 @@ export const Auth = () => {
+     const navigate = useNavigate();
+ 
+     const sportsOptions = [
+-        'Athletics', 'Swimming', 'Gymnastics', 'Weightlifting',
++        'All', 'Athletics', 'Swimming', 'Gymnastics', 'Weightlifting',
+         'Boxing', 'Wrestling', 'Archery', 'Shooting'
+     ];
+ 
+@@ -55,7 +55,7 @@ export const Auth = () => {
+                 navigate('/');
+             } else {
+                 if (formData.sports.length === 0) {
+-                    setError('Please select at least one sport to evaluate.');
++                    setError('Please select at least one sport to evaluate, or select "All".');
+                     return;
+                 }
+                 const res = await api.post('/auth/register', {
+@@ -138,7 +138,7 @@ export const Auth = () => {
+                                 {sportsOptions.map(sport => (
+                                     <label
+                                         key={sport}
+-                                        className={`sport-checkbox ${formData.sports.includes(sport) ? 'selected' : ''}`}
++                                        className={`sport-checkbox ${formData.sports.includes(sport) ? 'selected' : ''} ${sport === 'All' ? 'master-admin-checkbox' : ''}`}
+                                     >
+                                         <input
+                                             type="checkbox"
+diff --git a/Web/src/pages/Dashboard.css b/Web/src/pages/Dashboard.css
+index 7511dca..05f7323 100644
+--- a/Web/src/pages/Dashboard.css
++++ b/Web/src/pages/Dashboard.css
+@@ -5,7 +5,7 @@
+ }
+ 
+ .stat-card {
+-    grid-column: span 4;
++    grid-column: span 3;
+     display: flex;
+     flex-direction: column;
+     justify-content: space-between;
+@@ -41,6 +41,16 @@
+     color: #dc2626;
+ }
+ 
++.badge-yellow {
++    background-color: #fef3c7;
++    color: #d97706;
++}
++
++.badge-default {
++    background-color: #e0e7ff;
++    color: #3730a3;
++}
++
+ .stat-value {
+     font-size: 36px;
+     font-weight: 700;
+diff --git a/Web/src/pages/Dashboard.jsx b/Web/src/pages/Dashboard.jsx
+index e21ead3..ea4d064 100644
+--- a/Web/src/pages/Dashboard.jsx
++++ b/Web/src/pages/Dashboard.jsx
+@@ -17,8 +17,12 @@ const StatCard = ({ title, value, badgeText, badgeType }) => (
+ export const Dashboard = () => {
+     const [stats, setStats] = useState({
+         totalAthletes: 0,
+-        activeEvaluations: 0,
+-        avgPerformanceScore: 0
++        approvedAthletes: 0,
++        rejectedAthletes: 0,
++        pendingAthletes: 0,
++        topPerformers: [],
++        stateDistribution: [],
++        flaggedActivity: null
+     });
+ 
+     const loadStats = async () => {
+@@ -40,14 +44,10 @@ export const Dashboard = () => {
+         <Layout sidebarType="light">
+             <div className="flex justify-between items-center mb-6">
+                 <div>
+-                    <h1 className="text-3xl text-main font-bold mb-1">National Performance Dashboard</h1>
++                    <h1 className="text-3xl font-bold mb-1 text-main">National Performance Dashboard</h1>
+                     <p className="text-muted text-sm">Real-time athlete metrics and compliance monitoring across India</p>
+                 </div>
+                 <div className="flex gap-4">
+-                    <button className="btn-secondary flex items-center gap-2">
+-                        <Download size={16} />
+-                        Export Report
+-                    </button>
+                     <button className="btn-primary flex items-center gap-2" onClick={loadStats}>
+                         Refresh Data
+                     </button>
+@@ -56,9 +56,10 @@ export const Dashboard = () => {
+ 
+             <div className="dashboard-grid">
+                 {/* Top Stats */}
+-                <StatCard title="Total Athletes Tracked" value={stats.totalAthletes} badgeText="+12%" badgeType="green" />
+-                <StatCard title="Active Evaluations" value={stats.activeEvaluations} badgeText="+5%" badgeType="green" />
+-                <StatCard title="Avg. Performance Score" value={`${stats.avgPerformanceScore}%`} badgeText="-2%" badgeType="red" />
++                <StatCard title="Total Athletes Applied" value={stats.totalAthletes} badgeText="Global" badgeType="default" />
++                <StatCard title="Athletes Approved" value={stats.approvedAthletes} badgeText="Verified" badgeType="green" />
++                <StatCard title="Athletes Rejected" value={stats.rejectedAthletes} badgeText="Denied" badgeType="red" />
++                <StatCard title="Pending Review" value={stats.pendingAthletes} badgeText="Action Req" badgeType="yellow" />
+ 
+                 {/* Heatmap Widget */}
+                 <div className="card heatmap-widget">
+@@ -68,21 +69,34 @@ export const Dashboard = () => {
+                             All Sports <ChevronDown size={14} />
+                         </button>
+                     </div>
+-                    <div style={{ backgroundColor: '#f8fafc', height: '300px', borderRadius: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+-                        <div style={{ position: 'relative', opacity: 0.8 }}>
+-                            <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+-                                <polygon fill="#e2e8f0" points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon>
+-                                <line x1="9" y1="3" x2="9" y2="21"></line>
+-                                <line x1="15" y1="3" x2="15" y2="21"></line>
+-                            </svg>
+-                            <div style={{ position: 'absolute', top: '15px', left: '40px', color: '#3b3b98' }}>
+-                                <MapPin size={32} fill="currentColor" stroke="white" />
++                    <div style={{ backgroundColor: '#f8fafc', height: '300px', borderRadius: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
++                        {stats.stateDistribution && stats.stateDistribution.length > 0 ? (
++                            <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', gap: '16px', overflowY: 'auto' }}>
++                                {stats.stateDistribution.map(stat => (
++                                    <div key={stat._id || 'unknown'} className="flex items-center gap-4">
++                                        <div style={{ minWidth: '100px', fontSize: '13px', fontWeight: 'bold', color: '#475569', textTransform: 'capitalize' }}>{stat._id || 'Unknown'}</div>
++                                        <div style={{ flex: 1, height: '8px', backgroundColor: '#e2e8f0', borderRadius: '4px', overflow: 'hidden' }}>
++                                            <div style={{ width: `${Math.min((stat.count / Math.max(stats.totalAthletes, 1)) * 100, 100)}%`, height: '100%', backgroundColor: '#3b82f6' }}></div>
++                                        </div>
++                                        <div style={{ minWidth: '30px', textAlign: 'right', fontSize: '13px', fontWeight: 'bold', color: '#0f172a' }}>{stat.count}</div>
++                                    </div>
++                                ))}
+                             </div>
+-                            <div style={{ position: 'absolute', bottom: '10px', right: '0px', width: '20px', height: '20px', backgroundColor: '#a5b4fc', borderRadius: '50%' }}></div>
+-                            <div style={{ position: 'absolute', bottom: '-10px', left: '-10px', width: '24px', height: '24px', backgroundColor: '#a5b4fc', borderRadius: '50%' }}></div>
+-                        </div>
+-                        <p className="font-bold mt-4" style={{ color: '#334155' }}>Interactive Map Component</p>
+-                        <p className="text-sm text-muted">Loading performance density data for India...</p>
++                        ) : (
++                            <>
++                                <div style={{ position: 'relative', opacity: 0.8 }}>
++                                    <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
++                                        <polygon fill="#e2e8f0" points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon>
++                                        <line x1="9" y1="3" x2="9" y2="21"></line>
++                                        <line x1="15" y1="3" x2="15" y2="21"></line>
++                                    </svg>
++                                    <div style={{ position: 'absolute', top: '15px', left: '40px', color: '#3b3b98' }}>
++                                        <MapPin size={32} fill="currentColor" stroke="white" />
++                                    </div>
++                                </div>
++                                <p className="font-bold mt-4" style={{ color: '#334155' }}>No State Data Available</p>
++                            </>
++                        )}
+                     </div>
+                 </div>
+ 
+@@ -93,40 +107,30 @@ export const Dashboard = () => {
+                     </h2>
+                     <div className="flex justify-between items-end mb-4">
+                         <div>
+-                            <div className="text-xs text-muted mb-1 uppercase font-bold tracking-wider">FLAGGED VIDEOS</div>
+-                            <div className="text-3xl text-danger-color font-bold">24</div>
++                            <div className="text-xs text-muted mb-1 uppercase font-bold tracking-wider">REJECTED VIDEOS</div>
++                            <div className="text-3xl font-bold" style={{ color: '#dc2626' }}>{stats.flaggedActivity?.count || 0}</div>
+                         </div>
+                         <div style={{ textAlign: 'right' }}>
+                             <div className="text-xs text-muted mb-1">Risk Status</div>
+-                            <div className="text-xs font-bold" style={{ backgroundColor: '#fef3c7', color: '#d97706', padding: '2px 8px', borderRadius: '4px' }}>MEDIUM RISK</div>
+-                        </div>
+-                    </div>
+-
+-                    <div className="mb-6">
+-                        <div className="text-xs font-bold text-main mb-2">Risk Distribution</div>
+-                        <div style={{ display: 'flex', height: '8px', borderRadius: '4px', overflow: 'hidden', marginBottom: '8px' }}>
+-                            <div style={{ width: '60%', backgroundColor: '#22c55e' }}></div>
+-                            <div style={{ width: '25%', backgroundColor: '#f59e0b' }}></div>
+-                            <div style={{ width: '15%', backgroundColor: '#ef4444' }}></div>
+-                        </div>
+-                        <div className="flex justify-between text-xs text-muted">
+-                            <span>Low (60%)</span>
+-                            <span>Med (25%)</span>
+-                            <span>High (15%)</span>
++                            <div className="text-xs font-bold" style={{ backgroundColor: '#fef3c7', color: '#d97706', padding: '2px 8px', borderRadius: '4px' }}>MONITORING</div>
+                         </div>
+                     </div>
+ 
+                     <div style={{ backgroundColor: '#f8fafc', padding: '12px', borderRadius: '8px', marginBottom: '16px' }}>
+-                        <div className="text-xs text-muted mb-2 font-bold tracking-wider">LATEST FLAG</div>
+-                        <div className="flex items-center gap-3">
+-                            <div style={{ width: '40px', height: '40px', backgroundColor: '#e2e8f0', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+-                                <Play fill="#94a3b8" stroke="none" size={16} />
+-                            </div>
+-                            <div>
+-                                <div className="font-bold text-sm">Potential Frame Drop</div>
+-                                <div className="text-xs text-muted">Regional Center: Patiala</div>
++                        <div className="text-xs text-muted mb-2 font-bold tracking-wider">LATEST REJECTION</div>
++                        {stats.flaggedActivity?.latest ? (
++                            <div className="flex items-center gap-3">
++                                <div style={{ width: '40px', height: '40px', backgroundColor: '#e2e8f0', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
++                                    <Play fill="#94a3b8" stroke="none" size={16} />
++                                </div>
++                                <div>
++                                    <div className="font-bold text-sm">Review Failed</div>
++                                    <div className="text-xs text-muted">{stats.flaggedActivity.latest.user?.name || 'Unknown'} - {stats.flaggedActivity.latest.user?.state || 'Unknown'}</div>
++                                </div>
+                             </div>
+-                        </div>
++                        ) : (
++                            <div className="text-sm text-muted">No recently flagged videos</div>
++                        )}
+                     </div>
+ 
+                     <button className="btn-secondary" style={{ width: '100%', borderColor: '#2b2b85', color: '#2b2b85' }}>
+@@ -141,23 +145,28 @@ export const Dashboard = () => {
+                 <div className="card chart-card flex flex-col">
+                     <h3 className="text-sm font-bold mb-6">Vertical Jump Avg (by Age)</h3>
+                     <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', gap: '12px', paddingBottom: '24px' }}>
+-                        {/* Just simple CSS bars for mockup */}
+-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+-                            <div style={{ height: '60px', width: '100%', backgroundColor: '#3b3b98', borderRadius: '4px 4px 0 0' }}></div>
+-                            <span className="text-xs text-muted mt-2">12-14</span>
+-                        </div>
+-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+-                            <div style={{ height: '90px', width: '100%', backgroundColor: '#3b3b98', borderRadius: '4px 4px 0 0' }}></div>
+-                            <span className="text-xs text-muted mt-2">15-17</span>
+-                        </div>
+-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+-                            <div style={{ height: '140px', width: '100%', backgroundColor: '#3b3b98', borderRadius: '4px 4px 0 0' }}></div>
+-                            <span className="text-xs text-muted mt-2">18-20</span>
+-                        </div>
+-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+-                            <div style={{ height: '120px', width: '100%', backgroundColor: '#3b3b98', borderRadius: '4px 4px 0 0' }}></div>
+-                            <span className="text-xs text-muted mt-2">21+</span>
+-                        </div>
++                        {stats.charts?.jumpStats?.length > 0 ? (
++                            stats.charts.jumpStats.map(stat => {
++                                const heightValues = { '0': 60, '15': 90, '18': 140, '21+': 120 };
++                                const labels = { '0': '12-14', '15': '15-17', '18': '18-20', '21+': '21+' };
++                                const heightAmount = stat.avgScore || heightValues[stat._id] || 50;
++                                return (
++                                    <div key={stat._id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
++                                        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', height: '150px', width: '100%', padding: '0 4px' }}>
++                                            <div style={{ borderTopRadius: '4px', backgroundColor: '#3b3b98', width: '100%', height: `${Math.min(heightAmount * 2, 150)}px`, textAlign: 'center', transition: 'height 0.3s' }}>
++                                                <span style={{ color: 'white', fontSize: '10px', display: 'block', paddingTop: '4px' }}>{Math.round(stat.avgScore)}</span>
++                                            </div>
++                                        </div>
++                                        <span className="text-xs text-muted mt-2">{labels[stat._id] || stat._id}</span>
++                                    </div>
++                                );
++                            })
++                        ) : (
++                            <div className="flex-1 flex flex-col items-center justify-center text-muted" style={{ width: '100%' }}>
++                                <Activity size={24} className="mb-2 text-slate-300" />
++                                <p className="text-xs">No Data</p>
++                            </div>
++                        )}
+                     </div>
+                 </div>
+ 
+@@ -165,40 +174,62 @@ export const Dashboard = () => {
+                 <div className="card chart-card flex flex-col">
+                     <h3 className="text-sm font-bold mb-6">Sit-up Avg (by Gender)</h3>
+                     <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', paddingBottom: '24px' }}>
+-                        <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end' }}>
+-                            <div style={{ height: '100px', width: '24px', backgroundColor: '#3b3b98', borderRadius: '4px 4px 0 0' }}></div>
+-                            <div style={{ height: '80px', width: '24px', backgroundColor: '#cbd5e1', borderRadius: '4px 4px 0 0' }}></div>
+-                        </div>
+-                        <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-end' }}>
+-                            <div style={{ height: '140px', width: '24px', backgroundColor: '#3b3b98', borderRadius: '4px 4px 0 0' }}></div>
+-                            <div style={{ height: '120px', width: '24px', backgroundColor: '#cbd5e1', borderRadius: '4px 4px 0 0' }}></div>
+-                        </div>
++                        {stats.charts?.situpStats?.length > 0 ? (
++                            stats.charts.situpStats.map(stat => (
++                                <div key={stat._id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
++                                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', height: '140px', width: '100%', padding: '0 8px' }}>
++                                        <div style={{ borderTopRadius: '4px', backgroundColor: stat._id === 'male' ? '#3b3b98' : '#cbd5e1', width: '100%', height: `${Math.min(stat.avgScore * 1.5, 140)}px`, textAlign: 'center', transition: 'height 0.3s' }}>
++                                            <span style={{ color: stat._id === 'male' ? 'white' : '#334155', fontSize: '10px', display: 'block', paddingTop: '4px' }}>{Math.round(stat.avgScore)}</span>
++                                        </div>
++                                    </div>
++                                </div>
++                            ))
++                        ) : (
++                            <div className="flex-1 flex flex-col items-center justify-center text-muted" style={{ width: '100%' }}>
++                                <Activity size={24} className="mb-2 text-slate-300" />
++                                <p className="text-xs">No Data</p>
++                            </div>
++                        )}
+                     </div>
+-                    <div className="flex justify-center gap-6 mt-4 pb-4 border-b" style={{ borderColor: '#f1f5f9' }}>
+-                        <div className="flex items-center gap-2 text-xs font-bold text-main">
+-                            <div style={{ width: '8px', height: '8px', backgroundColor: '#3b3b98' }}></div> Male
+-                        </div>
+-                        <div className="flex items-center gap-2 text-xs font-bold text-main">
+-                            <div style={{ width: '8px', height: '8px', backgroundColor: '#cbd5e1' }}></div> Female
++                    {stats.charts?.situpStats?.length > 0 && (
++                        <div className="flex justify-center gap-6 mt-4 pb-4 border-b" style={{ borderColor: '#f1f5f9' }}>
++                            <div className="flex items-center gap-2 text-xs font-bold text-main">
++                                <div style={{ width: '8px', height: '8px', backgroundColor: '#3b3b98' }}></div> Male
++                            </div>
++                            <div className="flex items-center gap-2 text-xs font-bold text-main">
++                                <div style={{ width: '8px', height: '8px', backgroundColor: '#cbd5e1' }}></div> Female
++                            </div>
+                         </div>
+-                    </div>
+-                    <div className="flex justify-around mt-4">
+-                        <span className="text-xs text-muted">Junior</span>
+-                        <span className="text-xs text-muted">Senior</span>
+-                    </div>
++                    )}
+                 </div>
+ 
+                 {/* Endurance Trends */}
+                 <div className="card chart-card">
+                     <h3 className="text-sm font-bold mb-6">Endurance Trends (Quarterly)</h3>
+-                    <div style={{ height: '150px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 20px', marginTop: '20px' }}>
+-                        <svg viewBox="0 0 100 50" width="100%" height="100%" preserveAspectRatio="none" style={{ overflow: 'visible' }}>
+-                            <path d="M 0 40 Q 15 35 25 25 T 50 20 T 75 22 T 100 5" fill="none" stroke="#2b2b85" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+-                        </svg>
+-                    </div>
+-                    <div className="flex justify-between mt-8 text-xs text-muted px-4">
+-                        <span>Q1</span><span>Q2</span><span>Q3</span><span>Q4</span>
++                    <div style={{ height: '150px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 20px', marginTop: '20px', position: 'relative' }}>
++                        {stats.charts?.enduranceStats?.length > 1 ? (
++                            <svg viewBox="0 0 100 50" width="100%" height="100%" preserveAspectRatio="none" style={{ overflow: 'visible' }}>
++                                {/* Very rough path generation just to mimic a dynamic trend line based on actual score drops/rises */}
++                                <path
++                                    d={`M 0 ${50 - Math.min((stats.charts.enduranceStats[0]?.avgScore || 20) / 2, 50)} 
++                                        L 33 ${50 - Math.min((stats.charts.enduranceStats[1]?.avgScore || 25) / 2, 50)} 
++                                        L 66 ${50 - Math.min((stats.charts.enduranceStats[2]?.avgScore || 30) / 2, 50)} 
++                                        L 100 ${50 - Math.min((stats.charts.enduranceStats[3]?.avgScore || 40) / 2, 50)}`}
++                                    fill="none" stroke="#2b2b85" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"
++                                />
++                            </svg>
++                        ) : (
++                            <div className="flex-1 flex flex-col items-center justify-center text-muted h-full w-full">
++                                <Activity size={24} className="mb-2 text-slate-300" />
++                                <p className="text-xs">Need 2+ Quarters</p>
++                            </div>
++                        )}
+                     </div>
++                    {stats.charts?.enduranceStats?.length > 1 && (
++                        <div className="flex justify-between mt-8 text-xs text-muted px-4">
++                            <span>Q1</span><span>Q2</span><span>Q3</span><span>Q4</span>
++                        </div>
++                    )}
+                 </div>
+             </div>
+ 
+@@ -211,44 +242,45 @@ export const Dashboard = () => {
+                 <div style={{ overflowX: 'auto' }}>
+                     <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '14px' }}>
+                         <thead>
+-                            <tr style={{ color: '#64748b', fontSize: '12px', borderBottom: '1px solid #e2e8f0' }}>
+-                                <th style={{ padding: '16px 8px', fontWeight: 'bold', letterSpacing: '0.5px' }}>RANK</th>
+-                                <th style={{ padding: '16px 8px', fontWeight: 'bold', letterSpacing: '0.5px' }}>ATHLETE NAME</th>
+-                                <th style={{ padding: '16px 8px', fontWeight: 'bold', letterSpacing: '0.5px' }}>STATE</th>
+-                                <th style={{ padding: '16px 8px', fontWeight: 'bold', letterSpacing: '0.5px' }}>PRIMARY ACTIVITY</th>
+-                                <th style={{ padding: '16px 8px', fontWeight: 'bold', letterSpacing: '0.5px', textAlign: 'right' }}>PERFORMANCE SCORE</th>
++                            <tr style={{ color: '#64748b', fontSize: '12px', borderBottom: '1px solid #e2e8f0', backgroundColor: '#f8fafc' }}>
++                                <th style={{ padding: '16px 24px', fontWeight: 'bold', letterSpacing: '0.5px' }}>RANK</th>
++                                <th style={{ padding: '16px 24px', fontWeight: 'bold', letterSpacing: '0.5px' }}>ATHLETE NAME</th>
++                                <th style={{ padding: '16px 24px', fontWeight: 'bold', letterSpacing: '0.5px' }}>STATE</th>
++                                <th style={{ padding: '16px 24px', fontWeight: 'bold', letterSpacing: '0.5px' }}>PRIMARY ACTIVITY</th>
++                                <th style={{ padding: '16px 24px', fontWeight: 'bold', letterSpacing: '0.5px', textAlign: 'right' }}>PERFORMANCE SCORE</th>
+                             </tr>
+                         </thead>
+                         <tbody>
+-                            {[
+-                                { rank: 1, init: 'AS', name: 'Arjun Singh', state: 'Haryana', activity: '100m Sprint', score: '98.4', bg: '#fef3c7', activeColor: '#d97706', initBg: '#e0e7ff', initColor: '#3730a3' },
+-                                { rank: 2, init: 'PK', name: 'Priya Kumari', state: 'Punjab', activity: 'Vertical Jump', score: '96.8', bg: '#f1f5f9', activeColor: '#64748b', initBg: '#e0e7ff', initColor: '#3730a3' },
+-                                { rank: 3, init: 'RN', name: 'Rahul Nair', state: 'Kerala', activity: 'Endurance Run', score: '95.2', bg: '#fff7ed', activeColor: '#ea580c', initBg: '#e0e7ff', initColor: '#3730a3' },
+-                                { rank: 4, init: 'ST', name: 'Sneha Thakur', state: 'Manipur', activity: 'Sit-ups', score: '94.7', bg: '#f1f5f9', activeColor: '#64748b', initBg: '#e0e7ff', initColor: '#3730a3' },
+-                            ].map((row, i) => (
+-                                <tr key={i} style={{ borderBottom: '1px solid #f1f5f9' }}>
+-                                    <td style={{ padding: '16px 8px' }}>
+-                                        <div style={{ width: '24px', height: '24px', borderRadius: '4px', backgroundColor: row.bg, color: row.activeColor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '12px' }}>
+-                                            {row.rank}
+-                                        </div>
+-                                    </td>
+-                                    <td style={{ padding: '16px 8px' }}>
+-                                        <div className="flex items-center gap-3">
+-                                            <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: row.initBg, color: row.initColor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '12px' }}>
+-                                                {row.init}
++                            {stats.topPerformers && stats.topPerformers.length > 0 ? (
++                                stats.topPerformers.map((row, i) => (
++                                    <tr key={row._id || i} style={{ borderBottom: '1px solid #f1f5f9' }}>
++                                        <td style={{ padding: '16px 24px' }}>
++                                            <div style={{ width: '24px', height: '24px', borderRadius: '4px', backgroundColor: i === 0 ? '#fef3c7' : '#f1f5f9', color: i === 0 ? '#d97706' : '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '12px' }}>
++                                                {i + 1}
+                                             </div>
+-                                            <span className="font-bold">{row.name}</span>
+-                                        </div>
+-                                    </td>
+-                                    <td style={{ padding: '16px 8px', color: '#475569' }}>{row.state}</td>
+-                                    <td style={{ padding: '16px 8px' }}>
+-                                        <span style={{ backgroundColor: '#f1f5f9', color: '#0f172a', padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>{row.activity}</span>
+-                                    </td>
+-                                    <td style={{ padding: '16px 8px', textAlign: 'right', fontWeight: 'bold', fontSize: '16px', color: '#2b2b85' }}>
+-                                        {row.score}
+-                                    </td>
++                                        </td>
++                                        <td style={{ padding: '16px 24px' }}>
++                                            <div className="flex items-center gap-3">
++                                                <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#e0e7ff', color: '#3730a3', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '12px' }}>
++                                                    {row.name?.substring(0, 2).toUpperCase() || 'NA'}
++                                                </div>
++                                                <span className="font-bold">{row.name}</span>
++                                            </div>
++                                        </td>
++                                        <td style={{ padding: '16px 24px', color: '#475569' }}>{row.state || 'N/A'}</td>
++                                        <td style={{ padding: '16px 24px' }}>
++                                            <span style={{ backgroundColor: '#f1f5f9', color: '#0f172a', padding: '4px 8px', borderRadius: '4px', fontSize: '12px', fontWeight: '600' }}>{row.sports?.length > 0 ? row.sports[0] : 'General'}</span>
++                                        </td>
++                                        <td style={{ padding: '16px 24px', textAlign: 'right', fontWeight: 'bold', fontSize: '16px', color: '#2b2b85' }}>
++                                            {row.overallScore ? Number(row.overallScore).toFixed(1) : '0.0'}
++                                        </td>
++                                    </tr>
++                                ))
++                            ) : (
++                                <tr>
++                                    <td colSpan="5" style={{ padding: '24px', textAlign: 'center', color: '#64748b' }}>No top performers found</td>
+                                 </tr>
+-                            ))}
++                            )}
+                         </tbody>
+                     </table>
+                 </div>
+diff --git a/Web/src/pages/Evaluations.jsx b/Web/src/pages/Evaluations.jsx
+index 812eff4..bbaae91 100644
+--- a/Web/src/pages/Evaluations.jsx
++++ b/Web/src/pages/Evaluations.jsx
+@@ -9,6 +9,8 @@ export const Evaluations = () => {
+     const [loading, setLoading] = useState(true);
+     const navigate = useNavigate();
+ 
++    const [selectedAthleteId, setSelectedAthleteId] = useState(null);
++
+     useEffect(() => {
+         const fetchPendingSubmissions = async () => {
+             try {
+@@ -25,96 +27,170 @@ export const Evaluations = () => {
+         fetchPendingSubmissions();
+     }, []);
+ 
+-    const handleReviewClick = (submissionId) => {
+-        // Future enhancement: could pass the specific ID to Review page
+-        navigate('/review');
++    const handleReviewClick = (athleteId) => {
++        navigate(`/review/${athleteId}`);
+     };
+ 
++    // Group submissions by Athlete
++    const athletesMap = {};
++    submissions.forEach(sub => {
++        const athleteId = sub.user?._id;
++        if (!athleteId) return;
++
++        if (!athletesMap[athleteId]) {
++            athletesMap[athleteId] = {
++                user: sub.user,
++                submissions: []
++            };
++        }
++        athletesMap[athleteId].submissions.push(sub);
++    });
++
++    const groupedAthletes = Object.values(athletesMap);
++
++    // View Logic
++    const selectedAthleteData = selectedAthleteId ? athletesMap[selectedAthleteId] : null;
++
+     return (
+-        <Layout sidebarType="dark">
+-            <div className="flex justify-between items-end mb-6">
++        <Layout sidebarType="light">
++            <div className="flex justify-between items-center mb-6">
+                 <div>
+                     <div className="text-sm text-muted mb-2 font-medium" style={{ color: '#2b2b85', letterSpacing: '1px' }}>
+                         <Activity size={16} className="inline mr-2" />
+                         PENDING EVALUATIONS
+                     </div>
+-                    <h1 className="text-3xl font-bold mb-1" style={{ color: '#0f172a' }}>Video Submissions</h1>
++                    <h1 className="text-3xl font-bold mb-1 text-main">Video Submissions</h1>
+                     <p className="text-muted text-sm" style={{ maxWidth: '600px', lineHeight: '1.5' }}>
+-                        Review unassessed video proofs uploaded by athletes. Evaluate their biomechanics, verify scores, and approve or request re-uploads.
++                        {selectedAthleteData
++                            ? `Reviewing pending videos for ${selectedAthleteData.user.name}.`
++                            : `Select an athlete to review their unassessed video proofs.`}
+                     </p>
+                 </div>
++
++                {selectedAthleteId && (
++                    <button
++                        className="btn-secondary flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium transition-colors"
++                        onClick={() => setSelectedAthleteId(null)}
++                    >
++                        &larr; Back to Athletes list
++                    </button>
++                )}
+             </div>
+ 
+             {/* Quick Stats */}
+-            <div className="dashboard-grid mb-6">
+-                <div className="card stat-card flex items-center gap-4">
+-                    <div style={{ width: '48px', height: '48px', backgroundColor: '#fcd34d', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#b45309' }}>
+-                        <Activity size={24} />
+-                    </div>
+-                    <div>
+-                        <div className="text-xs text-muted font-bold mb-1 tracking-wider">AWAITING REVIEW</div>
+-                        <div className="text-2xl font-bold">{submissions.length}</div>
++            {!selectedAthleteId && (
++                <div className="dashboard-grid mb-6">
++                    <div className="card stat-card flex items-center gap-4">
++                        <div style={{ width: '48px', height: '48px', backgroundColor: '#fcd34d', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#b45309' }}>
++                            <Activity size={24} />
++                        </div>
++                        <div>
++                            <div className="text-xs text-muted font-bold mb-1 tracking-wider">ATHLETES NEEDING REVIEW</div>
++                            <div className="text-2xl font-bold">{groupedAthletes.length}</div>
++                        </div>
+                     </div>
+                 </div>
+-            </div>
++            )}
+ 
+-            {/* Table */}
+-            <div className="card" style={{ padding: '0', overflow: 'hidden' }}>
+-                <div className="flex justify-between items-center" style={{ padding: '16px 24px', borderBottom: '1px solid #e2e8f0', backgroundColor: '#f8fafc' }}>
++            {/* Table Area */}
++            <div className="card" style={{ padding: '0', overflow: 'hidden', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025)' }}>
++                <div className="flex justify-between items-center" style={{ padding: '20px 24px', borderBottom: '1px solid #e2e8f0', backgroundColor: '#ffffff' }}>
+                     <div className="text-sm font-bold tracking-wider color-muted flex items-center gap-2">
+-                        <PlaySquare size={16} /> RECENT UPLOADS
++                        <PlaySquare size={16} />
++                        {selectedAthleteId ? `VIDEOS BY ${selectedAthleteData?.user?.name?.toUpperCase()}` : 'ATHLETES WITH PENDING VIDEOS'}
+                     </div>
+                 </div>
+ 
+                 {loading ? (
+-                    <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>Loading submissions...</div>
++                    <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>Loading data...</div>
+                 ) : submissions.length === 0 ? (
+                     <div style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>No pending video submissions right now.</div>
++                ) : !selectedAthleteId ? (
++                    /* ATHLETE LISTING VIEW */
++                    <div style={{ overflowX: 'auto' }}>
++                        <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0, textAlign: 'left', fontSize: '14px' }}>
++                            <thead>
++                                <tr style={{ color: '#475569', fontSize: '12px', backgroundColor: '#f8fafc', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
++                                    <th style={{ padding: '16px 24px', fontWeight: 'bold', borderBottom: '2px solid #e2e8f0' }}>Athlete</th>
++                                    <th style={{ padding: '16px 24px', fontWeight: 'bold', borderBottom: '2px solid #e2e8f0' }}>Email</th>
++                                    <th style={{ padding: '16px 24px', fontWeight: 'bold', borderBottom: '2px solid #e2e8f0' }}>Pending Videos</th>
++                                    <th style={{ padding: '16px 24px', fontWeight: 'bold', borderBottom: '2px solid #e2e8f0', textAlign: 'right' }}>Action</th>
++                                </tr>
++                            </thead>
++                            <tbody>
++                                {groupedAthletes.map((athleteRow, i) => (
++                                    <tr key={athleteRow.user._id || i} className="hover:bg-slate-50 transition-colors" style={{ borderBottom: '1px solid #f1f5f9', cursor: 'pointer' }} onClick={() => setSelectedAthleteId(athleteRow.user._id)}>
++                                        <td style={{ padding: '16px 24px' }}>
++                                            <div className="font-bold text-main" style={{ fontSize: '15px' }}>{athleteRow.user.name || 'Unknown Athlete'}</div>
++                                        </td>
++                                        <td style={{ padding: '16px 24px', color: '#64748b' }}>
++                                            {athleteRow.user.email || 'N/A'}
++                                        </td>
++                                        <td style={{ padding: '16px 24px' }}>
++                                            <div style={{ fontWeight: '600', color: '#0f172a' }}>
++                                                {athleteRow.submissions.length} {athleteRow.submissions.length === 1 ? 'Video' : 'Videos'}
++                                            </div>
++                                        </td>
++                                        <td style={{ padding: '16px 24px', textAlign: 'right' }}>
++                                            <button
++                                                className="btn-primary"
++                                                style={{ backgroundColor: '#4f46e5', padding: '6px 14px', fontSize: '13px', borderRadius: '6px' }}
++                                                onClick={(e) => {
++                                                    e.stopPropagation();
++                                                    setSelectedAthleteId(athleteRow.user._id);
++                                                }}
++                                            >
++                                                View Videos
++                                            </button>
++                                        </td>
++                                    </tr>
++                                ))}
++                            </tbody>
++                        </table>
++                    </div>
+                 ) : (
+-                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '14px' }}>
+-                        <thead>
+-                            <tr style={{ color: '#64748b', fontSize: '12px', borderBottom: '1px solid #e2e8f0' }}>
+-                                <th style={{ padding: '16px 24px', fontWeight: 'bold' }}>ATHLETE</th>
+-                                <th style={{ padding: '16px 24px', fontWeight: 'bold' }}>TEST TYPE</th>
+-                                <th style={{ padding: '16px 24px', fontWeight: 'bold' }}>DATE SUBMITTED</th>
+-                                <th style={{ padding: '16px 24px', fontWeight: 'bold' }}>STATUS</th>
+-                                <th style={{ padding: '16px 24px', fontWeight: 'bold', textAlign: 'right' }}>ACTION</th>
+-                            </tr>
+-                        </thead>
+-                        <tbody>
+-                            {submissions.map((sub, i) => (
+-                                <tr key={sub._id || i} style={{ borderBottom: '1px solid #f1f5f9', cursor: 'pointer' }} onClick={() => handleReviewClick(sub._id)}>
+-                                    <td style={{ padding: '16px 24px' }}>
+-                                        <div className="font-bold text-main">{sub.user?.name || 'Unknown Athlete'}</div>
+-                                        <div className="text-xs text-muted">{sub.user?.email || 'N/A'}</div>
+-                                    </td>
+-                                    <td style={{ padding: '16px 24px' }}>
+-                                        <div style={{ fontWeight: '600', color: '#0f172a' }}>{sub.testName}</div>
+-                                    </td>
+-                                    <td style={{ padding: '16px 24px', color: '#64748b' }}>
+-                                        {new Date(sub.dateTaken).toLocaleDateString()}
+-                                    </td>
+-                                    <td style={{ padding: '16px 24px' }}>
+-                                        <span style={{ backgroundColor: '#fef3c7', color: '#d97706', padding: '4px 10px', borderRadius: '12px', fontSize: '12px', fontWeight: '700' }}>
+-                                            Pending
+-                                        </span>
+-                                    </td>
+-                                    <td style={{ padding: '16px 24px', textAlign: 'right' }}>
+-                                        <button
+-                                            className="btn-primary"
+-                                            style={{ backgroundColor: '#4f46e5', padding: '6px 14px', fontSize: '13px', borderRadius: '6px' }}
+-                                            onClick={(e) => {
+-                                                e.stopPropagation();
+-                                                handleReviewClick(sub._id);
+-                                            }}
+-                                        >
+-                                            Review Video
+-                                        </button>
+-                                    </td>
++                    /* INDIVIDUAL ATHLETE VIDEOS VIEW */
++                    <div style={{ overflowX: 'auto' }}>
++                        <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0, textAlign: 'left', fontSize: '14px' }}>
++                            <thead>
++                                <tr style={{ color: '#475569', fontSize: '12px', backgroundColor: '#f8fafc', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
++                                    <th style={{ padding: '16px 24px', fontWeight: 'bold', borderBottom: '2px solid #e2e8f0' }}>Test Type</th>
++                                    <th style={{ padding: '16px 24px', fontWeight: 'bold', borderBottom: '2px solid #e2e8f0' }}>Date Submitted</th>
++                                    <th style={{ padding: '16px 24px', fontWeight: 'bold', borderBottom: '2px solid #e2e8f0' }}>Status</th>
++                                    <th style={{ padding: '16px 24px', fontWeight: 'bold', borderBottom: '2px solid #e2e8f0', textAlign: 'right' }}>Action</th>
+                                 </tr>
+-                            ))}
+-                        </tbody>
+-                    </table>
++                            </thead>
++                            <tbody>
++                                {selectedAthleteData.submissions.map((sub, i) => (
++                                    <tr key={sub._id || i} style={{ borderBottom: '1px solid #f1f5f9', cursor: 'pointer' }} onClick={() => handleReviewClick(selectedAthleteData.user._id)}>
++                                        <td style={{ padding: '16px 24px' }}>
++                                            <div style={{ fontWeight: '600', color: '#0f172a' }}>{sub.testName}</div>
++                                        </td>
++                                        <td style={{ padding: '16px 24px', color: '#64748b' }}>
++                                            {new Date(sub.dateTaken).toLocaleDateString()}
++                                        </td>
++                                        <td style={{ padding: '16px 24px' }}>
++                                            <span style={{ backgroundColor: '#fef3c7', color: '#d97706', padding: '4px 10px', borderRadius: '12px', fontSize: '12px', fontWeight: '700' }}>
++                                                Pending
++                                            </span>
++                                        </td>
++                                        <td style={{ padding: '16px 24px', textAlign: 'right' }}>
++                                            <button
++                                                className="btn-primary"
++                                                style={{ backgroundColor: '#4f46e5', padding: '6px 14px', fontSize: '13px', borderRadius: '6px' }}
++                                                onClick={(e) => {
++                                                    e.stopPropagation();
++                                                    handleReviewClick(selectedAthleteData.user._id);
++                                                }}
++                                            >
++                                                Review Video
++                                            </button>
++                                        </td>
++                                    </tr>
++                                ))}
++                            </tbody>
++                        </table>
++                    </div>
+                 )}
+             </div>
+         </Layout>
+diff --git a/Web/src/pages/ShortlistedAthletes.jsx b/Web/src/pages/ShortlistedAthletes.jsx
+index 2958adc..61f18e8 100644
+--- a/Web/src/pages/ShortlistedAthletes.jsx
++++ b/Web/src/pages/ShortlistedAthletes.jsx
+@@ -24,13 +24,13 @@ export const ShortlistedAthletes = () => {
+     const avgScore = athletes.length ? (athletes.reduce((acc, a) => acc + (a.overallScore || 0), 0) / athletes.length).toFixed(1) : 0;
+ 
+     return (
+-        <Layout sidebarType="dark">
++        <Layout sidebarType="light">
+             <div className="flex justify-between items-center mb-6">
+                 <div>
+                     <div className="text-xs font-bold mb-2 flex items-center gap-2" style={{ color: '#2b2b85', letterSpacing: '1px' }}>
+                         <MapPin size={16} /> NATIONAL TRAINING CAMP
+                     </div>
+-                    <h1 className="text-3xl font-bold mb-1" style={{ color: '#0f172a' }}>Shortlisted Athletes</h1>
++                    <h1 className="text-3xl font-bold mb-1 text-main">Shortlisted Athletes</h1>
+                     <p className="text-muted text-sm" style={{ maxWidth: '600px', lineHeight: '1.5' }}>Manage and export top-performing athletes selected for the upcoming national development programs based on recent trial scores.</p>
+                 </div>
+                 <div className="flex gap-4 items-center">
+diff --git a/Web/src/pages/SubmissionReview.jsx b/Web/src/pages/SubmissionReview.jsx
+index 98be453..5a676fc 100644
+--- a/Web/src/pages/SubmissionReview.jsx
++++ b/Web/src/pages/SubmissionReview.jsx
+@@ -1,84 +1,98 @@
+ import React, { useState, useEffect } from 'react';
+ import { Layout } from '../components/Layout';
+-import { History, Play, SkipBack, SkipForward, Volume2, Settings, Maximize, ShieldAlert, Download, CheckCircle, RefreshCcw, XCircle, FileText, Activity } from 'lucide-react';
++import { useParams, useNavigate } from 'react-router-dom';
++import { History, Play, SkipBack, SkipForward, Volume2, Settings, Maximize, ShieldAlert, Download, CheckCircle, RefreshCcw, XCircle, FileText, Activity, ChevronLeft, ChevronRight } from 'lucide-react';
+ import api from '../api';
+ 
+ export const SubmissionReview = () => {
+-    const [submission, setSubmission] = useState(null);
++    const { id } = useParams();
++    const navigate = useNavigate();
++
++    const [athleteData, setAthleteData] = useState(null);
+     const [remarks, setRemarks] = useState('');
++    const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+ 
+     useEffect(() => {
+-        const fetchSubmissions = async () => {
++        const fetchAthleteData = async () => {
+             try {
+-                // In a real app, you'd get the submission ID from the URL params
+-                // For this demo, we'll just fetch the first pending submission
+-                const sportsStr = localStorage.getItem('sports');
+-                const sports = sportsStr ? JSON.parse(sportsStr).join(',') : '';
+-                const res = await api.get(`/admin/submissions?status=pending&sports=${sports}`);
+-                if (res.data.length > 0) {
+-                    setSubmission(res.data[0]);
++                if (!id) return;
++                const res = await api.get(`/admin/athletes/${id}`);
++                setAthleteData(res.data);
++                if (res.data.athlete.evaluationRemarks) {
++                    setRemarks(res.data.athlete.evaluationRemarks);
+                 }
+             } catch (err) {
+                 console.error(err);
+             }
+         };
+-        fetchSubmissions();
+-    }, []);
++        fetchAthleteData();
++    }, [id]);
+ 
+-    const evaluate = async (status, baseScore) => {
+-        if (!submission) return;
++    const evaluate = async (status) => {
++        if (!athleteData) return;
+         try {
+-            await api.put(`/admin/submissions/${submission._id}/evaluate`, {
++            await api.put(`/admin/athletes/${id}/evaluate`, {
+                 status,
+-                score: baseScore,
+                 remarks
+             });
+-            alert(`Submission ${status} successfully!`);
+-            window.location.reload();
++            alert(`Athlete marked as ${status.toUpperCase()} successfully!`);
++            navigate('/evaluations');
+         } catch (err) {
+             console.error(err);
+         }
+     };
+ 
+-    if (!submission) {
++    if (!athleteData) {
+         return (
+-            <Layout sidebarType="none" showHeader={true}>
+-                <div style={{ padding: '40px', textAlign: 'center' }}>No pending submissions to review.</div>
++            <Layout sidebarType="light" showHeader={true}>
++                <div style={{ padding: '40px', textAlign: 'center' }}>Loading athlete profile...</div>
+             </Layout>
+         );
+     }
+ 
+-    const { user } = submission;
++    const { athlete, submissions, achievements } = athleteData;
++    const currentVideo = submissions[currentVideoIndex];
++
++    // Helper to determine badge color for status
++    const getStatusColor = (status) => {
++        switch (status) {
++            case 'approved': return { bg: '#f0fdf4', text: '#16a34a', border: '#bbf7d0' };
++            case 'rejected': return { bg: '#fef2f2', text: '#dc2626', border: '#fecaca' };
++            default: return { bg: '#fef3c7', text: '#d97706', border: '#fde68a' }; // pending
++        }
++    };
++    const statusColors = getStatusColor(athlete.evaluationStatus);
+ 
+     return (
+-        <Layout sidebarType="none" showHeader={true}>
+-            <div className="mb-6 flex justify-between items-end">
++        <Layout sidebarType="light" showHeader={true}>
++            <div className="flex justify-between items-center mb-6">
+                 <div>
+                     <div className="text-sm text-muted mb-2 font-medium">
+-                        Home &gt; Submissions &gt; <strong style={{ color: '#0f172a' }}>{user?.name || 'Athlete'} - Review</strong>
++                        <button onClick={() => navigate('/evaluations')} className="hover:underline text-blue-600 border-none bg-transparent cursor-pointer p-0">Submissions</button> &gt; <strong style={{ color: '#0f172a' }}>{athlete.name} - Profile Review</strong>
+                     </div>
+-                    <h1 className="text-3xl font-bold mb-1" style={{ color: '#2b2b85' }}>Submission Review</h1>
+-                    <p className="text-muted text-sm">Application ID: {submission._id.substring(0, 8).toUpperCase()} &bull; Submitted on {new Date(submission.dateTaken).toLocaleDateString()}</p>
++                    <h1 className="text-3xl font-bold mb-1 text-main">Athlete Global Review</h1>
++                    <p className="text-muted text-sm">Reviewing total fitness profile and uploaded assessments.</p>
+                 </div>
+                 <div className="flex gap-4">
+-                    <div style={{ padding: '8px 16px', color: '#d97706', border: '1px solid #fde68a', backgroundColor: '#fef3c7', borderRadius: '24px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: '600' }}>
+-                        <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#d97706' }}></div>
+-                        Status: Pending Evaluation
++                    <div style={{ padding: '8px 16px', color: statusColors.text, border: `1px solid ${statusColors.border}`, backgroundColor: statusColors.bg, borderRadius: '24px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: 'bold', textTransform: 'uppercase' }}>
++                        <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: statusColors.text }}></div>
++                        Status: {athlete.evaluationStatus}
+                     </div>
+                     <button className="btn-secondary flex items-center gap-2" style={{ borderRadius: '8px', padding: '8px 16px' }}>
+                         <History size={16} />
+-                        History
++                        Audit Log
+                     </button>
+                 </div>
+             </div>
+ 
+             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 380px', gap: '24px', alignItems: 'start' }}>
+-                {/* Left Column - Video Player */}
++                {/* Left Column - Video Gallery */}
+                 <div>
+                     <div style={{ width: '100%', aspectRatio: '16/9', backgroundColor: '#1e293b', borderRadius: '12px', overflow: 'hidden', position: 'relative' }}>
+-                        {submission.videoProofUrl ? (
++                        {currentVideo?.videoProofUrl ? (
+                             <video
+-                                src={submission.videoProofUrl}
++                                key={currentVideo.videoProofUrl} // force re-render on change
++                                src={currentVideo.videoProofUrl}
+                                 controls
+                                 style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                             >
+@@ -86,11 +100,41 @@ export const SubmissionReview = () => {
+                             </video>
+                         ) : (
+                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '100%', color: '#64748b' }}>
+-                                No video proof provided for this submission.
++                                {submissions.length === 0 ? "Athlete hasn't uploaded any videos." : "No video proof for this test."}
++                            </div>
++                        )}
++
++                        {/* Video Overlay Label */}
++                        {currentVideo && (
++                            <div style={{ position: 'absolute', top: 16, left: 16, backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', padding: '6px 12px', borderRadius: '6px', fontSize: '14px', fontWeight: 'bold' }}>
++                                {currentVideo.testName} &bull; {new Date(currentVideo.dateTaken).toLocaleDateString()}
+                             </div>
+                         )}
+                     </div>
+ 
++                    {/* Video Gallery Controls */}
++                    {submissions.length > 1 && (
++                        <div className="flex justify-between items-center mt-4 bg-white p-3 rounded-lg border border-slate-200">
++                            <button
++                                onClick={() => setCurrentVideoIndex(prev => Math.max(0, prev - 1))}
++                                disabled={currentVideoIndex === 0}
++                                className={`flex items-center gap-1 font-bold ${currentVideoIndex === 0 ? 'text-slate-300' : 'text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-md transition-colors'}`}
++                            >
++                                <ChevronLeft size={18} /> Previous Video
++                            </button>
++                            <span className="text-sm font-bold text-slate-500">
++                                Video {currentVideoIndex + 1} of {submissions.length}
++                            </span>
++                            <button
++                                onClick={() => setCurrentVideoIndex(prev => Math.min(submissions.length - 1, prev + 1))}
++                                disabled={currentVideoIndex === submissions.length - 1}
++                                className={`flex items-center gap-1 font-bold ${currentVideoIndex === submissions.length - 1 ? 'text-slate-300' : 'text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-md transition-colors'}`}
++                            >
++                                Next Video <ChevronRight size={18} />
++                            </button>
++                        </div>
++                    )}
++
+                     {/* Video Tools Bar */}
+                     <div className="card mt-6" style={{ display: 'flex', gap: '24px', padding: '16px 24px' }}>
+                         <div>
+@@ -125,147 +169,103 @@ export const SubmissionReview = () => {
+                     {/* Athlete Profile Card */}
+                     <div className="card mb-6" style={{ padding: '24px' }}>
+                         <div className="flex gap-4 mb-6">
+-                            <div style={{ width: '64px', height: '64px', borderRadius: '8px', overflow: 'hidden', backgroundColor: '#f1f5f9' }}>
+-                                <img src="https://i.pravatar.cc/150?img=12" alt="Rajesh Kumar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
++                            <div style={{ width: '64px', height: '64px', borderRadius: '8px', overflow: 'hidden', backgroundColor: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
++                                <span className="text-2xl font-bold text-slate-400">{athlete.name.charAt(0)}</span>
+                             </div>
+                             <div>
+-                                <div className="text-xl font-bold text-main">Rajesh Kumar</div>
+-                                <div className="text-sm font-semibold" style={{ color: '#2b2b85', marginBottom: '4px' }}>Category: Elite Javelin Throw</div>
++                                <div className="text-xl font-bold text-main">{athlete.name}</div>
++                                <div className="text-sm font-semibold" style={{ color: '#2b2b85', marginBottom: '4px' }}>{athlete.email}</div>
+                                 <div className="flex gap-2 mt-1">
+-                                    <span style={{ fontSize: '10px', fontWeight: 'bold', backgroundColor: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>U-19</span>
+-                                    <span style={{ fontSize: '10px', fontWeight: 'bold', backgroundColor: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>HARYANA</span>
++                                    {athlete.sports?.map(sport => (
++                                        <span key={sport} style={{ fontSize: '10px', fontWeight: 'bold', backgroundColor: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>{sport}</span>
++                                    ))}
+                                 </div>
+                             </div>
+                         </div>
+ 
+                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                             <div>
+-                                <div className="text-xs text-muted mb-1 font-bold">AGE</div>
+-                                <div className="text-sm font-bold text-main">18 Years 4 Months</div>
++                                <div className="text-xs text-muted mb-1 font-bold">GENDER</div>
++                                <div className="text-sm font-bold text-main capitalize">{athlete.gender || 'Not specified'}</div>
+                             </div>
+                             <div>
+-                                <div className="text-xs text-muted mb-1 font-bold">PRIMARY SPORT</div>
+-                                <div className="text-sm font-bold text-main">Athletics - Javelin</div>
++                                <div className="text-xs text-muted mb-1 font-bold">AGE</div>
++                                <div className="text-sm font-bold text-main">
++                                    {athlete.dateOfBirth ? `${new Date().getFullYear() - new Date(athlete.dateOfBirth).getFullYear()} Years` : 'Not specified'}
++                                </div>
+                             </div>
+                             <div>
+-                                <div className="text-xs text-muted mb-1 font-bold">COACH</div>
+-                                <div className="text-sm font-bold text-main">Dharmendra Singh</div>
++                                <div className="text-xs text-muted mb-1 font-bold">HEIGHT / WEIGHT</div>
++                                <div className="text-sm font-bold text-main">
++                                    {athlete.height || '?'}cm / {athlete.weight || '?'}kg
++                                </div>
+                             </div>
+                             <div>
+-                                <div className="text-xs text-muted mb-1 font-bold">ACADEMIC LEVEL</div>
+-                                <div className="text-sm font-bold text-main">12th Standard</div>
++                                <div className="text-xs text-muted mb-1 font-bold">LOCATION</div>
++                                <div className="text-sm font-bold text-main">{athlete.state || athlete.address || 'Unknown'}</div>
+                             </div>
+                         </div>
+                     </div>
+ 
+                     {/* Certificates & Documents */}
+-                    <div className="card mb-6">
+-                        <div className="flex justify-between items-center mb-4">
+-                            <h3 className="text-sm font-bold">Certificates & Documents</h3>
+-                            <span style={{ fontSize: '12px', backgroundColor: '#f8fafc', padding: '2px 8px', borderRadius: '12px', fontWeight: 'bold', color: '#64748b' }}>2 Files</span>
+-                        </div>
+-                        <div className="flex flex-col gap-3">
+-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+-                                <div className="flex items-center gap-3">
+-                                    <div style={{ width: '32px', height: '32px', backgroundColor: '#fee2e2', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ef4444' }}>
+-                                        <FileText size={16} />
+-                                    </div>
+-                                    <div>
+-                                        <div className="text-sm font-bold text-main">National_Participation_2023.pdf</div>
+-                                        <div className="text-xs text-muted">1.2 MB &bull; Verified</div>
+-                                    </div>
+-                                </div>
+-                                <button style={{ color: '#94a3b8' }}><Download size={18} /></button>
++                    {achievements.length > 0 && (
++                        <div className="card mb-6">
++                            <div className="flex justify-between items-center mb-4">
++                                <h3 className="text-sm font-bold">Certificates & Achievements</h3>
++                                <span style={{ fontSize: '12px', backgroundColor: '#f8fafc', padding: '2px 8px', borderRadius: '12px', fontWeight: 'bold', color: '#64748b' }}>{achievements.length} Items</span>
+                             </div>
+-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+-                                <div className="flex items-center gap-3">
+-                                    <div style={{ width: '32px', height: '32px', backgroundColor: '#e0e7ff', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4f46e5' }}>
+-                                        <FileText size={16} />
+-                                    </div>
+-                                    <div>
+-                                        <div className="text-sm font-bold text-main">State_ID_Proof.jpg</div>
+-                                        <div className="text-xs text-muted">842 KB &bull; Verified</div>
++                            <div className="flex flex-col gap-3">
++                                {achievements.map((ach) => (
++                                    <div key={ach._id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
++                                        <div className="flex items-center gap-3">
++                                            <div style={{ width: '32px', height: '32px', backgroundColor: '#e0e7ff', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4f46e5' }}>
++                                                <FileText size={16} />
++                                            </div>
++                                            <div>
++                                                <div className="text-sm font-bold text-main" style={{ maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{ach.title}</div>
++                                                <div className="text-xs text-muted">{new Date(ach.dateEarned).getFullYear()}</div>
++                                            </div>
++                                        </div>
++                                        {ach.proofUrl && (
++                                            <a href={ach.proofUrl} target="_blank" rel="noreferrer" style={{ color: '#94a3b8' }}><Download size={18} /></a>
++                                        )}
+                                     </div>
+-                                </div>
+-                                <button style={{ color: '#94a3b8' }}><Download size={18} /></button>
+-                            </div>
+-                        </div>
+-                    </div>
+-
+-                    {/* AI Performance Metrics */}
+-                    <div className="card mb-6">
+-                        <h3 className="text-sm font-bold mb-4 flex items-center gap-2">
+-                            <Activity size={18} color="#4f46e5" /> AI PERFORMANCE METRICS
+-                        </h3>
+-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+-                            <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '8px' }}>
+-                                <div className="text-xs font-bold text-muted mb-2 tracking-wider">RELEASE VELOCITY</div>
+-                                <div className="text-2xl font-bold text-main mb-2">28.4 <span className="text-sm text-muted">m/s</span></div>
+-                                <div style={{ width: '100%', height: '4px', backgroundColor: '#e2e8f0', borderRadius: '2px' }}>
+-                                    <div style={{ width: '85%', height: '100%', backgroundColor: '#2b2b85', borderRadius: '2px' }}></div>
+-                                </div>
+-                            </div>
+-                            <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '8px' }}>
+-                                <div className="text-xs font-bold text-muted mb-2 tracking-wider">LAUNCH ANGLE</div>
+-                                <div className="text-2xl font-bold text-main mb-2">42.1 <span className="text-sm text-muted">deg</span></div>
+-                                <div style={{ width: '100%', height: '4px', backgroundColor: '#e2e8f0', borderRadius: '2px' }}>
+-                                    <div style={{ width: '70%', height: '100%', backgroundColor: '#2b2b85', borderRadius: '2px' }}></div>
+-                                </div>
+-                            </div>
+-                            <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '8px' }}>
+-                                <div className="text-xs font-bold text-muted mb-1 tracking-wider">GRIP TECHNIQUE</div>
+-                                <div className="text-sm font-bold" style={{ color: '#16a34a' }}>EXCELLENT (FORK)</div>
+-                                <div className="text-xs text-muted mt-1">Confidence: 94%</div>
+-                            </div>
+-                            <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '8px' }}>
+-                                <div className="text-xs font-bold text-muted mb-1 tracking-wider">RUN-UP SPEED</div>
+-                                <div className="text-sm font-bold" style={{ color: '#2b2b85' }}>CONSISTENCY HIGH</div>
+-                                <div className="text-xs text-muted mt-1">6.8m/s Peak</div>
++                                ))}
+                             </div>
+                         </div>
+-                    </div>
++                    )}
+ 
+                     {/* Reviewer Evaluation */}
+                     <div className="card" style={{ borderColor: '#e2e8f0' }}>
+-                        <h3 className="text-sm font-bold mb-4">Reviewer Evaluation</h3>
++                        <h3 className="text-sm font-bold mb-4">Athlete Decision</h3>
+ 
+                         <div className="mb-4">
+-                            <div className="text-xs font-bold text-muted mb-2 tracking-wider">REVIEWER REMARKS</div>
++                            <div className="text-xs font-bold text-muted mb-2 tracking-wider">OFFICIAL REMARKS</div>
+                             <textarea
+                                 style={{ width: '100%', minHeight: '100px', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: '14px', fontFamily: 'inherit', resize: 'vertical' }}
+-                                placeholder="Enter detailed feedback for the athlete..."
++                                placeholder="Enter detailed feedback for the athlete. This logic applies to their entire profile..."
+                                 value={remarks}
+                                 onChange={(e) => setRemarks(e.target.value)}
+                             ></textarea>
+                         </div>
+ 
+-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', backgroundColor: '#f8fafc', borderRadius: '8px', marginBottom: '20px' }}>
+-                            <div className="flex items-center gap-2">
+-                                <ShieldAlert size={16} color="#ef4444" />
+-                                <span className="text-sm font-bold text-main">Flag as Suspicious</span>
+-                            </div>
+-                            <div style={{ width: '40px', height: '24px', backgroundColor: '#e2e8f0', borderRadius: '12px', position: 'relative', cursor: 'pointer' }}>
+-                                <div style={{ width: '20px', height: '20px', backgroundColor: 'white', borderRadius: '50%', position: 'absolute', top: '2px', left: '2px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}></div>
+-                            </div>
+-                        </div>
+-
+                         <div style={{ display: 'flex', gap: '12px' }}>
+-                            <button onClick={() => evaluate('approved', 92)} style={{ flex: 1, padding: '12px', borderRadius: '8px', border: '1px solid #bbf7d0', backgroundColor: '#f0fdf4', color: '#16a34a', fontWeight: 'bold', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
++                            <button onClick={() => evaluate('approved')} style={{ flex: 1, padding: '12px', borderRadius: '8px', border: '1px solid #bbf7d0', backgroundColor: '#f0fdf4', color: '#16a34a', fontWeight: 'bold', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', transition: 'all 0.2s', opacity: athlete.evaluationStatus === 'approved' ? 0.5 : 1 }}>
+                                 <CheckCircle size={20} />
+                                 APPROVE
+                             </button>
+-                            <button onClick={() => evaluate('pending', 0)} style={{ flex: 1, padding: '12px', borderRadius: '8px', border: '1px solid #fed7aa', backgroundColor: '#fff7ed', color: '#ea580c', fontWeight: 'bold', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
++                            <button onClick={() => evaluate('pending')} style={{ flex: 1, padding: '12px', borderRadius: '8px', border: '1px solid #fed7aa', backgroundColor: '#fff7ed', color: '#ea580c', fontWeight: 'bold', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', transition: 'all 0.2s', opacity: athlete.evaluationStatus === 'pending' ? 0.5 : 1 }}>
+                                 <RefreshCcw size={20} />
+-                                REUPLOAD
++                                PENDING
+                             </button>
+-                            <button onClick={() => evaluate('rejected', 0)} style={{ flex: 1, padding: '12px', borderRadius: '8px', border: '1px solid #fecaca', backgroundColor: '#fef2f2', color: '#dc2626', fontWeight: 'bold', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
++                            <button onClick={() => evaluate('rejected')} style={{ flex: 1, padding: '12px', borderRadius: '8px', border: '1px solid #fecaca', backgroundColor: '#fef2f2', color: '#dc2626', fontWeight: 'bold', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', transition: 'all 0.2s', opacity: athlete.evaluationStatus === 'rejected' ? 0.5 : 1 }}>
+                                 <XCircle size={20} />
+                                 REJECT
+                             </button>
+                         </div>
+ 
+                         <div className="text-center mt-4">
+-                            <span className="text-xs text-muted italic">Evaluating this submission will notify the State Admin and Athlete via SMS/Email.</span>
++                            <span className="text-xs text-muted italic">Evaluating this athlete will notify them via SMS/Email of their global evaluation status.</span>
+                         </div>
+                     </div>
+ 
+diff --git a/app/App.tsx b/app/App.tsx
+index a3d50c7..5f92d5d 100644
+--- a/app/App.tsx
++++ b/app/App.tsx
+@@ -16,6 +16,9 @@ import SelectTestScreen from './src/screens/SelectTestScreen';
+ import TestInstructionsScreen from './src/screens/TestInstructionsScreen';
+ import UploadingDataScreen from './src/screens/UploadingDataScreen';
+ import UploadAssessmentScreen from './src/screens/UploadAssessmentScreen';
++import NotificationsScreen from './src/screens/NotificationsScreen';
++
++import SubmissionsScreen from './src/screens/SubmissionsScreen';
+ 
+ import LoginScreen from './src/screens/LoginScreen';
+ 
+@@ -35,6 +38,8 @@ export default function App() {
+           <Stack.Screen name="TestInstructions" component={TestInstructionsScreen} />
+           <Stack.Screen name="UploadAssessment" component={UploadAssessmentScreen} />
+           <Stack.Screen name="UploadingData" component={UploadingDataScreen} />
++          <Stack.Screen name="Notifications" component={NotificationsScreen} />
++          <Stack.Screen name="Submissions" component={SubmissionsScreen} />
+         </Stack.Navigator>
+       </NavigationContainer>
+       <StatusBar style="auto" />
+diff --git a/app/package-lock.json b/app/package-lock.json
+index 2a1cf21..f5db7df 100644
+--- a/app/package-lock.json
++++ b/app/package-lock.json
+@@ -15,7 +15,9 @@
+         "@react-navigation/native-stack": "^7.13.0",
+         "@reduxjs/toolkit": "^2.11.2",
+         "axios": "^1.13.5",
++        "cloudinary": "2.9.0",
+         "expo": "~54.0.33",
++        "expo-av": "^16.0.8",
+         "expo-image-picker": "~17.0.10",
+         "expo-status-bar": "~3.0.9",
+         "react": "19.1.0",
+@@ -4139,6 +4141,18 @@
+         "node": ">=0.8"
+       }
+     },
++    "node_modules/cloudinary": {
++      "version": "2.9.0",
++      "resolved": "https://registry.npmjs.org/cloudinary/-/cloudinary-2.9.0.tgz",
++      "integrity": "sha512-F3iKMOy4y0zy0bi5JBp94SC7HY7i/ImfTPSUV07iJmRzH1Iz8WavFfOlJTR1zvYM/xKGoiGZ3my/zy64In0IQQ==",
++      "license": "MIT",
++      "dependencies": {
++        "lodash": "^4.17.21"
++      },
++      "engines": {
++        "node": ">=9"
++      }
++    },
+     "node_modules/color": {
+       "version": "4.2.3",
+       "resolved": "https://registry.npmjs.org/color/-/color-4.2.3.tgz",
+@@ -4701,6 +4715,23 @@
+         }
+       }
+     },
++    "node_modules/expo-av": {
++      "version": "16.0.8",
++      "resolved": "https://registry.npmjs.org/expo-av/-/expo-av-16.0.8.tgz",
++      "integrity": "sha512-cmVPftGR/ca7XBgs7R6ky36lF3OC0/MM/lpgX/yXqfv0jASTsh7AYX9JxHCwFmF+Z6JEB1vne9FDx4GiLcGreQ==",
++      "license": "MIT",
++      "peerDependencies": {
++        "expo": "*",
++        "react": "*",
++        "react-native": "*",
++        "react-native-web": "*"
++      },
++      "peerDependenciesMeta": {
++        "react-native-web": {
++          "optional": true
++        }
++      }
++    },
+     "node_modules/expo-font": {
+       "version": "14.0.11",
+       "resolved": "https://registry.npmjs.org/expo-font/-/expo-font-14.0.11.tgz",
+@@ -6693,6 +6724,12 @@
+         "node": ">=8"
+       }
+     },
++    "node_modules/lodash": {
++      "version": "4.17.23",
++      "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.17.23.tgz",
++      "integrity": "sha512-LgVTMpQtIopCi79SJeDiP0TfWi5CNEc/L/aRdTh3yIvmZXTnheWpKjSZhnvMl8iXbC1tFg9gdHHDMLoV7CnG+w==",
++      "license": "MIT"
++    },
+     "node_modules/lodash.debounce": {
+       "version": "4.0.8",
+       "resolved": "https://registry.npmjs.org/lodash.debounce/-/lodash.debounce-4.0.8.tgz",
+diff --git a/app/package.json b/app/package.json
+index 8f2c479..f50f2d3 100644
+--- a/app/package.json
++++ b/app/package.json
+@@ -16,7 +16,9 @@
+     "@react-navigation/native-stack": "^7.13.0",
+     "@reduxjs/toolkit": "^2.11.2",
+     "axios": "^1.13.5",
++    "cloudinary": "2.9.0",
+     "expo": "~54.0.33",
++    "expo-av": "^16.0.8",
+     "expo-image-picker": "~17.0.10",
+     "expo-status-bar": "~3.0.9",
+     "react": "19.1.0",
+diff --git a/app/src/hooks/useRedux.ts b/app/src/hooks/useRedux.ts
+index 3a9e7d5..2dfc9b7 100644
+--- a/app/src/hooks/useRedux.ts
++++ b/app/src/hooks/useRedux.ts
+@@ -1,5 +1,5 @@
+ import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
+-import type { RootState, AppDispatch } from './index';
++import type { RootState, AppDispatch } from '../store/index';
+ 
+ // Use throughout your app instead of plain `useDispatch` and `useSelector`
+ export const useAppDispatch = () => useDispatch<AppDispatch>();
+diff --git a/app/src/screens/HomeScreen.tsx b/app/src/screens/HomeScreen.tsx
+index f6ce8a4..8ef8f11 100644
+--- a/app/src/screens/HomeScreen.tsx
++++ b/app/src/screens/HomeScreen.tsx
+@@ -3,23 +3,41 @@ import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity, SafeAreaVi
+ import { Colors, Spacing } from '../constants/theme';
+ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+ import AsyncStorage from '@react-native-async-storage/async-storage';
+-import { useNavigation } from '@react-navigation/native';
++import { useNavigation, useFocusEffect } from '@react-navigation/native';
++import api from '../services/apiClient';
+ 
+ export default function HomeScreen() {
+     const navigation = useNavigation<any>();
+-    const [userName, setUserName] = useState('Rahul Kumar');
+-    const [userSport, setUserSport] = useState('Boxing');
++    const [userName, setUserName] = useState('Athlete');
++    const [userSport, setUserSport] = useState('-');
++    const [hasUnread, setHasUnread] = useState(false);
++    const [evalStatus, setEvalStatus] = useState('pending');
++
++    useFocusEffect(
++        React.useCallback(() => {
++            const checkUnread = async () => {
++                try {
++                    const res = await api.get('/notifications');
++                    const unread = res.data.some((n: any) => !n.isRead);
++                    setHasUnread(unread);
++                } catch (err) {
++                    console.log('Error checking notifications:', err);
++                }
++            };
++            checkUnread();
++        }, [])
++    );
+ 
+     useEffect(() => {
+         const loadProfileData = async () => {
+             try {
+-                const name = await AsyncStorage.getItem('userName');
+-                const sportsStr = await AsyncStorage.getItem('userSports');
+-                if (name) setUserName(name);
+-                if (sportsStr) {
+-                    const sports = JSON.parse(sportsStr);
+-                    if (sports && sports.length > 0) {
+-                        setUserSport(sports[0]); // display primary sport
++                // Fetch full profile from DB instead of just relying on local storage
++                const res = await api.get('/auth/me');
++                if (res.data) {
++                    setUserName(res.data.name);
++                    setEvalStatus(res.data.evaluationStatus);
++                    if (res.data.sports && res.data.sports.length > 0) {
++                        setUserSport(res.data.sports[0]); // display primary sport
+                     }
+                 }
+             } catch (err) {
+@@ -29,6 +47,14 @@ export default function HomeScreen() {
+         loadProfileData();
+     }, []);
+ 
++    const getStatusDisplay = () => {
++        if (evalStatus === 'approved') return { label: 'Approved Athlete', color: Colors.success };
++        if (evalStatus === 'rejected') return { label: 'Profile Rejected', color: Colors.error };
++        return { label: 'Verification Pending', color: '#F59E0B' };
++    };
++
++    const statusDisp = getStatusDisplay();
++
+     return (
+         <SafeAreaView style={styles.container}>
+             <View style={styles.header}>
+@@ -36,9 +62,12 @@ export default function HomeScreen() {
+                     <Text style={styles.headerSubtitle}>SAI TALENT ASSESSMENT</Text>
+                     <Text style={styles.headerTitle}>Welcome, {userName.split(' ')[0]}</Text>
+                 </View>
+-                <TouchableOpacity style={styles.notificationBtn}>
++                <TouchableOpacity
++                    style={styles.notificationBtn}
++                    onPress={() => navigation.navigate('Notifications')}
++                >
+                     <Ionicons name="notifications" size={24} color="#374151" />
+-                    <View style={styles.dot} />
++                    {hasUnread && <View style={styles.dot} />}
+                 </TouchableOpacity>
+             </View>
+ 
+@@ -48,31 +77,31 @@ export default function HomeScreen() {
+                     <View style={styles.avatarContainer}>
+                         <View style={styles.avatar}>
+                             <Ionicons name="person" size={50} color="#D1D5DB" />
+-                            <View style={styles.checkIcon}>
+-                                <Ionicons name="checkmark-circle" size={20} color={Colors.success} />
++                            <View style={[styles.checkIcon, { backgroundColor: statusDisp.color }]}>
++                                <Ionicons name={evalStatus === 'approved' ? 'checkmark-circle' : (evalStatus === 'rejected' ? 'close-circle' : 'time')} size={20} color={Colors.white} />
+                             </View>
+                         </View>
+                     </View>
+                     <Text style={styles.profileName}>{userName}</Text>
+-                    <Text style={styles.verifiedTag}>Verified Athlete</Text>
++                    <Text style={[styles.verifiedTag, { color: statusDisp.color }]}>{statusDisp.label}</Text>
+                     <View style={styles.idBadge}>
+-                        <Text style={styles.idText}>ID: SAI-2023-8892</Text>
++                        <Text style={styles.idText}>ID: SAI-PROFILE</Text>
+                     </View>
+ 
+                     <View style={styles.divider} />
+ 
+                     <View style={styles.statsRow}>
+                         <View style={styles.statItem}>
+-                            <Text style={styles.statLabel}>AGE</Text>
+-                            <Text style={styles.statValue}>17</Text>
++                            <Text style={styles.statLabel}>STATUS</Text>
++                            <Text style={[styles.statValue, { color: statusDisp.color, textTransform: 'capitalize' }]}>{evalStatus}</Text>
+                         </View>
+                         <View style={[styles.statItem, styles.statBorder]}>
+                             <Text style={styles.statLabel}>SPORT</Text>
+                             <Text style={styles.statValue} numberOfLines={1}>{userSport}</Text>
+                         </View>
+                         <View style={styles.statItem}>
+-                            <Text style={styles.statLabel}>STATE</Text>
+-                            <Text style={styles.statValue}>HR</Text>
++                            <Text style={styles.statLabel}>DOCS</Text>
++                            <Text style={styles.statValue}>-</Text>
+                         </View>
+                     </View>
+                 </View>
+@@ -80,13 +109,17 @@ export default function HomeScreen() {
+                 {/* Profile Completion */}
+                 <View style={styles.completionCard}>
+                     <View style={styles.completionHeader}>
+-                        <Text style={styles.cardTitle}>Profile Completion</Text>
+-                        <Text style={styles.percentText}>75%</Text>
++                        <Text style={styles.cardTitle}>Global Evaluation</Text>
++                        <Text style={[styles.percentText, { color: statusDisp.color }]}>{evalStatus.toUpperCase()}</Text>
+                     </View>
+                     <View style={styles.progressContainer}>
+-                        <View style={[styles.progressFill, { width: '75%' }]} />
++                        <View style={[styles.progressFill, { width: evalStatus === 'approved' ? '100%' : (evalStatus === 'rejected' ? '100%' : '50%'), backgroundColor: statusDisp.color }]} />
+                     </View>
+-                    <Text style={styles.suggestionText}>Complete your profile to apply for national schemes.</Text>
++                    <Text style={styles.suggestionText}>
++                        {evalStatus === 'approved' ? 'Your profile has been approved! You are ready for national schemes.' :
++                            evalStatus === 'rejected' ? 'Your profile was rejected. Please review official feedback in notifications.' :
++                                'Your profile is currently under review by evaluators.'}
++                    </Text>
+                 </View>
+ 
+                 {/* Start Fitness Test */}
+@@ -96,8 +129,10 @@ export default function HomeScreen() {
+                             <Ionicons name="timer" size={30} color={Colors.white} />
+                         </View>
+                         <View>
+-                            <Text style={styles.fitnessTitle}>Start Fitness Test</Text>
+-                            <Text style={styles.fitnessSubtitle}>Battery of tests pending</Text>
++                            <Text style={styles.fitnessTitle}>Assessments</Text>
++                            <Text style={styles.fitnessSubtitle}>
++                                {evalStatus === 'approved' ? 'Profile verified.' : 'Upload assessments to get verified.'}
++                            </Text>
+                         </View>
+                     </View>
+                     <Ionicons name="chevron-forward" size={24} color={Colors.white} />
+@@ -111,7 +146,7 @@ export default function HomeScreen() {
+                         </View>
+                         <Text style={styles.gridTitle}>Upload Certificates</Text>
+                     </TouchableOpacity>
+-                    <TouchableOpacity style={styles.gridCard}>
++                    <TouchableOpacity style={styles.gridCard} onPress={() => navigation.navigate('Submissions')}>
+                         <View style={styles.iconCircleLightBlue}>
+                             <MaterialCommunityIcons name="history" size={24} color={Colors.primary} />
+                         </View>
+@@ -151,7 +186,7 @@ export default function HomeScreen() {
+                     <Ionicons name="timer-outline" size={24} color={Colors.textSecondary} />
+                     <Text style={styles.navText}>Tests</Text>
+                 </TouchableOpacity>
+-                <TouchableOpacity style={styles.navItem}>
++                <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Submissions')}>
+                     <Ionicons name="folder-outline" size={24} color={Colors.textSecondary} />
+                     <Text style={styles.navText}>Submissions</Text>
+                 </TouchableOpacity>
+diff --git a/app/src/screens/LoginScreen.tsx b/app/src/screens/LoginScreen.tsx
+index e6cec7e..a78ba16 100644
+--- a/app/src/screens/LoginScreen.tsx
++++ b/app/src/screens/LoginScreen.tsx
+@@ -96,12 +96,18 @@ export default function LoginScreen() {
+                     {!loading && <Ionicons name="arrow-forward" size={20} color={Colors.white} />}
+                 </TouchableOpacity>
+ 
+-                <View style={styles.registerContainer}>
+-                    <Text style={styles.registerText}>Don't have an account? </Text>
+-                    <TouchableOpacity onPress={() => navigation.navigate('Registration')}>
+-                        <Text style={styles.registerLink}>Register Now</Text>
+-                    </TouchableOpacity>
++                <View style={styles.dividerContainer}>
++                    <View style={styles.divider} />
++                    <Text style={styles.dividerText}>OR</Text>
++                    <View style={styles.divider} />
+                 </View>
++
++                <TouchableOpacity
++                    style={styles.signupButton}
++                    onPress={() => navigation.navigate('Registration')}
++                >
++                    <Text style={styles.signupText}>Sign Up</Text>
++                </TouchableOpacity>
+             </View>
+         </SafeAreaView>
+     );
+@@ -203,18 +209,35 @@ const styles = StyleSheet.create({
+         fontWeight: 'bold',
+         marginRight: 8,
+     },
+-    registerContainer: {
++    dividerContainer: {
+         flexDirection: 'row',
+-        justifyContent: 'center',
+         alignItems: 'center',
++        marginBottom: 24,
+     },
+-    registerText: {
+-        fontSize: 14,
++    divider: {
++        flex: 1,
++        height: 1,
++        backgroundColor: '#E5E7EB',
++    },
++    dividerText: {
++        marginHorizontal: 16,
+         color: Colors.textSecondary,
++        fontWeight: '600',
+     },
+-    registerLink: {
+-        fontSize: 14,
+-        fontWeight: 'bold',
++    signupButton: {
++        backgroundColor: Colors.white,
++        flexDirection: 'row',
++        height: 56,
++        borderRadius: 12,
++        alignItems: 'center',
++        justifyContent: 'center',
++        marginBottom: 24,
++        borderWidth: 2,
++        borderColor: Colors.primary,
++    },
++    signupText: {
+         color: Colors.primary,
++        fontSize: 16,
++        fontWeight: 'bold',
+     },
+ });
+diff --git a/app/src/screens/RegistrationScreen.tsx b/app/src/screens/RegistrationScreen.tsx
+index 8c5cc96..83d8a5c 100644
+--- a/app/src/screens/RegistrationScreen.tsx
++++ b/app/src/screens/RegistrationScreen.tsx
+@@ -4,7 +4,8 @@ import { Colors, Spacing } from '../constants/theme';
+ import { Ionicons } from '@expo/vector-icons';
+ import { useNavigation } from '@react-navigation/native';
+ import DateTimePicker from '@react-native-community/datetimepicker';
+-import { Platform, Modal } from 'react-native';
++import { Platform, Modal, Image } from 'react-native';
++import * as ImagePicker from 'expo-image-picker';
+ 
+ export default function RegistrationScreen() {
+     const navigation = useNavigation<any>();
+@@ -20,6 +21,27 @@ export default function RegistrationScreen() {
+     const [date, setDate] = useState(new Date());
+     const [showDatePicker, setShowDatePicker] = useState(false);
+ 
++    // Document state
++    const [aadhaarUri, setAadhaarUri] = useState<string | null>(null);
++    const [dobUri, setDobUri] = useState<string | null>(null);
++
++    const pickImage = async (setImage: (uri: string) => void) => {
++        try {
++            await ImagePicker.requestMediaLibraryPermissionsAsync();
++            const result = await ImagePicker.launchImageLibraryAsync({
++                mediaTypes: ['images'],
++                allowsEditing: true,
++                quality: 0.8,
++            });
++
++            if (!result.canceled && result.assets && result.assets.length > 0) {
++                setImage(result.assets[0].uri);
++            }
++        } catch (error) {
++            Alert.alert('Error', 'Failed to pick image');
++        }
++    };
++
+     const onDateChangeAndroid = (event: any, selectedDate?: Date) => {
+         setShowDatePicker(false);
+         if (event.type === 'set' && selectedDate) {
+@@ -38,8 +60,8 @@ export default function RegistrationScreen() {
+     };
+ 
+     const handleNext = () => {
+-        if (!name || !email || !password || !gender || !stateRegion) {
+-            Alert.alert("Required Fields", "Please fill in all mandatory fields, including State/Region.");
++        if (!name || !email || !password || !gender || !stateRegion || !aadhaarUri || (!dob && !dobUri)) {
++            Alert.alert("Required Fields", "Please fill in all mandatory fields, including State/Region and required documents.");
+             return;
+         }
+ 
+@@ -51,7 +73,9 @@ export default function RegistrationScreen() {
+                 dateOfBirth: dob,
+                 gender,
+                 address,
+-                state: stateRegion
++                state: stateRegion,
++                aadhaarUri,
++                dobUri
+             }
+         });
+     };
+@@ -210,6 +234,37 @@ export default function RegistrationScreen() {
+                         />
+                     </View>
+ 
++                    {/* Document Upload section */}
++                    <Text style={[styles.label, { marginTop: 10, fontSize: 16 }]}>Document Uploads</Text>
++
++                    <View style={styles.inputGroup}>
++                        <Text style={styles.label}>Aadhaar Card <Text style={styles.required}>*</Text></Text>
++                        <TouchableOpacity style={styles.uploadArea} onPress={() => pickImage(setAadhaarUri)}>
++                            {aadhaarUri ? (
++                                <Image source={{ uri: aadhaarUri }} style={styles.previewImage} />
++                            ) : (
++                                <View style={styles.uploadPlaceholder}>
++                                    <Ionicons name="cloud-upload-outline" size={32} color={Colors.primary} />
++                                    <Text style={styles.uploadTextDark}>Upload Aadhaar</Text>
++                                </View>
++                            )}
++                        </TouchableOpacity>
++                    </View>
++
++                    <View style={styles.inputGroup}>
++                        <Text style={styles.label}>Date of Birth Certificate <Text style={styles.required}>*</Text></Text>
++                        <TouchableOpacity style={styles.uploadArea} onPress={() => pickImage(setDobUri)}>
++                            {dobUri ? (
++                                <Image source={{ uri: dobUri }} style={styles.previewImage} />
++                            ) : (
++                                <View style={styles.uploadPlaceholder}>
++                                    <Ionicons name="cloud-upload-outline" size={32} color={Colors.primary} />
++                                    <Text style={styles.uploadTextDark}>Upload DOB Certificate</Text>
++                                </View>
++                            )}
++                        </TouchableOpacity>
++                    </View>
++
+                     <View style={styles.inputGroup}>
+                         <Text style={styles.label}>Mobile Number</Text>
+                         <View style={styles.inputView}>
+@@ -429,4 +484,28 @@ const styles = StyleSheet.create({
+         fontWeight: 'bold',
+         marginRight: 8,
+     },
++    uploadArea: {
++        borderWidth: 1,
++        borderColor: '#D1D5DB',
++        borderStyle: 'dashed',
++        borderRadius: 8,
++        height: 120,
++        backgroundColor: '#F9FAFB',
++        overflow: 'hidden',
++        justifyContent: 'center',
++        alignItems: 'center',
++    },
++    uploadPlaceholder: {
++        alignItems: 'center',
++    },
++    uploadTextDark: {
++        marginTop: 8,
++        color: Colors.textSecondary,
++        fontWeight: '600',
++    },
++    previewImage: {
++        width: '100%',
++        height: '100%',
++        resizeMode: 'cover',
++    },
+ });
+diff --git a/app/src/screens/SelectTestScreen.tsx b/app/src/screens/SelectTestScreen.tsx
+index f361dec..21faabe 100644
+--- a/app/src/screens/SelectTestScreen.tsx
++++ b/app/src/screens/SelectTestScreen.tsx
+@@ -1,12 +1,15 @@
+-import React, { useState } from 'react';
++import React, { useState, useEffect } from 'react';
+ import { StyleSheet, Text, View, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
+ import { Colors, Spacing } from '../constants/theme';
+ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+-import { useNavigation } from '@react-navigation/native';
++import { useNavigation, useIsFocused } from '@react-navigation/native';
++import AsyncStorage from '@react-native-async-storage/async-storage';
+ 
+ export default function SelectTestScreen() {
+     const navigation = useNavigation<any>();
+-    const [selectedTest, setSelectedTest] = useState('Vertical Jump');
++    const isFocused = useIsFocused();
++    const [selectedTest, setSelectedTest] = useState<string | null>(null);
++    const [completedTests, setCompletedTests] = useState<string[]>([]);
+ 
+     const tests = [
+         {
+@@ -34,8 +37,8 @@ export default function SelectTestScreen() {
+             iconType: 'MaterialCommunityIcons'
+         },
+         {
+-            id: '600m Endurance Run',
+-            title: '600m Endurance Run',
++            id: '100m Endurance Run',
++            title: '100m Endurance Run',
+             subtitle: 'Measures cardiovascular endurance',
+             tag: 'TIMED',
+             icon: 'run',
+@@ -43,6 +46,25 @@ export default function SelectTestScreen() {
+         },
+     ];
+ 
++    useEffect(() => {
++        const loadCompletedTests = async () => {
++            try {
++                const stored = await AsyncStorage.getItem('completedTests');
++                if (stored) {
++                    setCompletedTests(JSON.parse(stored));
++                }
++            } catch (err) {
++                console.log('Error loading completed tests', err);
++            }
++        };
++
++        if (isFocused) {
++            loadCompletedTests();
++        }
++    }, [isFocused]);
++
++    const allTestsCompleted = completedTests.length === tests.length;
++
+     return (
+         <SafeAreaView style={styles.container}>
+             {/* Top Header */}
+@@ -64,24 +86,32 @@ export default function SelectTestScreen() {
+                 <View style={styles.testsContainer}>
+                     {tests.map((test) => {
+                         const isSelected = selectedTest === test.id;
++                        const isCompleted = completedTests.includes(test.id);
++
+                         return (
+                             <TouchableOpacity
+                                 key={test.id}
+-                                style={[styles.testCard, isSelected && styles.testCardSelected]}
+-                                onPress={() => setSelectedTest(test.id)}
++                                style={[styles.testCard, isSelected && styles.testCardSelected, isCompleted && styles.testCardCompleted]}
++                                onPress={() => {
++                                    if (!isCompleted) {
++                                        setSelectedTest(test.id);
++                                    }
++                                }}
+                                 activeOpacity={0.7}
+                             >
+                                 <View style={styles.iconContainer}>
+                                     <MaterialCommunityIcons
+                                         name={test.icon as any}
+                                         size={24}
+-                                        color={Colors.primary}
++                                        color={isCompleted ? Colors.success : Colors.primary}
+                                     />
+                                 </View>
+ 
+                                 <View style={styles.textContainer}>
+                                     <View style={styles.titleRow}>
+-                                        <Text style={styles.testTitle}>{test.title}</Text>
++                                        <Text style={[styles.testTitle, isCompleted && { color: Colors.textSecondary, textDecorationLine: 'line-through' }]}>
++                                            {test.title}
++                                        </Text>
+                                         <View style={styles.tagContainer}>
+                                             <Text style={styles.tagText}>{test.tag}</Text>
+                                         </View>
+@@ -90,7 +120,12 @@ export default function SelectTestScreen() {
+                                 </View>
+ 
+                                 <View style={styles.radioContainer}>
+-                                    {isSelected ? (
++                                    {isCompleted ? (
++                                        <View style={styles.completedBadge}>
++                                            <Ionicons name="checkmark" size={14} color={Colors.white} />
++                                            <Text style={styles.completedText}>Done</Text>
++                                        </View>
++                                    ) : isSelected ? (
+                                         <Ionicons name="checkmark-circle" size={24} color={Colors.primary} />
+                                     ) : (
+                                         <View style={styles.radioOutline} />
+@@ -104,11 +139,26 @@ export default function SelectTestScreen() {
+ 
+             <View style={styles.bottomFooter}>
+                 <TouchableOpacity
+-                    style={styles.continueButton}
+-                    onPress={() => navigation.navigate('TestInstructions')}
++                    style={[
++                        styles.continueButton,
++                        (!selectedTest && !allTestsCompleted) && { opacity: 0.5 }
++                    ]}
++                    onPress={async () => {
++                        if (allTestsCompleted) {
++                            // Clear tests out after submitting mapping them to completed (for now we assume done)
++                            await AsyncStorage.removeItem('completedTests');
++                            navigation.navigate('UploadingData');
++                        } else if (selectedTest) {
++                            const testSpec = tests.find(t => t.id === selectedTest);
++                            navigation.navigate('TestInstructions', { testId: selectedTest, testName: testSpec?.title });
++                        }
++                    }}
++                    disabled={!selectedTest && !allTestsCompleted}
+                     activeOpacity={0.8}
+                 >
+-                    <Text style={styles.continueButtonText}>Continue</Text>
++                    <Text style={styles.continueButtonText}>
++                        {allTestsCompleted ? 'Submit Final Assessment' : 'Continue with Selected'}
++                    </Text>
+                 </TouchableOpacity>
+             </View>
+         </SafeAreaView>
+@@ -172,6 +222,11 @@ const styles = StyleSheet.create({
+         borderColor: Colors.primary,
+         backgroundColor: '#F0F5FF',
+     },
++    testCardCompleted: {
++        backgroundColor: '#F9FAFB',
++        borderColor: '#E5E7EB',
++        opacity: 0.8,
++    },
+     iconContainer: {
+         width: 48,
+         height: 48,
+@@ -221,6 +276,20 @@ const styles = StyleSheet.create({
+         borderWidth: 2,
+         borderColor: '#D1D5DB',
+     },
++    completedBadge: {
++        flexDirection: 'row',
++        alignItems: 'center',
++        backgroundColor: Colors.success,
++        paddingHorizontal: 8,
++        paddingVertical: 4,
++        borderRadius: 12,
++    },
++    completedText: {
++        color: Colors.white,
++        fontSize: 10,
++        fontWeight: 'bold',
++        marginLeft: 4,
++    },
+     bottomFooter: {
+         backgroundColor: Colors.white,
+         paddingHorizontal: Spacing.md,
+diff --git a/app/src/screens/SportsProfileScreen.tsx b/app/src/screens/SportsProfileScreen.tsx
+index 4937bbc..2374969 100644
+--- a/app/src/screens/SportsProfileScreen.tsx
++++ b/app/src/screens/SportsProfileScreen.tsx
+@@ -1,5 +1,5 @@
+ import React, { useState } from 'react';
+-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, SafeAreaView, Dimensions, Alert } from 'react-native';
++import { StyleSheet, Text, View, ScrollView, TouchableOpacity, SafeAreaView, Dimensions, Alert, Platform } from 'react-native';
+ import { Colors, Spacing } from '../constants/theme';
+ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+ import { useNavigation, useRoute } from '@react-navigation/native';
+@@ -169,22 +169,68 @@ export default function SportsProfileScreen() {
+                     style={styles.saveButton}
+                     onPress={async () => {
+                         try {
+-                            const res = await apiClient.post('/auth/register', {
+-                                name: registrationData.name || `Athlete ${Math.floor(Math.random() * 10000)}`,
+-                                email: registrationData.email || `athlete${Math.floor(Math.random() * 10000)}@example.com`,
+-                                password: registrationData.password || 'password123',
+-                                role: 'athlete',
+-                                gender: registrationData.gender || 'male',
+-                                address: registrationData.address || '',
+-                                state: registrationData.state || '',
+-                                dateOfBirth: registrationData.dateOfBirth ? new Date(registrationData.dateOfBirth.split('/').reverse().join('-')).toISOString() : null,
+-                                sports: [selectedSport]
++                            const formData = new FormData();
++
++                            formData.append('name', registrationData.name || `Athlete ${Math.floor(Math.random() * 10000)}`);
++                            formData.append('email', registrationData.email || `athlete${Math.floor(Math.random() * 10000)}@example.com`);
++                            formData.append('password', registrationData.password || 'password123');
++                            formData.append('role', 'athlete');
++                            formData.append('gender', registrationData.gender || 'male');
++                            formData.append('address', registrationData.address || '');
++                            formData.append('state', registrationData.state || '');
++
++                            if (registrationData.dateOfBirth) {
++                                formData.append('dateOfBirth', new Date(registrationData.dateOfBirth.split('/').reverse().join('-')).toISOString());
++                            }
++
++                            // It's a single sport right now from selectedSport
++                            formData.append('sports', selectedSport);
++
++                            if (registrationData.aadhaarUri) {
++                                const adFileUrl = registrationData.aadhaarUri;
++                                const filename = adFileUrl.split('/').pop() || 'aadhaar.jpg';
++                                const match = /\.(\w+)$/.exec(filename);
++                                const type = match ? `image/${match[1]}` : `image/jpeg`;
++
++                                formData.append('aadhaarCard', {
++                                    uri: Platform.OS === 'android' && !adFileUrl.startsWith('file://') ? `file://${adFileUrl}` : adFileUrl,
++                                    name: filename,
++                                    type,
++                                } as any);
++                            }
++
++                            if (registrationData.dobUri) {
++                                const dobFileUrl = registrationData.dobUri;
++                                const filename = dobFileUrl.split('/').pop() || 'dob.jpg';
++                                const match = /\.(\w+)$/.exec(filename);
++                                const type = match ? `image/${match[1]}` : `image/jpeg`;
++
++                                formData.append('dobCertificate', {
++                                    uri: Platform.OS === 'android' && !dobFileUrl.startsWith('file://') ? `file://${dobFileUrl}` : dobFileUrl,
++                                    name: filename,
++                                    type,
++                                } as any);
++                            }
++
++                            const response = await fetch(`${apiClient.defaults.baseURL}/auth/register`, {
++                                method: 'POST',
++                                headers: {
++                                    'Content-Type': 'multipart/form-data',
++                                },
++                                body: formData,
+                             });
+-                            const token = res.data.token;
+-                            if (token) {
+-                                await AsyncStorage.setItem('userToken', token);
+-                                await AsyncStorage.setItem('userName', res.data.name || registrationData.name || '');
+-                                await AsyncStorage.setItem('userSports', JSON.stringify(res.data.sports || [selectedSport]));
++
++                            if (!response.ok) {
++                                const errorData = await response.json();
++                                throw new Error(errorData.message || 'Registration failed');
++                            }
++
++                            const resData = await response.json();
++
++                            if (resData.token) {
++                                await AsyncStorage.setItem('userToken', resData.token);
++                                await AsyncStorage.setItem('userName', resData.name || registrationData.name || '');
++                                await AsyncStorage.setItem('userSports', JSON.stringify(resData.sports || [selectedSport]));
+                             }
+                             navigation.navigate('SelectTest');
+                         } catch (err: any) {
+diff --git a/app/src/screens/TestInstructionsScreen.tsx b/app/src/screens/TestInstructionsScreen.tsx
+index 316801d..b5856d6 100644
+--- a/app/src/screens/TestInstructionsScreen.tsx
++++ b/app/src/screens/TestInstructionsScreen.tsx
+@@ -2,14 +2,19 @@ import React, { useState } from 'react';
+ import { StyleSheet, Text, View, ScrollView, TouchableOpacity, SafeAreaView, Dimensions } from 'react-native';
+ import { Colors, Spacing } from '../constants/theme';
+ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+-import { useNavigation } from '@react-navigation/native';
++import { useNavigation, useRoute } from '@react-navigation/native';
+ 
+ const { width } = Dimensions.get('window');
+ 
+ export default function TestInstructionsScreen() {
+     const navigation = useNavigation<any>();
++    const route = useRoute<any>();
+     const [isConfirmed, setIsConfirmed] = useState(false);
+ 
++    // Get test info from previous screen
++    const testId = route.params?.testId || 'Unknown Test';
++    const testName = route.params?.testName || 'Fitness Test';
++
+     return (
+         <SafeAreaView style={styles.container}>
+             {/* Top Header */}
+@@ -17,7 +22,7 @@ export default function TestInstructionsScreen() {
+                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                     <Ionicons name="arrow-back" size={24} color={Colors.textPrimary} />
+                 </TouchableOpacity>
+-                <Text style={styles.headerTitle}>Test Instructions</Text>
++                <Text style={styles.headerTitle}>{testName} Instructions</Text>
+             </View>
+ 
+             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+@@ -111,7 +116,7 @@ export default function TestInstructionsScreen() {
+                         styles.startButton,
+                         !isConfirmed && styles.startButtonDisabled
+                     ]}
+-                    onPress={() => isConfirmed && navigation.navigate('UploadAssessment')}
++                    onPress={() => isConfirmed && navigation.navigate('UploadAssessment', { testId, testName })}
+                     activeOpacity={isConfirmed ? 0.8 : 1}
+                     disabled={!isConfirmed}
+                 >
+diff --git a/app/src/screens/UploadAchievementsScreen.tsx b/app/src/screens/UploadAchievementsScreen.tsx
+index ec58cc4..84c5d51 100644
+--- a/app/src/screens/UploadAchievementsScreen.tsx
++++ b/app/src/screens/UploadAchievementsScreen.tsx
+@@ -1,115 +1,374 @@
+-import React from 'react';
+-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
++import React, { useState, useEffect } from 'react';
++import { StyleSheet, Text, View, ScrollView, TouchableOpacity, SafeAreaView, TextInput, Alert, ActivityIndicator, Platform, Image, Modal, KeyboardAvoidingView, StatusBar } from 'react-native';
+ import { Colors, Spacing } from '../constants/theme';
+ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+ import { useNavigation } from '@react-navigation/native';
++import * as ImagePicker from 'expo-image-picker';
++import AsyncStorage from '@react-native-async-storage/async-storage';
++import api from '../services/apiClient';
+ 
+ export default function UploadAchievementsScreen() {
+     const navigation = useNavigation<any>();
+ 
++    // Form State
++    const [modalVisible, setModalVisible] = useState(false);
++    const [level, setLevel] = useState('');
++    const [year, setYear] = useState('');
++    const [result, setResult] = useState('');
++    const [imageUri, setImageUri] = useState<string | null>(null);
++    const [isSubmitting, setIsSubmitting] = useState(false);
++
++    // Achievements List State
++    const [achievements, setAchievements] = useState<any[]>([]);
++    const [loadingData, setLoadingData] = useState(true);
++
++    useEffect(() => {
++        fetchAchievements();
++    }, []);
++
++    const fetchAchievements = async () => {
++        try {
++            const res = await api.get('/achievements');
++            setAchievements(res.data);
++        } catch (error) {
++            console.error('Error fetching achievements', error);
++        } finally {
++            setLoadingData(false);
++        }
++    };
++
++    const pickDocument = async () => {
++        try {
++            await ImagePicker.requestMediaLibraryPermissionsAsync();
++            const result = await ImagePicker.launchImageLibraryAsync({
++                mediaTypes: ['images'],
++                allowsEditing: true,
++                quality: 0.8,
++            });
++
++            if (!result.canceled && result.assets && result.assets.length > 0) {
++                setImageUri(result.assets[0].uri);
++            }
++        } catch (error) {
++            Alert.alert('Error', 'Failed to pick image');
++        }
++    };
++
++    const resetForm = () => {
++        setLevel('');
++        setYear('');
++        setResult('');
++        setImageUri(null);
++    };
++
++    const handleAddToList = async () => {
++        if (!level || !year || !result || !imageUri) {
++            Alert.alert('Incomplete Form', 'Please fill all fields and select a certificate image.');
++            return;
++        }
++
++        setIsSubmitting(true);
++        try {
++            const formData = new FormData();
++
++            let fileUri = imageUri;
++            if (Platform.OS === 'android' && !fileUri.startsWith('file://')) {
++                fileUri = `file://${fileUri}`;
++            }
++
++            const filename = imageUri.split('/').pop() || 'cert.jpg';
++            const match = /\.(\w+)$/.exec(filename);
++            const type = match ? `image/${match[1]}` : `image/jpeg`;
++
++            formData.append('proof', {
++                uri: fileUri,
++                name: filename,
++                type: type,
++            } as any);
++
++            const titleStr = `${level} Championship ${year}`;
++            const descStr = `Result: ${result}`;
++
++            formData.append('title', titleStr);
++            formData.append('description', descStr);
++            formData.append('dateEarned', new Date(`${year}-01-01`).toISOString());
++
++            const token = await AsyncStorage.getItem('userToken');
++            const response = await fetch(`${api.defaults.baseURL}/achievements`, {
++                method: 'POST',
++                headers: {
++                    'Authorization': `Bearer ${token}`
++                },
++                body: formData,
++            });
++
++            if (!response.ok) {
++                const errorData = await response.json();
++                throw new Error(errorData.message || 'Failed to upload certificate');
++            }
++
++            const newAchievement = await response.json();
++
++            setAchievements(prev => [newAchievement, ...prev]);
++            resetForm();
++            setModalVisible(false);
++
++            // Re-fetch to guarantee sync
++            fetchAchievements();
++            Alert.alert('Success', 'Achievement successfully added to your profile!');
++
++        } catch (error: any) {
++            console.error('Upload Error:', error);
++            Alert.alert('Upload Failed', error.message || 'Something went wrong');
++        } finally {
++            setIsSubmitting(false);
++        }
++    };
++
++    const handleDelete = async (id: string) => {
++        Alert.alert(
++            'Delete Certificate',
++            'Are you sure you want to remove this achievement?',
++            [
++                { text: 'Cancel', style: 'cancel' },
++                {
++                    text: 'Delete',
++                    style: 'destructive',
++                    onPress: async () => {
++                        try {
++                            await api.delete(`/achievements/${id}`);
++                            setAchievements(prev => prev.filter(a => a._id !== id));
++                        } catch (err) {
++                            Alert.alert('Error', 'Failed to delete certificate.');
++                        }
++                    }
++                }
++            ]
++        );
++    };
++
++    const handleFinish = () => {
++        if (achievements.length === 0) {
++            Alert.alert(
++                'No Certificates',
++                'You haven\'t uploaded any achievements. Are you sure you want to return home without adding any?',
++                [
++                    { text: 'Cancel', style: 'cancel' },
++                    { text: 'Yes, Leave', style: 'default', onPress: () => navigation.navigate('Home') }
++                ]
++            );
++            return;
++        }
++
++        navigation.navigate('Home');
++    };
++
+     return (
+         <SafeAreaView style={styles.container}>
+-            <View style={styles.topHeader}>
+-                <TouchableOpacity onPress={() => navigation.goBack()}>
+-                    <Ionicons name="arrow-back" size={24} color={Colors.textPrimary} />
++            <StatusBar barStyle="dark-content" backgroundColor="#F9FAFB" />
++
++            {/* Minimalist Premium Header */}
++            <View style={styles.header}>
++                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
++                    <Ionicons name="arrow-back" size={24} color="#1E293B" />
++                </TouchableOpacity>
++                <View>
++                    <Text style={styles.headerTitle}>Achievements</Text>
++                    <Text style={styles.headerSubtitle}>{achievements.length} Uploaded</Text>
++                </View>
++                <TouchableOpacity onPress={handleFinish} style={styles.doneBtn}>
++                    <Text style={styles.doneText}>Done</Text>
+                 </TouchableOpacity>
+-                <Text style={styles.headerTitle}>Upload Achievements</Text>
+-                <View style={{ width: 24 }} />
+             </View>
+ 
+-            <ScrollView contentContainerStyle={styles.scrollContent}>
+-                <Text style={styles.sectionTitle}>New Entry</Text>
+-
+-                <View style={styles.form}>
+-                    <View style={styles.inputGroup}>
+-                        <Text style={styles.label}>Competition Level</Text>
+-                        <View style={styles.inputView}>
+-                            <Text style={styles.placeholderText}>Select level (e.g. National)</Text>
+-                            <Ionicons name="chevron-down" size={20} color={Colors.textSecondary} />
+-                        </View>
++            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
++                {loadingData ? (
++                    <View style={styles.centerBox}>
++                        <ActivityIndicator size="large" color={Colors.primary} />
++                        <Text style={styles.loadingText}>Fetching your records...</Text>
+                     </View>
+-
+-                    <View style={styles.row}>
+-                        <View style={[styles.inputGroup, { flex: 1, marginRight: 10 }]}>
+-                            <Text style={styles.label}>Year</Text>
+-                            <View style={styles.inputView}>
+-                                <Text style={styles.placeholderText}>Year</Text>
+-                                <Ionicons name="chevron-down" size={20} color={Colors.textSecondary} />
+-                            </View>
+-                        </View>
+-                        <View style={[styles.inputGroup, { flex: 1 }]}>
+-                            <Text style={styles.label}>Result</Text>
+-                            <View style={styles.inputView}>
+-                                <Text style={styles.placeholderText}>Medal</Text>
+-                                <Ionicons name="chevron-down" size={20} color={Colors.textSecondary} />
+-                            </View>
++                ) : achievements.length === 0 ? (
++                    <View style={styles.emptyState}>
++                        <View style={styles.emptyIconBg}>
++                            <MaterialCommunityIcons name="medal-outline" size={60} color="#94A3B8" />
+                         </View>
+-                    </View>
++                        <Text style={styles.emptyTitle}>No Achievements Yet</Text>
++                        <Text style={styles.emptyDesc}>Showcase your talent by uploading your sports certificates, medals, and past records.</Text>
+ 
+-                    <View style={styles.inputGroup}>
+-                        <Text style={styles.label}>Certificate Proof</Text>
+-                        <TouchableOpacity style={styles.uploadArea}>
+-                            <Ionicons name="cloud-upload" size={40} color={Colors.primary} />
+-                            <Text style={styles.uploadTitle}>Tap to upload image or PDF</Text>
+-                            <Text style={styles.uploadInfo}>SVG, PNG, JPG or PDF (MAX. 5MB)</Text>
++                        <TouchableOpacity style={styles.emptyAddBtn} onPress={() => setModalVisible(true)}>
++                            <Ionicons name="add" size={20} color={Colors.white} />
++                            <Text style={styles.emptyAddText}>Upload First Certificate</Text>
+                         </TouchableOpacity>
+                     </View>
++                ) : (
++                    <View style={styles.listContainer}>
++                        {achievements.map((item) => (
++                            <View key={item._id} style={styles.achievementCard}>
++                                <View style={styles.cardHeader}>
++                                    <View style={styles.iconContainer}>
++                                        <Ionicons name="trophy" size={22} color="#F59E0B" />
++                                    </View>
++                                    <TouchableOpacity style={styles.deleteBtn} onPress={() => handleDelete(item._id)}>
++                                        <Ionicons name="trash-outline" size={20} color="#EF4444" />
++                                    </TouchableOpacity>
++                                </View>
+ 
+-                    <TouchableOpacity style={styles.addButton}>
+-                        <Ionicons name="add-circle" size={20} color={Colors.primary} />
+-                        <Text style={styles.addButtonText}>Add to List</Text>
+-                    </TouchableOpacity>
+-                </View>
+-
+-                <View style={styles.listHeader}>
+-                    <Text style={styles.sectionTitle}>Added Certificates <Text style={styles.countText}>(2)</Text></Text>
+-                </View>
++                                <View style={styles.cardBody}>
++                                    <Text style={styles.cardTitle} numberOfLines={1}>{item.title}</Text>
++                                    <Text style={styles.cardDesc} numberOfLines={2}>
++                                        {item.description}
++                                    </Text>
++                                </View>
+ 
+-                <View style={styles.certificateList}>
+-                    <View style={styles.certCard}>
+-                        <View style={styles.certIconBg}>
+-                            <Ionicons name="document-text" size={24} color={Colors.primary} />
+-                        </View>
+-                        <View style={styles.certInfo}>
+-                            <Text style={styles.certName}>National Athletics Meet</Text>
+-                            <View style={styles.badgeRow}>
+-                                <View style={styles.nationalBadge}>
+-                                    <Text style={styles.badgeText}>NATIONAL</Text>
++                                <View style={styles.cardFooter}>
++                                    <View style={styles.detailPill}>
++                                        <Ionicons name="calendar-outline" size={14} color="#64748B" />
++                                        <Text style={styles.detailText}>{new Date(item.dateEarned).getFullYear()}</Text>
++                                    </View>
++                                    <View style={styles.detailPill}>
++                                        <Ionicons name="document-attach-outline" size={14} color="#64748B" />
++                                        <Text style={styles.detailText}>Proof Attached</Text>
++                                    </View>
+                                 </View>
+-                                <Text style={styles.certMeta}> • 2023 • 🏆 Gold</Text>
+                             </View>
+-                        </View>
+-                        <TouchableOpacity>
+-                            <Ionicons name="trash-outline" size={24} color={Colors.textSecondary} />
+-                        </TouchableOpacity>
++                        ))}
++
++                        {/* Bottom Spacer */}
++                        <View style={{ height: 100 }} />
+                     </View>
++                )}
++            </ScrollView>
++
++            {/* Floating Action Button */}
++            {!loadingData && achievements.length > 0 && (
++                <TouchableOpacity
++                    style={styles.fab}
++                    onPress={() => setModalVisible(true)}
++                    activeOpacity={0.8}
++                >
++                    <Ionicons name="add" size={32} color={Colors.white} />
++                </TouchableOpacity>
++            )}
+ 
+-                    <View style={styles.certCard}>
+-                        <View style={styles.certIconBgLight}>
+-                            <MaterialCommunityIcons name="file-pdf-box" size={30} color={Colors.primary} />
++            {/* Add Achievement Modal */}
++            <Modal
++                animationType="slide"
++                transparent={true}
++                visible={modalVisible}
++                onRequestClose={() => {
++                    if (!isSubmitting) setModalVisible(false);
++                }}
++            >
++                <KeyboardAvoidingView
++                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
++                    style={styles.modalOverlay}
++                >
++                    <View style={styles.modalContent}>
++                        <View style={styles.modalHeader}>
++                            <Text style={styles.modalTitle}>New Achievement</Text>
++                            <TouchableOpacity
++                                onPress={() => {
++                                    if (!isSubmitting) {
++                                        setModalVisible(false);
++                                        resetForm();
++                                    }
++                                }}
++                                style={styles.closeModalBtn}
++                            >
++                                <Ionicons name="close" size={24} color="#64748B" />
++                            </TouchableOpacity>
+                         </View>
+-                        <View style={styles.certInfo}>
+-                            <Text style={styles.certName}>State Swimming Champio...</Text>
+-                            <View style={styles.badgeRow}>
+-                                <View style={styles.stateBadge}>
+-                                    <Text style={styles.badgeText}>STATE</Text>
++
++                        <ScrollView style={styles.formScroll} showsVerticalScrollIndicator={false}>
++                            <View style={styles.inputGroup}>
++                                <Text style={styles.label}>Competition Level</Text>
++                                <TextInput
++                                    style={styles.textInput}
++                                    placeholder="e.g. National, State, District"
++                                    value={level}
++                                    onChangeText={setLevel}
++                                    placeholderTextColor="#94A3B8"
++                                    editable={!isSubmitting}
++                                />
++                            </View>
++
++                            <View style={styles.row}>
++                                <View style={[styles.inputGroup, { flex: 1, marginRight: 12 }]}>
++                                    <Text style={styles.label}>Year</Text>
++                                    <TextInput
++                                        style={styles.textInput}
++                                        placeholder="e.g. 2023"
++                                        value={year}
++                                        onChangeText={setYear}
++                                        keyboardType="numeric"
++                                        maxLength={4}
++                                        placeholderTextColor="#94A3B8"
++                                        editable={!isSubmitting}
++                                    />
++                                </View>
++                                <View style={[styles.inputGroup, { flex: 1.5 }]}>
++                                    <Text style={styles.label}>Result / Position</Text>
++                                    <TextInput
++                                        style={styles.textInput}
++                                        placeholder="e.g. Gold, 1st Place"
++                                        value={result}
++                                        onChangeText={setResult}
++                                        placeholderTextColor="#94A3B8"
++                                        editable={!isSubmitting}
++                                    />
+                                 </View>
+-                                <Text style={styles.certMeta}> • 2022 • 🏆 Silver</Text>
+                             </View>
++
++                            <View style={styles.inputGroup}>
++                                <Text style={styles.label}>Certificate Proof <Text style={{ color: '#EF4444' }}>*</Text></Text>
++                                <TouchableOpacity
++                                    style={[styles.uploadArea, imageUri && styles.uploadAreaFilled, isSubmitting && { opacity: 0.5 }]}
++                                    onPress={pickDocument}
++                                    disabled={isSubmitting}
++                                    activeOpacity={0.7}
++                                >
++                                    {imageUri ? (
++                                        <>
++                                            <Image source={{ uri: imageUri }} style={styles.previewImage} blurRadius={isSubmitting ? 5 : 0} />
++                                            {!isSubmitting && (
++                                                <View style={styles.replaceBadge}>
++                                                    <Ionicons name="pencil" size={14} color={Colors.white} />
++                                                    <Text style={styles.replaceText}>Replace</Text>
++                                                </View>
++                                            )}
++                                        </>
++                                    ) : (
++                                        <View style={styles.uploadPlaceholder}>
++                                            <View style={styles.uploadIconCircle}>
++                                                <Ionicons name="image-outline" size={32} color="#4F46E5" />
++                                            </View>
++                                            <Text style={styles.uploadTitle}>Tap to select image</Text>
++                                            <Text style={styles.uploadInfo}>Supports JPG, PNG (Max 5MB)</Text>
++                                        </View>
++                                    )}
++                                </TouchableOpacity>
++                            </View>
++                        </ScrollView>
++
++                        <View style={styles.modalFooter}>
++                            <TouchableOpacity
++                                style={[styles.submitBtn, isSubmitting && styles.submitBtnDisabled, (!level || !year || !result || !imageUri) && styles.submitBtnInactive]}
++                                onPress={handleAddToList}
++                                disabled={isSubmitting || !level || !year || !result || !imageUri}
++                            >
++                                {isSubmitting ? (
++                                    <ActivityIndicator size="small" color={Colors.white} />
++                                ) : (
++                                    <>
++                                        <Ionicons name="cloud-upload" size={20} color={Colors.white} />
++                                        <Text style={styles.submitBtnText}>Upload & Save</Text>
++                                    </>
++                                )}
++                            </TouchableOpacity>
+                         </View>
+-                        <TouchableOpacity>
+-                            <Ionicons name="trash-outline" size={24} color={Colors.textSecondary} />
+-                        </TouchableOpacity>
+                     </View>
+-                </View>
+-
+-                <TouchableOpacity
+-                    style={styles.submitButton}
+-                    onPress={() => navigation.navigate('Home')}
+-                >
+-                    <Text style={styles.submitText}>Submit Applications</Text>
+-                </TouchableOpacity>
+-            </ScrollView>
++                </KeyboardAvoidingView>
++            </Modal>
+         </SafeAreaView>
+     );
+ }
+@@ -117,189 +376,366 @@ export default function UploadAchievementsScreen() {
+ const styles = StyleSheet.create({
+     container: {
+         flex: 1,
+-        backgroundColor: '#F9FAFB',
++        backgroundColor: '#F8FAFC', // Slate 50
+     },
+-    topHeader: {
++    header: {
+         flexDirection: 'row',
+         alignItems: 'center',
+-        justifyContent: 'space-between',
+-        padding: Spacing.md,
+-        backgroundColor: Colors.white,
++        paddingHorizontal: Spacing.lg,
++        paddingBottom: 20,
++        paddingTop: Platform.OS === 'android' ? 40 : 20,
++        backgroundColor: '#F8FAFC',
+         borderBottomWidth: 1,
+-        borderBottomColor: '#f3f4f6',
++        borderBottomColor: '#F1F5F9', // Slate 100
++    },
++    backBtn: {
++        width: 40,
++        height: 40,
++        borderRadius: 20,
++        backgroundColor: '#F1F5F9',
++        alignItems: 'center',
++        justifyContent: 'center',
++        marginRight: 16,
+     },
+     headerTitle: {
+-        fontSize: 18,
++        fontSize: 22,
++        fontWeight: '800',
++        color: '#1E293B', // Slate 800
++        letterSpacing: -0.5,
++    },
++    headerSubtitle: {
++        fontSize: 13,
++        color: '#64748B', // Slate 500
++        fontWeight: '600',
++        marginTop: 2,
++    },
++    doneBtn: {
++        marginLeft: 'auto',
++        backgroundColor: '#EEF2FF', // Indigo 50
++        paddingHorizontal: 16,
++        paddingVertical: 8,
++        borderRadius: 20,
++    },
++    doneText: {
++        color: '#4F46E5', // Indigo 600
+         fontWeight: 'bold',
+-        color: Colors.textPrimary,
++        fontSize: 15,
+     },
+     scrollContent: {
+         padding: Spacing.md,
++        flexGrow: 1,
+     },
+-    sectionTitle: {
+-        fontSize: 20,
+-        fontWeight: 'bold',
+-        color: Colors.textPrimary,
+-        marginBottom: 20,
++    centerBox: {
++        flex: 1,
++        alignItems: 'center',
++        justifyContent: 'center',
+     },
+-    form: {
+-        backgroundColor: Colors.white,
+-        borderRadius: 16,
+-        padding: 16,
+-        marginBottom: 30,
+-        borderWidth: 1,
+-        borderColor: '#F3F4F6',
++    loadingText: {
++        marginTop: 12,
++        color: '#64748B',
++        fontSize: 15,
++        fontWeight: '500',
+     },
+-    inputGroup: {
+-        marginBottom: 16,
++    emptyState: {
++        flex: 1,
++        alignItems: 'center',
++        justifyContent: 'center',
++        paddingHorizontal: 30,
++        marginTop: 40,
+     },
+-    label: {
+-        fontSize: 14,
+-        fontWeight: '600',
+-        color: Colors.textPrimary,
+-        marginBottom: 8,
++    emptyIconBg: {
++        width: 120,
++        height: 120,
++        borderRadius: 60,
++        backgroundColor: '#F1F5F9',
++        alignItems: 'center',
++        justifyContent: 'center',
++        marginBottom: 24,
++    },
++    emptyTitle: {
++        fontSize: 22,
++        fontWeight: 'bold',
++        color: '#1E293B',
++        marginBottom: 12,
++    },
++    emptyDesc: {
++        fontSize: 15,
++        color: '#64748B',
++        textAlign: 'center',
++        lineHeight: 22,
++        marginBottom: 32,
+     },
+-    inputView: {
++    emptyAddBtn: {
+         flexDirection: 'row',
+         alignItems: 'center',
+-        backgroundColor: Colors.white,
+-        borderWidth: 1,
+-        borderColor: '#D1D5DB',
+-        borderRadius: 8,
+-        paddingHorizontal: 12,
+-        height: 50,
++        backgroundColor: '#4F46E5',
++        paddingHorizontal: 24,
++        paddingVertical: 14,
++        borderRadius: 100,
++        gap: 8,
++        shadowColor: '#4F46E5',
++        shadowOffset: { width: 0, height: 4 },
++        shadowOpacity: 0.3,
++        shadowRadius: 8,
++        elevation: 6,
+     },
+-    placeholderText: {
+-        flex: 1,
++    emptyAddText: {
++        color: Colors.white,
+         fontSize: 16,
+-        color: Colors.textSecondary,
++        fontWeight: 'bold',
+     },
+-    row: {
++    listContainer: {
++        paddingTop: 10,
++    },
++    achievementCard: {
++        backgroundColor: Colors.white,
++        borderRadius: 20,
++        padding: 20,
++        marginBottom: 16,
++        shadowColor: '#94A3B8',
++        shadowOffset: { width: 0, height: 8 },
++        shadowOpacity: 0.1,
++        shadowRadius: 16,
++        elevation: 4,
++        borderWidth: 1,
++        borderColor: '#F1F5F9',
++    },
++    cardHeader: {
+         flexDirection: 'row',
++        justifyContent: 'space-between',
++        alignItems: 'flex-start',
++        marginBottom: 12,
+     },
+-    uploadArea: {
+-        borderWidth: 2,
+-        borderColor: '#3B82F6',
+-        borderStyle: 'dashed',
+-        borderRadius: 12,
+-        padding: 30,
++    iconContainer: {
++        width: 44,
++        height: 44,
++        borderRadius: 14,
++        backgroundColor: '#FFFBEB', // Amber 50
+         alignItems: 'center',
+-        backgroundColor: '#EFF6FF',
++        justifyContent: 'center',
+     },
+-    uploadTitle: {
+-        fontSize: 16,
++    deleteBtn: {
++        width: 36,
++        height: 36,
++        borderRadius: 18,
++        backgroundColor: '#FEF2F2', // Red 50
++        alignItems: 'center',
++        justifyContent: 'center',
++    },
++    cardBody: {
++        marginBottom: 16,
++    },
++    cardTitle: {
++        fontSize: 18,
+         fontWeight: 'bold',
+-        color: Colors.textPrimary,
+-        marginTop: 12,
++        color: '#1E293B',
++        marginBottom: 4,
+     },
+-    uploadInfo: {
+-        fontSize: 12,
+-        color: Colors.textSecondary,
+-        marginTop: 4,
++    cardDesc: {
++        fontSize: 15,
++        color: '#64748B',
++        lineHeight: 22,
+     },
+-    addButton: {
++    cardFooter: {
+         flexDirection: 'row',
+         alignItems: 'center',
+-        justifyContent: 'center',
+-        borderWidth: 1,
+-        borderColor: '#D1D5DB',
+-        borderRadius: 12,
+-        height: 50,
+-        marginTop: 10,
+-    },
+-    addButtonText: {
+-        marginLeft: 8,
+-        color: Colors.primary,
+-        fontWeight: 'bold',
++        gap: 12,
++        paddingTop: 16,
++        borderTopWidth: 1,
++        borderTopColor: '#F1F5F9',
+     },
+-    listHeader: {
++    detailPill: {
+         flexDirection: 'row',
+         alignItems: 'center',
+-        marginBottom: 16,
++        gap: 6,
++        backgroundColor: '#F8FAFC',
++        paddingHorizontal: 12,
++        paddingVertical: 6,
++        borderRadius: 8,
++    },
++    detailText: {
++        fontSize: 13,
++        fontWeight: '600',
++        color: '#475569', // Slate 600
++    },
++    fab: {
++        position: 'absolute',
++        bottom: 40,
++        right: 24,
++        width: 64,
++        height: 64,
++        borderRadius: 32,
++        backgroundColor: '#4F46E5', // Indigo 600
++        alignItems: 'center',
++        justifyContent: 'center',
++        shadowColor: '#4F46E5',
++        shadowOffset: { width: 0, height: 8 },
++        shadowOpacity: 0.4,
++        shadowRadius: 16,
++        elevation: 8,
+     },
+-    countText: {
+-        color: Colors.textSecondary,
+-        fontWeight: 'normal',
++
++    // Modal Styles
++    modalOverlay: {
++        flex: 1,
++        justifyContent: 'flex-end',
++        backgroundColor: 'rgba(15, 23, 42, 0.6)', // Slate 900, 60% opacity
+     },
+-    certificateList: {
+-        marginBottom: 30,
++    modalContent: {
++        backgroundColor: Colors.white,
++        borderTopLeftRadius: 32,
++        borderTopRightRadius: 32,
++        paddingTop: 24,
++        paddingHorizontal: 24,
++        maxHeight: '90%',
++        minHeight: '60%',
++        shadowColor: '#000',
++        shadowOffset: { width: 0, height: -10 },
++        shadowOpacity: 0.1,
++        shadowRadius: 20,
++        elevation: 20,
+     },
+-    certCard: {
++    modalHeader: {
+         flexDirection: 'row',
+         alignItems: 'center',
+-        backgroundColor: Colors.white,
+-        borderRadius: 16,
+-        padding: 16,
+-        marginBottom: 12,
+-        borderWidth: 1,
+-        borderColor: '#F3F4F6',
++        justifyContent: 'space-between',
++        marginBottom: 24,
+     },
+-    certIconBg: {
+-        width: 48,
+-        height: 48,
+-        borderRadius: 12,
+-        backgroundColor: '#DBEAFE',
++    modalTitle: {
++        fontSize: 22,
++        fontWeight: '800',
++        color: '#1E293B',
++    },
++    closeModalBtn: {
++        width: 40,
++        height: 40,
++        borderRadius: 20,
++        backgroundColor: '#F1F5F9',
+         alignItems: 'center',
+         justifyContent: 'center',
+-        marginRight: 16,
+     },
+-    certIconBgLight: {
+-        width: 48,
+-        height: 48,
+-        borderRadius: 12,
+-        backgroundColor: '#EFF6FF',
++    formScroll: {
++        marginBottom: 20,
++    },
++    inputGroup: {
++        marginBottom: 20,
++    },
++    label: {
++        fontSize: 14,
++        fontWeight: '700',
++        color: '#334155', // Slate 700
++        marginBottom: 8,
++        letterSpacing: 0.3,
++    },
++    textInput: {
++        backgroundColor: '#F8FAFC',
++        borderWidth: 1,
++        borderColor: '#E2E8F0', // Slate 200
++        borderRadius: 14,
++        paddingHorizontal: 16,
++        height: 56,
++        fontSize: 16,
++        color: '#1E293B',
++        fontWeight: '500',
++    },
++    row: {
++        flexDirection: 'row',
++    },
++    uploadArea: {
++        borderWidth: 2,
++        borderColor: '#C7D2FE', // Indigo 200
++        borderStyle: 'dashed',
++        borderRadius: 20,
++        height: 180,
++        backgroundColor: '#EEF2FF', // Indigo 50
++        overflow: 'hidden',
++    },
++    uploadAreaFilled: {
++        borderStyle: 'solid',
++        borderColor: '#E2E8F0',
++        backgroundColor: '#F8FAFC',
++    },
++    uploadPlaceholder: {
++        flex: 1,
+         alignItems: 'center',
+         justifyContent: 'center',
+-        marginRight: 16,
+     },
+-    certInfo: {
+-        flex: 1,
++    uploadIconCircle: {
++        width: 64,
++        height: 64,
++        borderRadius: 32,
++        backgroundColor: Colors.white,
++        alignItems: 'center',
++        justifyContent: 'center',
++        marginBottom: 16,
++        shadowColor: '#4F46E5',
++        shadowOffset: { width: 0, height: 4 },
++        shadowOpacity: 0.1,
++        shadowRadius: 8,
++        elevation: 2,
+     },
+-    certName: {
++    uploadTitle: {
+         fontSize: 16,
+         fontWeight: 'bold',
+-        color: Colors.textPrimary,
++        color: '#4F46E5',
++        marginBottom: 4,
++    },
++    uploadInfo: {
++        fontSize: 13,
++        color: '#64748B',
++    },
++    previewImage: {
++        width: '100%',
++        height: '100%',
++        resizeMode: 'cover',
+     },
+-    badgeRow: {
++    replaceBadge: {
++        position: 'absolute',
++        bottom: 16,
++        right: 16,
++        backgroundColor: 'rgba(15, 23, 42, 0.75)', // Slate 900
+         flexDirection: 'row',
+         alignItems: 'center',
+-        marginTop: 4,
+-    },
+-    nationalBadge: {
+-        backgroundColor: '#DBEAFE',
+-        paddingHorizontal: 8,
+-        paddingVertical: 2,
+-        borderRadius: 4,
+-    },
+-    stateBadge: {
+-        backgroundColor: '#E0E7FF',
+-        paddingHorizontal: 8,
+-        paddingVertical: 2,
+-        borderRadius: 4,
+-    },
+-    badgeText: {
+-        fontSize: 10,
+-        color: Colors.primary,
+-        fontWeight: 'bold',
++        paddingHorizontal: 12,
++        paddingVertical: 6,
++        borderRadius: 20,
++        gap: 6,
+     },
+-    certMeta: {
++    replaceText: {
++        color: Colors.white,
+         fontSize: 12,
+-        color: Colors.textSecondary,
++        fontWeight: 'bold',
++    },
++    modalFooter: {
++        paddingVertical: 24,
++        borderTopWidth: 1,
++        borderTopColor: '#F1F5F9',
++        paddingBottom: Platform.OS === 'ios' ? 40 : 24,
+     },
+-    submitButton: {
+-        backgroundColor: Colors.primary,
+-        height: 60,
+-        borderRadius: 12,
++    submitBtn: {
++        flexDirection: 'row',
+         alignItems: 'center',
+         justifyContent: 'center',
+-        marginBottom: 40,
+-        shadowColor: Colors.primary,
+-        shadowOffset: { width: 0, height: 4 },
+-        shadowOpacity: 0.2,
+-        shadowRadius: 8,
+-        elevation: 4,
++        backgroundColor: '#4F46E5', // Indigo 600
++        height: 56,
++        borderRadius: 16,
++        gap: 10,
++        shadowColor: '#4F46E5',
++        shadowOffset: { width: 0, height: 6 },
++        shadowOpacity: 0.3,
++        shadowRadius: 12,
++        elevation: 6,
++    },
++    submitBtnDisabled: {
++        backgroundColor: '#818CF8', // Indigo 400
++        shadowOpacity: 0.1,
++    },
++    submitBtnInactive: {
++        backgroundColor: '#CBD5E1', // Slate 300
++        shadowColor: 'transparent',
++        elevation: 0,
+     },
+-    submitText: {
++    submitBtnText: {
+         color: Colors.white,
+         fontSize: 18,
+         fontWeight: 'bold',
+diff --git a/app/src/screens/UploadAssessmentScreen.tsx b/app/src/screens/UploadAssessmentScreen.tsx
+index 86845f0..6433d49 100644
+--- a/app/src/screens/UploadAssessmentScreen.tsx
++++ b/app/src/screens/UploadAssessmentScreen.tsx
+@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, ScrollView, TouchableOpacity, SafeAreaView, Dim
+ import AsyncStorage from '@react-native-async-storage/async-storage';
+ import { Colors, Spacing } from '../constants/theme';
+ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+-import { useNavigation } from '@react-navigation/native';
++import { useNavigation, useRoute } from '@react-navigation/native';
+ import apiClient from '../services/apiClient';
+ import * as ImagePicker from 'expo-image-picker';
+ 
+@@ -11,9 +11,14 @@ const { width } = Dimensions.get('window');
+ 
+ export default function UploadAssessmentScreen() {
+     const navigation = useNavigation<any>();
++    const route = useRoute<any>();
+     const [videoUri, setVideoUri] = useState<string | null>(null);
+     const [isUploading, setIsUploading] = useState(false);
+ 
++    // Get test info from previous screen
++    const testId = route.params?.testId || 'Unknown Test';
++    const testName = route.params?.testName || 'Fitness Test';
++
+     const pickVideo = async (source: 'camera' | 'gallery') => {
+         try {
+             let result;
+@@ -56,7 +61,7 @@ export default function UploadAssessmentScreen() {
+                 {/* Title & Description */}
+                 <Text style={styles.mainTitle}>Record or Upload</Text>
+                 <Text style={styles.subtitle}>
+-                    Submit your performance video for the 100m sprint assessment. Ensure good lighting.
++                    Submit your performance video for the {testName} assessment. Ensure good lighting.
+                 </Text>
+ 
+                 {/* Upload Options */}
+@@ -191,18 +196,16 @@ export default function UploadAssessmentScreen() {
+                             } as any);
+ 
+                             // Append other fields
+-                            formData.append('testName', '100m Sprint');
++                            formData.append('testName', testName);
+                             formData.append('score', '0');
+                             formData.append('metrics', JSON.stringify({ duration: 12 }));
+                             formData.append('dateTaken', new Date().toISOString());
+ 
+-                            // Use native fetch instead of Axios to avoid the React Native Android FormData boundary stripping bug
+                             const token = await AsyncStorage.getItem('userToken');
+-                            const response = await fetch('http://192.168.31.124:5000/api/fitness', {
++                            const response = await fetch(`${apiClient.defaults.baseURL}/fitness`, {
+                                 method: 'POST',
+                                 headers: {
+-                                    'Authorization': `Bearer ${token}`,
+-                                    // Do NOT set Content-Type here, let fetch generate the boundary
++                                    'Authorization': `Bearer ${token}`
+                                 },
+                                 body: formData,
+                             });
+@@ -212,8 +215,16 @@ export default function UploadAssessmentScreen() {
+                                 throw new Error(errorData.message || 'Upload failed');
+                             }
+ 
++                            // Update local completed tests array
++                            const storedStr = await AsyncStorage.getItem('completedTests');
++                            let completed = storedStr ? JSON.parse(storedStr) : [];
++                            if (!completed.includes(testId)) {
++                                completed.push(testId);
++                                await AsyncStorage.setItem('completedTests', JSON.stringify(completed));
++                            }
++
+                             Alert.alert('Success', 'Assessment uploaded successfully!');
+-                            navigation.navigate('UploadingData');
++                            navigation.navigate('SelectTest');
+                         } catch (err: any) {
+                             console.error('Upload failed:', err);
+                             console.error('Upload failed full trace:', JSON.stringify(err));
+diff --git a/app/src/services/apiClient.ts b/app/src/services/apiClient.ts
+index 6852654..22d2261 100644
+--- a/app/src/services/apiClient.ts
++++ b/app/src/services/apiClient.ts
+@@ -10,23 +10,6 @@ const apiClient: AxiosInstance = axios.create({
+         'Content-Type': 'application/json',
+     },
+     timeout: 60000, // Increased timeout to 60s for video uploads
+-    transformRequest: [function (data, headers) {
+-        // Handle React Native FormData
+-        if (data && data._parts) {
+-            if (headers) {
+-                delete headers['Content-Type'];
+-            }
+-            return data;
+-        }
+-        // Handle standard FormData
+-        if (typeof FormData !== 'undefined' && data instanceof FormData) {
+-            if (headers) {
+-                delete headers['Content-Type'];
+-            }
+-            return data;
+-        }
+-        return JSON.stringify(data);
+-    }],
+ });
+ 
+ // Request Interceptor
+@@ -37,9 +20,10 @@ apiClient.interceptors.request.use(
+             if (token) {
+                 config.headers.Authorization = `Bearer ${token}`;
+             }
+-            // Explicitly handle Content-Type for FormData
++            // Do not explicitly set Content-Type for FormData,
++            // let Axios/React Native generate the boundary string
+             if (config.data && config.data._parts) {
+-                config.headers['Content-Type'] = 'multipart/form-data';
++                delete config.headers['Content-Type'];
+             }
+         } catch (e) {
+             console.warn('Error reading token', e);
+diff --git a/backend/src/controllers/achievementController.js b/backend/src/controllers/achievementController.js
+index ec438ce..5118a0c 100644
+--- a/backend/src/controllers/achievementController.js
++++ b/backend/src/controllers/achievementController.js
+@@ -1,22 +1,51 @@
+ const Achievement = require('../models/Achievement');
+ 
++const cloudinary = require('cloudinary').v2;
++
++// Configure Cloudinary (ensure ENV vars are set)
++cloudinary.config({
++  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
++  api_key: process.env.CLOUDINARY_API_KEY,
++  api_secret: process.env.CLOUDINARY_API_SECRET,
++});
++
+ // @desc    Upload an achievement
+ // @route   POST /api/achievements
+ // @access  Private
+ exports.uploadAchievement = async (req, res) => {
+-  const { title, description, dateEarned, proofUrl } = req.body;
++  const { title, description, dateEarned } = req.body;
++  
++  if (!req.file) {
++      return res.status(400).json({ message: 'No proof file uploaded' });
++  }
+ 
+   try {
+-    const achievement = new Achievement({
+-      user: req.user._id,
+-      title,
+-      description,
+-      dateEarned,
+-      proofUrl,
+-    });
+-
+-    const createdAchievement = await achievement.save();
+-    res.status(201).json(createdAchievement);
++    // 1. Upload buffer to Cloudinary using stream
++    const uploadStream = cloudinary.uploader.upload_stream(
++      { resource_type: 'auto', folder: 'dipex/achievements' },
++      async (error, result) => {
++        if (error) {
++          console.error('Cloudinary achievement upload error:', error);
++          return res.status(500).json({ message: 'Error uploading proof to Cloudinary' });
++        }
++
++        // 2. Save document to DB
++        const achievement = new Achievement({
++          user: req.user._id,
++          title,
++          description,
++          dateEarned,
++          proofUrl: result.secure_url,
++        });
++
++        const createdAchievement = await achievement.save();
++        res.status(201).json(createdAchievement);
++      }
++    );
++
++    // Pipe the multer memory buffer to Cloudinary
++    uploadStream.end(req.file.buffer);
++
+   } catch (error) {
+     res.status(500).json({ message: error.message });
+   }
+diff --git a/backend/src/controllers/adminController.js b/backend/src/controllers/adminController.js
+index eff91ad..23f1943 100644
+--- a/backend/src/controllers/adminController.js
++++ b/backend/src/controllers/adminController.js
+@@ -1,35 +1,135 @@
+ const User = require('../models/User');
+ const FitnessTest = require('../models/FitnessTest');
+ const Achievement = require('../models/Achievement');
++const Notification = require('../models/Notification');
+ 
+ // @desc    Get dashboard totals and aggregates
+ // @route   GET /api/admin/dashboard
+ // @access  Public (mock admin)
+ exports.getDashboardStats = async (req, res) => {
+   try {
+-    const sportsFilter = req.query.sports ? req.query.sports.split(',') : [];
++    let sportsFilter = req.query.sports ? req.query.sports.split(',') : [];
++    if (sportsFilter.includes('All')) sportsFilter = [];
++    
+     const query = sportsFilter.length > 0 ? { role: 'athlete', sports: { $in: sportsFilter } } : { role: 'athlete' };
+ 
+     const totalAthletes = await User.countDocuments(query);
+-    const athletes = await User.find(query, '_id overallScore');
+-    const athleteIds = athletes.map(a => a._id);
++    const approvedAthletes = await User.countDocuments({ ...query, evaluationStatus: 'approved' });
++    const rejectedAthletes = await User.countDocuments({ ...query, evaluationStatus: 'rejected' });
++    const pendingAthletes = await User.countDocuments({ ...query, evaluationStatus: { $in: ['pending', null, undefined] } });
+ 
+-    const pendingEvaluations = await FitnessTest.countDocuments({ 
+-        status: 'pending',
+-        user: { $in: athleteIds }
++    // Top Performers Leaderboard
++    const topPerformers = await User.find(query)
++      .sort({ overallScore: -1 })
++      .limit(5)
++      .select('name state sports overallScore');
++
++    // Heatmap (State distribution)
++    const stateDistribution = await User.aggregate([
++      { $match: query },
++      { $group: { 
++          _id: { $toLower: { $trim: { input: { $ifNull: ["$state", "Unknown"] } } } }, 
++          count: { $sum: 1 } 
++      }},
++      { $sort: { count: -1 } }
++    ]);
++
++    // Flagged Activity
++    const validUsers = await User.find(query).select('_id');
++    const validUserIds = validUsers.map(u => u._id);
++    const flaggedVideosCount = await FitnessTest.countDocuments({
++      user: { $in: validUserIds },
++      status: 'rejected'
+     });
+-    
+-    // Calculate aggregate score
+-    const validScores = athletes.filter(a => a.overallScore > 0);
+-    const avgScore = validScores.length 
+-      ? validScores.reduce((acc, a) => acc + a.overallScore, 0) / validScores.length 
+-      : 0;
++    const latestFlag = await FitnessTest.findOne({
++      user: { $in: validUserIds },
++      status: 'rejected'
++    })
++    .sort({ updatedAt: -1 })
++    .populate('user', 'name address state');
++
++    // Chart 1: Vertical Jump Avg (by Age)
++    // We group by Age ranges: 12-14, 15-17, 18-20, 21+
++    const currentYear = new Date().getFullYear();
++    const jumpStats = await FitnessTest.aggregate([
++      { $match: { user: { $in: validUserIds }, testName: { $regex: /jump/i }, status: 'approved' } },
++      {
++        $lookup: {
++          from: 'users',
++          localField: 'user',
++          foreignField: '_id',
++          as: 'userDetails'
++        }
++      },
++      { $unwind: "$userDetails" },
++      {
++        $project: {
++          score: 1,
++          age: {
++             $subtract: [currentYear, { $year: "$userDetails.dateOfBirth" }]
++          }
++        }
++      },
++      {
++        $bucket: {
++          groupBy: "$age",
++          boundaries: [0, 15, 18, 21],
++          default: "21+",
++          output: {
++            avgScore: { $avg: "$score" }
++          }
++        }
++      }
++    ]);
++
++    // Chart 2: Sit-up Avg (by Gender)
++     const situpStats = await FitnessTest.aggregate([
++      { $match: { user: { $in: validUserIds }, testName: { $regex: /sit.up/i }, status: 'approved' } },
++      {
++        $lookup: {
++          from: 'users',
++          localField: 'user',
++          foreignField: '_id',
++          as: 'userDetails'
++        }
++      },
++      { $unwind: "$userDetails" },
++      {
++        $group: {
++           _id: "$userDetails.gender",
++           avgScore: { $avg: "$score" }
++        }
++      }
++    ]);
++
++    // Chart 3: Endurance Trends (Quarterly)
++    const enduranceStats = await FitnessTest.aggregate([
++      { $match: { user: { $in: validUserIds }, testName: { $regex: /endurance|run/i }, status: 'approved' } },
++      {
++        $group: {
++           _id: { $ceil: { $divide: [{ $month: "$dateTaken" }, 3] } },
++           avgScore: { $avg: "$score" }
++        }
++      },
++      { $sort: { "_id": 1 } }
++    ]);
+ 
+     res.json({
+       totalAthletes,
+-      pendingEvaluations,
+-      activeEvaluations: pendingEvaluations, // using pending as active
+-      avgPerformanceScore: avgScore.toFixed(1)
++      approvedAthletes,
++      rejectedAthletes,
++      pendingAthletes,
++      topPerformers,
++      stateDistribution,
++      flaggedActivity: {
++        count: flaggedVideosCount,
++        latest: latestFlag
++      },
++      charts: {
++        jumpStats,
++        situpStats,
++        enduranceStats
++      }
+     });
+   } catch (error) {
+     res.status(500).json({ message: error.message });
+@@ -41,7 +141,9 @@ exports.getDashboardStats = async (req, res) => {
+ // @access  Public (mock admin)
+ exports.getShortlistedAthletes = async (req, res) => {
+   try {
+-    const sportsFilter = req.query.sports ? req.query.sports.split(',') : [];
++    let sportsFilter = req.query.sports ? req.query.sports.split(',') : [];
++    if (sportsFilter.includes('All')) sportsFilter = [];
++
+     const query = sportsFilter.length > 0 ? { role: 'athlete', sports: { $in: sportsFilter } } : { role: 'athlete' };
+ 
+     const athletes = await User.find(query)
+@@ -58,7 +160,9 @@ exports.getShortlistedAthletes = async (req, res) => {
+ // @access  Public (mock admin)
+ exports.getSubmissions = async (req, res) => {
+   try {
+-    const sportsFilter = req.query.sports ? req.query.sports.split(',') : [];
++    let sportsFilter = req.query.sports ? req.query.sports.split(',') : [];
++    if (sportsFilter.includes('All')) sportsFilter = [];
++
+     const userQuery = sportsFilter.length > 0 ? { role: 'athlete', sports: { $in: sportsFilter } } : { role: 'athlete' };
+     const validUsers = await User.find(userQuery, '_id');
+     const validUserIds = validUsers.map(u => u._id);
+@@ -108,3 +212,58 @@ exports.evaluateSubmission = async (req, res) => {
+         res.status(500).json({ message: error.message });
+     }
+ };
++
++// @desc    Get a single athlete's details and all their submissions
++// @route   GET /api/admin/athletes/:id
++// @access  Public (mock admin)
++exports.getAthleteDetails = async (req, res) => {
++    try {
++        const athleteId = req.params.id;
++        const athlete = await User.findById(athleteId).select('-password');
++        
++        if (!athlete) {
++            return res.status(404).json({ message: 'Athlete not found' });
++        }
++
++        const submissions = await FitnessTest.find({ user: athleteId }).sort({ dateTaken: -1 });
++        const achievements = await Achievement.find({ user: athleteId }).sort({ dateEarned: -1 });
++        
++        res.json({ athlete, submissions, achievements });
++    } catch (error) {
++        res.status(500).json({ message: error.message });
++    }
++};
++
++// @desc    Evaluate an entire athlete
++// @route   PUT /api/admin/athletes/:id/evaluate
++// @access  Public (mock admin)
++exports.evaluateAthlete = async (req, res) => {
++    const { status, remarks } = req.body; // 'approved' or 'rejected'
++    
++    try {
++        const athlete = await User.findById(req.params.id);
++        if (!athlete) {
++            return res.status(404).json({ message: 'Athlete not found' });
++        }
++
++        athlete.evaluationStatus = status;
++        if (remarks) {
++            athlete.evaluationRemarks = remarks;
++        }
++        await athlete.save();
++
++        if (status === 'approved' || status === 'rejected') {
++            await Notification.create({
++                user: athlete._id,
++                title: `Application ${status.charAt(0).toUpperCase() + status.slice(1)}`,
++                message: `Your athlete profile evaluation has been ${status} by the administration.`,
++                type: 'status_update'
++            });
++        }
++
++        res.json({ message: 'Athlete evaluation updated', athlete });
++    } catch (error) {
++        console.error("Athlete Evaluation Error:", error);
++        res.status(500).json({ message: error.message });
++    }
++};
+diff --git a/backend/src/controllers/authController.js b/backend/src/controllers/authController.js
+index c50948b..2812a91 100644
+--- a/backend/src/controllers/authController.js
++++ b/backend/src/controllers/authController.js
+@@ -1,6 +1,26 @@
+ const User = require('../models/User');
+ const Admin = require('../models/Admin');
+ const jwt = require('jsonwebtoken');
++const cloudinary = require('cloudinary').v2;
++
++cloudinary.config({
++  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
++  api_key: process.env.CLOUDINARY_API_KEY,
++  api_secret: process.env.CLOUDINARY_API_SECRET,
++});
++
++const uploadBufferToCloudinary = (buffer, folder) => {
++  return new Promise((resolve, reject) => {
++    const uploadStream = cloudinary.uploader.upload_stream(
++      { resource_type: 'auto', folder },
++      (error, result) => {
++        if (error) return reject(error);
++        resolve(result);
++      }
++    );
++    uploadStream.end(buffer);
++  });
++};
+ 
+ // Generate JWT Token
+ const generateToken = (id) => {
+@@ -14,8 +34,19 @@ const generateToken = (id) => {
+ // @access  Public
+ exports.registerUser = async (req, res) => {
+   const { name, email, password, role, dateOfBirth, gender, height, weight, sports, address, state } = req.body;
++  let { aadhaarCardUrl, dobCertificateUrl } = req.body;
+ 
+   try {
++    if (req.files) {
++      if (req.files.aadhaarCard && req.files.aadhaarCard.length > 0) {
++        const result = await uploadBufferToCloudinary(req.files.aadhaarCard[0].buffer, 'dipex/documents');
++        aadhaarCardUrl = result.secure_url;
++      }
++      if (req.files.dobCertificate && req.files.dobCertificate.length > 0) {
++        const result = await uploadBufferToCloudinary(req.files.dobCertificate[0].buffer, 'dipex/documents');
++        dobCertificateUrl = result.secure_url;
++      }
++    }
+     if (role === 'admin') {
+       const adminExists = await Admin.findOne({ email });
+       if (adminExists) return res.status(400).json({ message: 'Admin already exists' });
+@@ -34,7 +65,7 @@ exports.registerUser = async (req, res) => {
+     }
+ 
+     const user = await User.create({
+-      name, email, password, role, dateOfBirth, gender, height, weight, sports, address, state
++      name, email, password, role, dateOfBirth, gender, height, weight, sports, address, state, aadhaarCardUrl, dobCertificateUrl
+     });
+ 
+     if (user) {
+diff --git a/backend/src/index.js b/backend/src/index.js
+index 7b96337..de36cf4 100644
+--- a/backend/src/index.js
++++ b/backend/src/index.js
+@@ -24,6 +24,7 @@ app.use('/api/auth', require('./routes/authRoutes'));
+ app.use('/api/achievements', require('./routes/achievementRoutes'));
+ app.use('/api/fitness', require('./routes/fitnessRoutes'));
+ app.use('/api/admin', require('./routes/adminRoutes'));
++app.use('/api/notifications', require('./routes/notificationRoutes'));
+ 
+ // Basic Route
+ app.get('/', (req, res) => {
+diff --git a/backend/src/middleware/authMiddleware.js b/backend/src/middleware/authMiddleware.js
+index 239d875..b80f0fa 100644
+--- a/backend/src/middleware/authMiddleware.js
++++ b/backend/src/middleware/authMiddleware.js
+@@ -1,5 +1,6 @@
+ const jwt = require('jsonwebtoken');
+ const User = require('../models/User');
++const Admin = require('../models/Admin');
+ 
+ const protect = async (req, res, next) => {
+   let token;
+@@ -12,9 +13,16 @@ const protect = async (req, res, next) => {
+       token = req.headers.authorization.split(' ')[1];
+ 
+       const decoded = jwt.verify(token, process.env.JWT_SECRET);
++      let user = await User.findById(decoded.id).select('-password');
++      if (!user) {
++        user = await Admin.findById(decoded.id).select('-password');
++      }
+ 
+-      req.user = await User.findById(decoded.id).select('-password');
++      if (!user) {
++        return res.status(401).json({ message: 'User not found' });
++      }
+ 
++      req.user = user;
+       next();
+     } catch (error) {
+       console.error(error);
+diff --git a/backend/src/middleware/upload.js b/backend/src/middleware/upload.js
+index 89ac316..c5f601b 100644
+--- a/backend/src/middleware/upload.js
++++ b/backend/src/middleware/upload.js
+@@ -12,10 +12,10 @@ const storage = multer.diskStorage({
+ 
+ // Configure file filter (optional, to accept only specific file types)
+ const fileFilter = (req, file, cb) => {
+-  if (file.mimetype.startsWith('video/')) {
++  if (file.mimetype.startsWith('video/') || file.mimetype.startsWith('image/')) {
+     cb(null, true);
+   } else {
+-    cb(new Error('Not an video! Please upload only videos.'), false);
++    cb(new Error('Invalid file type! Please upload only videos or images.'), false);
+   }
+ };
+ 
+diff --git a/backend/src/models/User.js b/backend/src/models/User.js
+index 28e8516..25a49eb 100644
+--- a/backend/src/models/User.js
++++ b/backend/src/models/User.js
+@@ -31,16 +31,24 @@ const UserSchema = new mongoose.Schema({
+   weight: { type: Number }, // in kg
+   address: { type: String },
+   state: { type: String },
++  aadhaarCardUrl: { type: String },
++  dobCertificateUrl: { type: String },
+   sports: { type: [String], default: [] },
+   overallScore: { type: Number, default: 0 },
++  evaluationStatus: {
++    type: String,
++    enum: ['pending', 'approved', 'rejected'],
++    default: 'pending',
++  },
++  evaluationRemarks: { type: String },
+ }, {
+   timestamps: true,
+ });
+ 
+ // Password Hash middleware
+-UserSchema.pre('save', async function (next) {
++UserSchema.pre('save', async function () {
+   if (!this.isModified('password')) {
+-    return next();
++    return;
+   }
+   const salt = await bcrypt.genSalt(10);
+   this.password = await bcrypt.hash(this.password, salt);
+diff --git a/backend/src/routes/achievementRoutes.js b/backend/src/routes/achievementRoutes.js
+index 1ad9b26..e4e4b85 100644
+--- a/backend/src/routes/achievementRoutes.js
++++ b/backend/src/routes/achievementRoutes.js
+@@ -2,7 +2,12 @@ const express = require('express');
+ const router = express.Router();
+ const { uploadAchievement, getAchievements } = require('../controllers/achievementController');
+ const { protect } = require('../middleware/authMiddleware');
++const multer = require('multer');
+ 
+-router.route('/').post(protect, uploadAchievement).get(protect, getAchievements);
++// Configure multer (store in memory so we can pipe to Cloudinary)
++const storage = multer.memoryStorage();
++const upload = multer({ storage });
++
++router.route('/').post(protect, upload.single('proof'), uploadAchievement).get(protect, getAchievements);
+ 
+ module.exports = router;
+diff --git a/backend/src/routes/adminRoutes.js b/backend/src/routes/adminRoutes.js
+index 1dd389c..8991948 100644
+--- a/backend/src/routes/adminRoutes.js
++++ b/backend/src/routes/adminRoutes.js
+@@ -4,11 +4,15 @@ const {
+   getDashboardStats, 
+   getShortlistedAthletes, 
+   getSubmissions, 
+-  evaluateSubmission 
++  evaluateSubmission,
++  getAthleteDetails,
++  evaluateAthlete
+ } = require('../controllers/adminController');
+ 
+ router.get('/dashboard', getDashboardStats);
+ router.get('/athletes', getShortlistedAthletes);
++router.get('/athletes/:id', getAthleteDetails);
++router.put('/athletes/:id/evaluate', evaluateAthlete);
+ router.get('/submissions', getSubmissions);
+ router.put('/submissions/:id/evaluate', evaluateSubmission);
+ 
+diff --git a/backend/src/routes/authRoutes.js b/backend/src/routes/authRoutes.js
+index a9d48c9..37b8eb0 100644
+--- a/backend/src/routes/authRoutes.js
++++ b/backend/src/routes/authRoutes.js
+@@ -2,8 +2,12 @@ const express = require('express');
+ const router = express.Router();
+ const { registerUser, loginUser, getUserProfile } = require('../controllers/authController');
+ const { protect } = require('../middleware/authMiddleware');
++const multer = require('multer');
+ 
+-router.post('/register', registerUser);
++const storage = multer.memoryStorage();
++const upload = multer({ storage });
++
++router.post('/register', upload.fields([{ name: 'aadhaarCard', maxCount: 1 }, { name: 'dobCertificate', maxCount: 1 }]), registerUser);
+ router.post('/login', loginUser);
+ router.get('/me', protect, getUserProfile);
+ 

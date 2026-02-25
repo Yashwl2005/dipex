@@ -12,10 +12,10 @@ const storage = multer.diskStorage({
 
 // Configure file filter (optional, to accept only specific file types)
 const fileFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('video/')) {
+  if (file.mimetype.startsWith('video/') || file.mimetype.startsWith('image/')) {
     cb(null, true);
   } else {
-    cb(new Error('Not an video! Please upload only videos.'), false);
+    cb(new Error('Invalid file type! Please upload only videos or images.'), false);
   }
 };
 
