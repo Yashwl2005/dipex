@@ -58,7 +58,7 @@
 }
 
 .heatmap-widget {
-    grid-column: span 8;
+    grid-column: span 12;
     min-height: 400px;
 }
 

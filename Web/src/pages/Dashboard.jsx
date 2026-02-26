@@ -22,8 +22,7 @@ export const Dashboard = () => {
         rejectedAthletes: 0,
         pendingAthletes: 0,
         topPerformers: [],
-        stateDistribution: [],
-        flaggedActivity: null
+        stateDistribution: []
     });
 
     const loadStats = async () => {
@@ -65,79 +64,49 @@ export const Dashboard = () => {
                 {/* Heatmap Widget */}
                 <div className="card heatmap-widget">
                     <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-lg">State Performance Heatmap</h2>
-                        <button className="btn-secondary flex items-center gap-2 text-sm" style={{ padding: '6px 12px' }}>
-                            All Sports <ChevronDown size={14} />
-                        </button>
+                        <h2 className="text-lg font-bold">State Distribution</h2>
                     </div>
-                    <div style={{ backgroundColor: '#f8fafc', height: '300px', borderRadius: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+                    <div style={{ backgroundColor: '#f8fafc', height: '300px', borderRadius: '8px', padding: '20px' }}>
                         {stats.stateDistribution && stats.stateDistribution.length > 0 ? (
-                            <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', gap: '16px', overflowY: 'auto' }}>
-                                {stats.stateDistribution.map(stat => (
-                                    <div key={stat._id || 'unknown'} className="flex items-center gap-4">
-                                        <div style={{ minWidth: '100px', fontSize: '13px', fontWeight: 'bold', color: '#475569', textTransform: 'capitalize' }}>{stat._id || 'Unknown'}</div>
-                                        <div style={{ flex: 1, height: '8px', backgroundColor: '#e2e8f0', borderRadius: '4px', overflow: 'hidden' }}>
-                                            <div style={{ width: `${Math.min((stat.count / Math.max(stats.totalAthletes, 1)) * 100, 100)}%`, height: '100%', backgroundColor: '#3b82f6' }}></div>
-                                        </div>
-                                        <div style={{ minWidth: '30px', textAlign: 'right', fontSize: '13px', fontWeight: 'bold', color: '#0f172a' }}>{stat.count}</div>
-                                    </div>
-                                ))}
-                            </div>
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart
+                                    data={stats.stateDistribution.map(stat => ({
+                                        name: (stat._id || 'Unknown').charAt(0).toUpperCase() + (stat._id || 'unknown').slice(1),
+                                        value: stat.count
+                                    }))}
+                                    margin={{ top: 20, right: 30, left: -20, bottom: 20 }}
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                    <XAxis
+                                        dataKey="name"
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tick={{ fill: '#64748b', fontSize: 12 }}
+                                    />
+                                    <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b', fontSize: 12 }} allowDecimals={false} />
+                                    <RechartsTooltip
+                                        cursor={{ fill: '#f8fafc' }}
+                                        contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                        formatter={(value) => [value, 'Athletes']}
+                                    />
+                                    <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} maxBarSize={50}>
+                                        <LabelList dataKey="value" position="top" fill="#475569" fontSize={11} fontWeight="bold" />
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
                         ) : (
-                            <>
-                                <div style={{ position: 'relative', opacity: 0.8 }}>
-                                    <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
-                                        <polygon fill="#e2e8f0" points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon>
-                                        <line x1="9" y1="3" x2="9" y2="21"></line>
-                                        <line x1="15" y1="3" x2="15" y2="21"></line>
-                                    </svg>
-                                    <div style={{ position: 'absolute', top: '15px', left: '40px', color: '#3b3b98' }}>
-                                        <MapPin size={32} fill="currentColor" stroke="white" />
-                                    </div>
-                                </div>
+                            <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: 0.8 }}>
+                                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="mb-4">
+                                    <polygon fill="#e2e8f0" points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon>
+                                    <line x1="9" y1="3" x2="9" y2="21"></line>
+                                    <line x1="15" y1="3" x2="15" y2="21"></line>
+                                </svg>
                                 <p className="font-bold mt-4" style={{ color: '#334155' }}>No State Data Available</p>
-                            </>
-                        )}
-                    </div>
-                </div>
-
-                {/* Flagged Activity */}
-                <div className="card flagged-widget">
-                    <h2 className="text-lg flex items-center gap-2 mb-4">
-                        <Activity size={20} color="#dc2626" /> Flagged Activity
-                    </h2>
-                    <div className="flex justify-between items-end mb-4">
-                        <div>
-                            <div className="text-xs text-muted mb-1 uppercase font-bold tracking-wider">REJECTED VIDEOS</div>
-                            <div className="text-3xl font-bold" style={{ color: '#dc2626' }}>{stats.flaggedActivity?.count || 0}</div>
-                        </div>
-                        <div style={{ textAlign: 'right' }}>
-                            <div className="text-xs text-muted mb-1">Risk Status</div>
-                            <div className="text-xs font-bold" style={{ backgroundColor: '#fef3c7', color: '#d97706', padding: '2px 8px', borderRadius: '4px' }}>MONITORING</div>
-                        </div>
-                    </div>
-
-                    <div style={{ backgroundColor: '#f8fafc', padding: '12px', borderRadius: '8px', marginBottom: '16px' }}>
-                        <div className="text-xs text-muted mb-2 font-bold tracking-wider">LATEST REJECTION</div>
-                        {stats.flaggedActivity?.latest ? (
-                            <div className="flex items-center gap-3">
-                                <div style={{ width: '40px', height: '40px', backgroundColor: '#e2e8f0', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <Play fill="#94a3b8" stroke="none" size={16} />
-                                </div>
-                                <div>
-                                    <div className="font-bold text-sm">Review Failed</div>
-                                    <div className="text-xs text-muted">{stats.flaggedActivity.latest.user?.name || 'Unknown'} - {stats.flaggedActivity.latest.user?.state || 'Unknown'}</div>
-                                </div>
                             </div>
-                        ) : (
-                            <div className="text-sm text-muted">No recently flagged videos</div>
                         )}
                     </div>
-
-                    <button className="btn-secondary" style={{ width: '100%', borderColor: '#2b2b85', color: '#2b2b85' }}>
-                        Review All Flags
-                    </button>
                 </div>
+
             </div>
 
             {/* Charts Row */}
