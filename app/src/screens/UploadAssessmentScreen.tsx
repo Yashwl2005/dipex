@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, SafeAreaView, Dimensions, ImageBackground, Alert, ActivityIndicator, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Dimensions, ImageBackground, Alert, ActivityIndicator, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Colors, Spacing } from '../constants/theme';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -185,9 +187,10 @@ export default function UploadAssessmentScreen() {
                             }
 
                             // Append the video file
-                            const filename = videoUri.split('/').pop() || 'video.mp4';
+                            let filename = videoUri.split('/').pop() || 'video.mp4';
                             const match = /\.(\w+)$/.exec(filename);
-                            const type = match ? `video/${match[1]}` : `video/mp4`;
+                            const type = match ? `video/${match[1]}` : 'video/mp4';
+                            if (!match) filename = `${filename}.mp4`;
 
                             formData.append('video', {
                                 uri: fileUri,

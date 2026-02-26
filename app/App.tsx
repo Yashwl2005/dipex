@@ -24,25 +24,29 @@ import LoginScreen from './src/screens/LoginScreen';
 
 const Stack = createNativeStackNavigator();
 
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+
 export default function App() {
   return (
-    <Provider store={store}>
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Login">
-          <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name="Registration" component={RegistrationScreen} />
-          <Stack.Screen name="Home" component={HomeScreen} />
-          <Stack.Screen name="UploadAchievements" component={UploadAchievementsScreen} />
-          <Stack.Screen name="SportsProfile" component={SportsProfileScreen} />
-          <Stack.Screen name="SelectTest" component={SelectTestScreen} />
-          <Stack.Screen name="TestInstructions" component={TestInstructionsScreen} />
-          <Stack.Screen name="UploadAssessment" component={UploadAssessmentScreen} />
-          <Stack.Screen name="UploadingData" component={UploadingDataScreen} />
-          <Stack.Screen name="Notifications" component={NotificationsScreen} />
-          <Stack.Screen name="Submissions" component={SubmissionsScreen} />
-        </Stack.Navigator>
-      </NavigationContainer>
-      <StatusBar style="auto" />
-    </Provider>
+    <SafeAreaProvider>
+      <Provider store={store}>
+        <NavigationContainer>
+          <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Login">
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Registration" component={RegistrationScreen} />
+            <Stack.Screen name="Home" component={HomeScreen} />
+            <Stack.Screen name="UploadAchievements" component={UploadAchievementsScreen} />
+            <Stack.Screen name="SportsProfile" component={SportsProfileScreen} />
+            <Stack.Screen name="SelectTest" component={SelectTestScreen} />
+            <Stack.Screen name="TestInstructions" component={TestInstructionsScreen} />
+            <Stack.Screen name="UploadAssessment" component={UploadAssessmentScreen} />
+            <Stack.Screen name="UploadingData" component={UploadingDataScreen} />
+            <Stack.Screen name="Notifications" component={NotificationsScreen} />
+            <Stack.Screen name="Submissions" component={SubmissionsScreen} />
+          </Stack.Navigator>
+        </NavigationContainer>
+        <StatusBar style="auto" />
+      </Provider>
+    </SafeAreaProvider>
   );
 }

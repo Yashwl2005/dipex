@@ -1,10 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, FlatList, TouchableOpacity, SafeAreaView, ActivityIndicator, Image } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { StyleSheet, Text, View, FlatList, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 import { Colors, Spacing } from '../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { Video, ResizeMode } from 'expo-av';
+import { useVideoPlayer, VideoView } from 'expo-video';
 import api from '../services/apiClient';
+
+const VideoPlayerComponent = ({ url }: { url: string }) => {
+    const player = useVideoPlayer(url, player => {
+        player.loop = false;
+    });
+
+    return (
+        <VideoView style={styles.video} player={player} />
+    );
+};
 
 export default function SubmissionsScreen() {
     const navigation = useNavigation<any>();
@@ -49,17 +61,11 @@ export default function SubmissionsScreen() {
 
             {!!item.videoProofUrl && (
                 <View style={styles.videoContainer}>
-                    <Video
-                        source={{
-                            uri: item.videoProofUrl.includes('cloudinary.com')
-                                ? item.videoProofUrl.replace('http://', 'https://').replace('/upload/', '/upload/q_auto,vc_auto/')
-                                : item.videoProofUrl
-                        }}
-                        style={styles.video}
-                        useNativeControls
-                        resizeMode={ResizeMode.CONTAIN}
-                        isLooping={false}
-                    />
+                    <VideoPlayerComponent url={
+                        item.videoProofUrl.includes('cloudinary.com')
+                            ? item.videoProofUrl.replace('http://', 'https://').replace('/upload/', '/upload/q_auto,vc_auto/')
+                            : item.videoProofUrl
+                    } />
                 </View>
             )}
 

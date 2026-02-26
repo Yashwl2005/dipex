@@ -21,10 +21,12 @@ export const Sidebar = ({ type = 'light' }) => {
         { path: '/athletes', label: 'Athlete Management', icon: Users },
         { path: '/shortlisted', label: 'Shortlisted Athletes', icon: UserCheck },
         { path: '/reports', label: 'Reports', icon: FileText },
+        { path: '/announcements', label: 'Announcements', icon: FileText },
         { path: '/auth', label: 'New Admin Sign Up', icon: UserPlus },
     ] : [
         { path: '/', label: 'Dashboard', icon: LayoutDashboard },
         { path: '/athletes', label: 'Athletes', icon: Users },
+        { path: '/announcements', label: 'Announcements', icon: FileText },
         { path: '/auth', label: 'New Admin Sign Up', icon: UserPlus },
     ];
 

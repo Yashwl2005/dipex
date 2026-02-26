@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity } from 'react-native';
 import { Colors, Spacing } from '../constants/theme';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation, useIsFocused, useFocusEffect } from '@react-navigation/native';

@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Dashboard } from './pages/Dashboard';
 import { ShortlistedAthletes } from './pages/ShortlistedAthletes';
+import Announcements from './pages/Announcements';
 import { Auth } from './pages/Auth';
 
 import { Athletes } from './pages/Athletes';
@@ -18,6 +19,7 @@ function App() {
         <Route path="/athletes" element={<Athletes />} />
         <Route path="/athletes/:id" element={<AthleteDetail />} />
         <Route path="/shortlisted" element={<ShortlistedAthletes />} />
+        <Route path="/announcements" element={<Announcements />} />
         <Route path="/reports" element={<ReportsPlaceholder />} />
       </Routes>
     </Router>

@@ -219,7 +219,7 @@ exports.evaluateSubmission = async (req, res) => {
                  await Notification.create({
                      user: test.user,
                      title: 'Application Approved',
-                     message: 'Congratulations! Your outstanding fitness performance has earned you an automatic profile approval.',
+                     message: 'Congratulations! Your outstanding fitness performance has earned you an automatic profile approval. You have been selected for trials. We will notify you shortly about trials.',
                      type: 'status_update'
                  });
              }
@@ -278,10 +278,14 @@ exports.evaluateAthlete = async (req, res) => {
         await athlete.save();
 
         if (status === 'approved' || status === 'rejected') {
+            const message = status === 'approved' 
+                ? 'Your athlete profile has been approved. You have been selected for trials. We will notify you shortly about trials.'
+                : 'Your athlete profile evaluation has been rejected by the administration.';
+
             await Notification.create({
                 user: athlete._id,
                 title: `Application ${status.charAt(0).toUpperCase() + status.slice(1)}`,
-                message: `Your athlete profile evaluation has been ${status} by the administration.`,
+                message: message,
                 type: 'status_update'
             });
         }

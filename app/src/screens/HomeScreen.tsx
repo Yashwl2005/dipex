@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity, SafeAreaView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { Colors, Spacing } from '../constants/theme';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -14,6 +16,7 @@ export default function HomeScreen() {
     const [evalStatus, setEvalStatus] = useState('pending');
     const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
     const [overallScore, setOverallScore] = useState<number | null>(null);
+    const [announcements, setAnnouncements] = useState<any[]>([]);
 
     useFocusEffect(
         React.useCallback(() => {
@@ -97,49 +100,16 @@ export default function HomeScreen() {
     };
 
     // Comprehensive announcements data with actual Dates
-    // Using actual recent timestamps to simulate real data aging
-    const announcementsData = [
-        {
-            id: 1,
-            title: 'Khelo India Selection Trials 2026',
-            description: 'The national selection trials for the upcoming Khelo India Youth Games will commence on the 15th of next month. All registered athletes in Athletics and Swimming must ensure their profiles are 100% complete.',
-            postedAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago from current app load
-            type: 'trial',
-            iconName: 'flag',
-            iconColor: '#F59E0B',
-            bgColor: '#FEF3C7',
-        },
-        {
-            id: 2,
-            title: 'New Scholarship Opportunities',
-            description: 'The Sports Authority of India (SAI) has announced 500 new grassroots scholarships for U-17 athletes. Ensure your fitness assessment videos are uploaded before the end of the quarter to be considered.',
-            postedAt: new Date(Date.now() - 26 * 60 * 60 * 1000), // ~1 day ago
-            type: 'scholarship',
-            iconName: 'school',
-            iconColor: '#10B981',
-            bgColor: '#D1FAE5',
-        },
-        {
-            id: 3,
-            title: 'Mandatory Equipment Check',
-            description: 'New standard guidelines for protective gear in Boxing and Taekwondo have been published. Please review the updated sports guidelines under your profile to avoid disqualification during trials.',
-            postedAt: new Date(Date.now() - 3.5 * 24 * 60 * 60 * 1000), // ~3.5 days ago
-            type: 'update',
-            iconName: 'shield-checkmark',
-            iconColor: '#3B82F6',
-            bgColor: '#DBEAFE',
-        },
-        {
-            id: 4,
-            title: 'National Assessment Camp',
-            description: 'Selected candidates from the Northern zone will be invited to the New Delhi Regional Center for a 3-day high-performance assessment camp. Invitations will be sent via notifications.',
-            postedAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000), // ~8 days ago
-            type: 'camp',
-            iconName: 'fitness',
-            iconColor: '#8B5CF6',
-            bgColor: '#EDE9FE',
+    // Helper to get styling for announcement types
+    const getAnnouncementStyle = (type: string) => {
+        switch (type) {
+            case 'trial': return { iconName: 'flag', iconColor: '#F59E0B', bgColor: '#FEF3C7' };
+            case 'scholarship': return { iconName: 'school', iconColor: '#10B981', bgColor: '#D1FAE5' };
+            case 'update': return { iconName: 'shield-checkmark', iconColor: '#3B82F6', bgColor: '#DBEAFE' };
+            case 'camp': return { iconName: 'fitness', iconColor: '#8B5CF6', bgColor: '#EDE9FE' };
+            default: return { iconName: 'megaphone', iconColor: '#4F46E5', bgColor: '#E0E7FF' };
         }
-    ];
+    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -273,18 +243,25 @@ export default function HomeScreen() {
                     </TouchableOpacity>
                 </View>
 
-                {announcementsData.map((announcement) => (
-                    <View key={announcement.id} style={styles.announcementCard}>
-                        <View style={[styles.annIconBox, { backgroundColor: announcement.bgColor }]}>
-                            <Ionicons name={announcement.iconName as any} size={24} color={announcement.iconColor} />
-                        </View>
-                        <View style={styles.annContent}>
-                            <Text style={styles.annTitle}>{announcement.title}</Text>
-                            <Text style={styles.annDesc} numberOfLines={3}>{announcement.description}</Text>
-                            <Text style={styles.annTime}>{getTimeAgo(announcement.postedAt)}</Text>
-                        </View>
+                {announcements.length === 0 ? (
+                    <View style={{ padding: 20, alignItems: 'center' }}>
+                        <Text style={{ color: Colors.textSecondary }}>No recent announcements</Text>
                     </View>
-                ))}
+                ) : announcements.map((announcement) => {
+                    const style = getAnnouncementStyle(announcement.type);
+                    return (
+                        <View key={announcement._id} style={styles.announcementCard}>
+                            <View style={[styles.annIconBox, { backgroundColor: style.bgColor }]}>
+                                <Ionicons name={style.iconName as any} size={24} color={style.iconColor} />
+                            </View>
+                            <View style={styles.annContent}>
+                                <Text style={styles.annTitle}>{announcement.title}</Text>
+                                <Text style={styles.annDesc} numberOfLines={3}>{announcement.description}</Text>
+                                <Text style={styles.annTime}>{getTimeAgo(new Date(announcement.createdAt))}</Text>
+                            </View>
+                        </View>
+                    );
+                })}
             </ScrollView>
 
             {/* Bottom Nav Placeholder */}

@@ -74,7 +74,14 @@
 }
 
 .chart-card {
-    min-height: 300px;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-card>div {
+    flex: 1;
+    min-height: 0;
 }
 
 .leaderboard-widget {
