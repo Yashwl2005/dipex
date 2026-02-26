@@ -71,7 +71,7 @@ export default function SubmissionsScreen() {
 
             {!!item.score && (
                 <View style={styles.scoreContainer}>
-                    <Text style={styles.scoreLabel}>Score:</Text>
+                    <Text style={styles.scoreLabel}>Final Score:</Text>
                     <Text style={styles.scoreValue}>{item.score}</Text>
                 </View>
             )}

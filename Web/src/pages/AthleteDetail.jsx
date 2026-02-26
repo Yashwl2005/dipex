@@ -346,7 +346,7 @@ export const AthleteDetail = () => {
                                                 {new Date(sub.dateTaken).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })}
                                             </td>
                                             <td style={{ padding: '16px 24px', color: '#475569' }}>
-                                                {sub.metrics?.duration ? `${sub.metrics.duration}s` : '--'}
+                                                <div>{sub.metrics?.duration ? `${sub.metrics.duration}s` : '--'}</div>
                                             </td>
                                             <td style={{ padding: '16px 24px', fontWeight: 'bold', color: '#2b2b85', fontSize: '16px' }}>
                                                 {sub.score || '--'}

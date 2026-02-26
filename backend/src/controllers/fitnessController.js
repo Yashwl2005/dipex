@@ -11,7 +11,8 @@ exports.uploadFitnessData = async (req, res) => {
   console.log("Body:", req.body);
   console.log("File:", req.file ? req.file.path : 'No file');
 
-  const { testName, score, metrics, dateTaken } = req.body;
+  let { testName, score, metrics, dateTaken } = req.body;
+  let finalStatus = 'pending';
 
   try {
     let videoProofUrl = req.body.videoProofUrl || null;
@@ -43,6 +44,7 @@ exports.uploadFitnessData = async (req, res) => {
       metrics: parsedMetrics,
       dateTaken,
       videoProofUrl,
+      status: finalStatus
     });
 
     const createdTest = await fitnessTest.save();

@@ -17,6 +17,7 @@ import TestInstructionsScreen from './src/screens/TestInstructionsScreen';
 import UploadingDataScreen from './src/screens/UploadingDataScreen';
 import UploadAssessmentScreen from './src/screens/UploadAssessmentScreen';
 import NotificationsScreen from './src/screens/NotificationsScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
 
 import SubmissionsScreen from './src/screens/SubmissionsScreen';
 
@@ -37,6 +38,7 @@ export default function App() {
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="UploadAchievements" component={UploadAchievementsScreen} />
             <Stack.Screen name="SportsProfile" component={SportsProfileScreen} />
+            <Stack.Screen name="Profile" component={ProfileScreen} />
             <Stack.Screen name="SelectTest" component={SelectTestScreen} />
             <Stack.Screen name="TestInstructions" component={TestInstructionsScreen} />
             <Stack.Screen name="UploadAssessment" component={UploadAssessmentScreen} />

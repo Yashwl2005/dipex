@@ -148,3 +148,5 @@ export const Athletes = () => {
         </Layout>
     );
 };
+
+export default Athletes;

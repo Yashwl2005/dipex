@@ -166,3 +166,47 @@ exports.submitUserTest = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+// @desc    Update user profile
+// @route   PUT /api/auth/profile
+// @access  Private
+exports.updateUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+      user.name = req.body.name || user.name;
+      user.height = req.body.height || user.height;
+      user.weight = req.body.weight || user.weight;
+      user.address = req.body.address || user.address;
+      user.state = req.body.state || user.state;
+      
+      if (req.body.sports) {
+          // ensure it's an array or split string
+          user.sports = Array.isArray(req.body.sports) ? req.body.sports : [req.body.sports];
+      }
+
+      if (req.file) {
+        const result = await uploadBufferToCloudinary(req.file.buffer, 'dipex/profiles');
+        user.profilePhotoUrl = result.secure_url;
+      }
+
+      const updatedUser = await user.save();
+      
+      res.json({
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        height: updatedUser.height,
+        weight: updatedUser.weight,
+        address: updatedUser.address,
+        state: updatedUser.state,
+        sports: updatedUser.sports,
+        profilePhotoUrl: updatedUser.profilePhotoUrl
+      });
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

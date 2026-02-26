@@ -280,7 +280,7 @@ export default function HomeScreen() {
                     <Ionicons name="folder-outline" size={24} color={Colors.textSecondary} />
                     <Text style={styles.navText}>Submissions</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('SportsProfile')}>
+                <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Profile')}>
                     <Ionicons name="person-outline" size={24} color={Colors.textSecondary} />
                     <Text style={styles.navText}>Profile</Text>
                 </TouchableOpacity>
