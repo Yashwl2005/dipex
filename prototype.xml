@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxGraphModel dx="1400" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+
+    <!-- Mobile Screen Frame -->
+    <mxCell id="login_frame" value="" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#333333;strokeWidth=3;fillColor=#f8f9fa;" vertex="1" parent="1">
+      <mxGeometry x="50" y="50" width="280" height="560" as="geometry" />
+    </mxCell>
+    
+    <!-- Screen Title Bar -->
+    <mxCell id="login_title" value="&lt;b&gt;Sports Assessment Platform&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0056b3;fontColor=#ffffff;strokeColor=none;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
+      <mxGeometry x="50" y="80" width="280" height="40" as="geometry" />
+    </mxCell>
+    
+    <!-- Top Notch/Status Bar Area -->
+    <mxCell id="login_notch" value="12:00    &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;  📶 🔋" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e9ecef;strokeColor=none;align=center;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="50" y="50" width="280" height="30" as="geometry" />
+    </mxCell>
+    
+    <!-- Bottom Nav Bar (if needed) -->
+    <mxCell id="login_nav" value="🏠 Home | 🏆 Tests | 👤 Profile" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e9ecef;strokeColor=#cccccc;align=center;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="50" y="560" width="280" height="50" as="geometry" />
+    </mxCell>
+  
+    <mxCell id="login_el_0" value="" style="shape=image;html=1;verticalAlign=middle;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;imageAspect=0;aspect=fixed;image=https://cdn1.iconfinder.com/data/icons/social-messaging-ui-color/254000/39-512.png;strokeColor=#cccccc;" vertex="1" parent="1">
+      <mxGeometry x="140" y="150" width="100" height="100" as="geometry" />
+    </mxCell>
+    
+    <mxCell id="login_el_1" value="&lt;b&gt;Welcome Back, Athlete!&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#333333;fontSize=18" vertex="1" parent="1">
+      <mxGeometry x="90" y="270" width="200" height="30" as="geometry" />
+    </mxCell>
+    
+    <mxCell id="login_el_2" value="Email Address" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#ced4da;align=left;spacingLeft=10;fontColor=#6c757d" vertex="1" parent="1">
+      <mxGeometry x="70" y="320" width="240" height="40" as="geometry" />
+    </mxCell>
+    
+    <mxCell id="login_el_3" value="Password" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#ced4da;align=left;spacingLeft=10;fontColor=#6c757d" vertex="1" parent="1">
+      <mxGeometry x="70" y="380" width="240" height="40" as="geometry" />
+    </mxCell>
+    
+    <mxCell id="login_el_4" value="LOGIN" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#28a745;fontColor=#ffffff;strokeColor=#218838;fontSize=13;fontStyle=1" vertex="1" parent="1">
+      <mxGeometry x="70" y="450" width="240" height="45" as="geometry" />
+    </mxCell>
+    
+    <mxCell id="login_el_5" value="&lt;a href="#"&gt;Forgot Password?&lt;/a&gt;   |   &lt;a href="#"&gt;Register&lt;/a&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#333333;fontSize=12" vertex="1" parent="1">
+      <mxGeometry x="90" y="510" width="200" height="20" as="geometry" />
+    </mxCell>
+    
+    <!-- Mobile Screen Frame -->
+    <mxCell id="dash_mobile_frame" value="" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#333333;strokeWidth=3;fillColor=#f8f9fa;" vertex="1" parent="1">
+      <mxGeometry x="400" y="50" width="280" height="560" as="geometry" />
+    </mxCell>
+    
+    <!-- Screen Title Bar -->
+    <mxCell id="dash_mobile_title" value="&lt;b&gt;My Dashboard&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0056b3;fontColor=#ffffff;strokeColor=none;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
+      <mxGeometry x="400" y="80" width="280" height="40" as="geometry" />
+    </mxCell>
+    
+    <!-- Top Notch/Status Bar Area -->
+    <mxCell id="dash_mobile_notch" value="12:00    &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;  📶 🔋" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e9ecef;strokeColor=none;align=center;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="400" y="50" width="280" height="30" as="geometry" />
+    </mxCell>
+    
+    <!-- Bottom Nav Bar (if needed) -->
+    <mxCell id="dash_mobile_nav" value="🏠 Home | 🏆 Tests | 👤 Profile" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e9ecef;strokeColor=#cccccc;align=center;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="400" y="560" width="280" height="50" as="geometry" />
+    </mxCell>
+  
+    <mxCell id="dash_mobile_el_0" value="&lt;b&gt;Overall Rank&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;span style="font-size:24px;color:#28a745"&gt;#42&lt;/span&gt;&lt;br&gt;State Level" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dddddd;shadow=1;align=center;" vertex="1" parent="1">
+      <mxGeometry x="420" y="140" width="110" height="100" as="geometry" />
+    </mxCell>
+    
+    <mxCell id="dash_mobile_el_1" value="&lt;b&gt;Total Score&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;span style="font-size:24px;color:#007bff"&gt;85/100&lt;/span&gt;&lt;br&gt;Excellent" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dddddd;shadow=1;align=center;" vertex="1" parent="1">
+      <mxGeometry x="550" y="140" width="110" height="100" as="geometry" />
+    </mxCell>
+    
+    <mxCell id="dash_mobile_el_2" value="&lt;b&gt;Upcoming Assessments&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#333333;fontSize=14" vertex="1" parent="1">
+      <mxGeometry x="420" y="260" width="200" height="20" as="geometry" />
+    </mxCell>
+    
+    <mxCell id="dash_mobile_el_3" value="100m Sprint Trial&lt;br&gt;&lt;span style="color:gray;font-size:10px"&gt;Oct 25, 2026 - Stadium A&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dddddd;shadow=1;align=center;" vertex="1" parent="1">
+      <mxGeometry x="420" y="290" width="240" height="50" as="geometry" />
+    </mxCell>
+    
+    <mxCell id="dash_mobile_el_4" value="Vertical Jump Test&lt;br&gt;&lt;span style="color:gray;font-size:10px"&gt;Pending Upload&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dddddd;shadow=1;align=center;" vertex="1" parent="1">
+      <mxGeometry x="420" y="350" width="240" height="50" as="geometry" />
+    </mxCell>
+    
+    <mxCell id="dash_mobile_el_5" value="&lt;b&gt;Recent Feed&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#333333;fontSize=14" vertex="1" parent="1">
+      <mxGeometry x="420" y="420" width="200" height="20" as="geometry" />
+    </mxCell>
+    
+    <mxCell id="dash_mobile_el_6" value="🎉 National Scholarship Announced!" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dddddd;shadow=1;align=center;" vertex="1" parent="1">
+      <mxGeometry x="420" y="450" width="240" height="40" as="geometry" />
+    </mxCell>
+    
+    <mxCell id="dash_mobile_el_7" value="🔔 Your test was evaluated by Admin." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dddddd;shadow=1;align=center;" vertex="1" parent="1">
+      <mxGeometry x="420" y="500" width="240" height="40" as="geometry" />
+    </mxCell>
+    
+    <!-- Mobile Screen Frame -->
+    <mxCell id="upload_frame" value="" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#333333;strokeWidth=3;fillColor=#f8f9fa;" vertex="1" parent="1">
+      <mxGeometry x="750" y="50" width="280" height="560" as="geometry" />
+    </mxCell>
+    
+    <!-- Screen Title Bar -->
+    <mxCell id="upload_title" value="&lt;b&gt;Upload Video&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0056b3;fontColor=#ffffff;strokeColor=none;align=center;verticalAlign=middle;fontSize=14;" vertex="1" parent="1">
+      <mxGeometry x="750" y="80" width="280" height="40" as="geometry" />
+    </mxCell>
+    
+    <!-- Top Notch/Status Bar Area -->
+    <mxCell id="upload_notch" value="12:00    &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;  📶 🔋" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e9ecef;strokeColor=none;align=center;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="750" y="50" width="280" height="30" as="geometry" />
+    </mxCell>
+    
+    <!-- Bottom Nav Bar (if needed) -->
+    <mxCell id="upload_nav" value="🏠 Home | 🏆 Tests | 👤 Profile" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e9ecef;strokeColor=#cccccc;align=center;fontSize=12;" vertex="1" parent="1">
+      <mxGeometry x="750" y="560" width="280" height="50" as="geometry" />
+    </mxCell>
+  
+    <mxCell id="upload_el_0" value="&lt;b&gt;Select Assessment Type:&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#333333;fontSize=14" vertex="1" parent="1">
+      <mxGeometry x="770" y="140" width="200" height="20" as="geometry" />
+    </mxCell>
+    
+    <mxCell id="upload_el_1" value="e.g. Broad Jump / Pushups" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#ced4da;align=left;spacingLeft=10;fontColor=#6c757d" vertex="1" parent="1">
+      <mxGeometry x="770" y="170" width="240" height="40" as="geometry" />
+    </mxCell>
+    
+    <mxCell id="upload_el_2" value="🎥&lt;br&gt;&lt;b&gt;Tap to Select Video File&lt;/b&gt;&lt;br&gt;&lt;span style="color:gray;font-size:10px"&gt;Max 50MB, MP4 format&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dddddd;shadow=1;align=center;" vertex="1" parent="1">
+      <mxGeometry x="770" y="230" width="240" height="150" as="geometry" />
+    </mxCell>
+    
+    <mxCell id="upload_el_3" value="&lt;i&gt;AI engine will automatically process video&lt;br&gt;to calculate pose and metrics.&lt;/i&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#333333;fontSize=12" vertex="1" parent="1">
+      <mxGeometry x="770" y="400" width="240" height="40" as="geometry" />
+    </mxCell>
+    
+    <mxCell id="upload_el_4" value="UPLOAD &amp;amp; ANALYZE" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#28a745;fontColor=#ffffff;strokeColor=#218838;fontSize=13;fontStyle=1" vertex="1" parent="1">
+      <mxGeometry x="770" y="470" width="240" height="45" as="geometry" />
+    </mxCell>
+    
+  <!-- Web Browser Window -->
+  <mxCell id="web_frame" value="" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#333333;strokeWidth=2;fillColor=#f4f4f4;" vertex="1" parent="1">
+    <mxGeometry x="50" y="650" width="800" height="500" as="geometry" />
+  </mxCell>
+  
+  <!-- Browser Header -->
+  <mxCell id="web_header" value="🔴 🟡 🟢   &amp;nbsp;&amp;nbsp;https://admin.dipex-sports.com/dashboard" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e0e0e0;strokeColor=#bdbdbd;align=left;paddingLeft=10;" vertex="1" parent="1">
+    <mxGeometry x="50" y="650" width="800" height="30" as="geometry" />
+  </mxCell>
+  
+  <!-- Sidebar -->
+  <mxCell id="web_sidebar" value="&lt;br&gt;&lt;b&gt;DIPEX ADMIN&lt;/b&gt;&lt;br&gt;&lt;br&gt;📊 Dashboard&lt;br&gt;&lt;br&gt;🏃 Athletes&lt;br&gt;&lt;br&gt;📹 Video Evaluations&lt;br&gt;&lt;br&gt;📢 Announcements&lt;br&gt;&lt;br&gt;⚙️ Settings" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#2c3e50;fontColor=#ffffff;strokeColor=none;align=left;verticalAlign=top;paddingLeft=15;lineHeight=1.5;" vertex="1" parent="1">
+    <mxGeometry x="50" y="680" width="180" height="470" as="geometry" />
+  </mxCell>
+  
+  <!-- Top Nav -->
+  <mxCell id="web_topnav" value="Welcome, Super Admin &amp;nbsp;&amp;nbsp; 👤" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dddddd;align=right;paddingRight=20;" vertex="1" parent="1">
+    <mxGeometry x="230" y="680" width="620" height="50" as="geometry" />
+  </mxCell>
+
+  <!-- Web Content Area -->
+  <mxCell id="wd_card1" value="&lt;b&gt;Total Athletes&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;font-size:28px;color:#2E86C1&quot;&gt;1,245&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;shadow=1;" vertex="1" parent="1">
+    <mxGeometry x="260" y="760" width="160" height="100" as="geometry" />
+  </mxCell>
+
+  <mxCell id="wd_card2" value="&lt;b&gt;Pending Videos&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;font-size:28px;color:#E67E22&quot;&gt;38&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;shadow=1;" vertex="1" parent="1">
+    <mxGeometry x="450" y="760" width="160" height="100" as="geometry" />
+  </mxCell>
+
+  <mxCell id="wd_card3" value="&lt;b&gt;AI Approvals&lt;/b&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;font-size:28px;color:#27AE60&quot;&gt;492&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;shadow=1;" vertex="1" parent="1">
+    <mxGeometry x="640" y="760" width="160" height="100" as="geometry" />
+  </mxCell>
+
+  <!-- Table Wireframe -->
+  <mxCell id="wd_table_title" value="&lt;b&gt;Recent Video Submissions (Needs Manual Review)&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=16;" vertex="1" parent="1">
+    <mxGeometry x="260" y="890" width="400" height="30" as="geometry" />
+  </mxCell>
+
+  <mxCell id="wd_table" value="&lt;table style=&quot;width:100%; border-collapse:collapse; text-align:left;&quot;&gt;&lt;tr style=&quot;background-color:#f1f1f1; border-bottom:2px solid #ddd;&quot;&gt;&lt;th style=&quot;padding:10px;&quot;&gt;Athlete&lt;/th&gt;&lt;th&gt;Test&lt;/th&gt;&lt;th&gt;AI Score&lt;/th&gt;&lt;th&gt;Action&lt;/th&gt;&lt;/tr&gt;&lt;tr style=&quot;border-bottom:1px solid #eee;&quot;&gt;&lt;td style=&quot;padding:10px;&quot;&gt;Rahul Kumar&lt;/td&gt;&lt;td&gt;Pushups&lt;/td&gt;&lt;td&gt;45 (90%)&lt;/td&gt;&lt;td&gt;&lt;button style=&quot;background:#3498db;color:white;border:none;padding:5px 10px;border-radius:3px;&quot;&gt;Review&lt;/button&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr style=&quot;border-bottom:1px solid #eee;&quot;&gt;&lt;td style=&quot;padding:10px;&quot;&gt;Priya Singh&lt;/td&gt;&lt;td&gt;Sprint&lt;/td&gt;&lt;td&gt;12.4s (85%)&lt;/td&gt;&lt;td&gt;&lt;button style=&quot;background:#3498db;color:white;border:none;padding:5px 10px;border-radius:3px;&quot;&gt;Review&lt;/button&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dddddd;align=left;verticalAlign=top;" vertex="1" parent="1">
+    <mxGeometry x="260" y="930" width="540" height="180" as="geometry" />
+  </mxCell>
+
+  <mxCell id="flow1" value="Login Success" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeColor=#28a745;strokeWidth=2;fontSize=12;" edge="1" parent="1" source="login_el_4" target="dash_mobile_frame">
+    <mxGeometry relative="1" as="geometry" />
+  </mxCell>
+  <mxCell id="flow2" value="Navigate to Upload" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeColor=#007bff;strokeWidth=2;fontSize=12;" edge="1" parent="1" source="dash_mobile_nav" target="upload_frame">
+    <mxGeometry relative="1" as="geometry">
+      <Array as="points"><mxPoint x="710" y="585" /><mxPoint x="710" y="330" /></Array>
+    </mxGeometry>
+  </mxCell>
+  <mxCell id="flow3" value="Videos sent to Admin UI" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeColor=#e67e22;strokeWidth=2;fontSize=12;dashed=1;dashPattern=1 2;" edge="1" parent="1" source="upload_el_4" target="web_frame">
+    <mxGeometry relative="1" as="geometry">
+      <Array as="points"><mxPoint x="870" y="600" /><mxPoint x="450" y="600" /></Array>
+    </mxGeometry>
+  </mxCell>
+  </root>
+</mxGraphModel>
+</mxfile>

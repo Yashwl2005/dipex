@@ -1,0 +1,28 @@
+<!-- classdiagram.xml -->
+<mxGraphModel dx="1000" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+    <mxCell id="cl1" value="&lt;h4 style=&quot;margin:0px;text-align:center;&quot;&gt;Athlete&lt;/h4&gt;&lt;hr&gt;+ userId: String&lt;br&gt;+ height: Float&lt;br&gt;+ weight: Float&lt;br&gt;+ sport: String&lt;hr&gt;+ getProfile()&lt;br&gt;+ uploadVideo()&lt;br&gt;+ viewStatus()" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=5;spacingRight=5;" vertex="1" parent="1">
+      <mxGeometry x="50" y="50" width="180" height="150" as="geometry" />
+    </mxCell>
+    <mxCell id="cl2" value="&lt;h4 style=&quot;margin:0px;text-align:center;&quot;&gt;Admin&lt;/h4&gt;&lt;hr&gt;+ adminId: String&lt;br&gt;+ assignedSports: List&lt;hr&gt;+ filterAthletes()&lt;br&gt;+ approveAthlete()&lt;br&gt;+ pushNews()" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=5;spacingRight=5;" vertex="1" parent="1">
+      <mxGeometry x="350" y="50" width="180" height="150" as="geometry" />
+    </mxCell>
+    <mxCell id="cl3" value="&lt;h4 style=&quot;margin:0px;text-align:center;&quot;&gt;Submission&lt;/h4&gt;&lt;hr&gt;+ testType: String&lt;br&gt;+ videoUrl: String&lt;br&gt;+ aiScore: Int&lt;br&gt;+ approvalStatus: Enum&lt;hr&gt;+ save()&lt;br&gt;+ triggerAIAnalysis()" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=5;spacingRight=5;" vertex="1" parent="1">
+      <mxGeometry x="50" y="300" width="180" height="150" as="geometry" />
+    </mxCell>
+    <mxCell id="cl4" value="&lt;h4 style=&quot;margin:0px;text-align:center;&quot;&gt;AI_Processor&lt;/h4&gt;&lt;hr&gt;+ poseLandmarks: List&lt;br&gt;+ threshold: Float&lt;hr&gt;+ extractFrames()&lt;br&gt;+ calculateAngle()&lt;br&gt;+ getRepetitions()" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=left;spacingLeft=5;spacingRight=5;" vertex="1" parent="1">
+      <mxGeometry x="350" y="300" width="180" height="150" as="geometry" />
+    </mxCell>
+    <mxCell id="e1" value="Has (1..*)" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=open;endSize=12;" edge="1" parent="1" source="cl1" target="cl3">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e2" value="Analyzes (1..1)" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=open;endSize=12;" edge="1" parent="1" source="cl3" target="cl4">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e3" value="Evaluates" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=open;endSize=12;dashed=1;" edge="1" parent="1" source="cl2" target="cl1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+  </root>
+</mxGraphModel>

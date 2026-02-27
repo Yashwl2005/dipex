@@ -33,7 +33,7 @@ const generateToken = (id) => {
 // @route   POST /api/auth/register
 // @access  Public
 exports.registerUser = async (req, res) => {
-  const { name, email, password, role, dateOfBirth, gender, height, weight, sports, specificEvent, address, state } = req.body;
+  const { name, email, password, role, dateOfBirth, gender, height, weight, sports, specificEvent, address, state, aadhaarNumber } = req.body;
   let { aadhaarCardUrl, dobCertificateUrl, profilePhotoUrl, competitionVideoUrl } = req.body;
 
   try {
@@ -75,14 +75,26 @@ exports.registerUser = async (req, res) => {
       });
     }
 
+    if (!aadhaarNumber) {
+        return res.status(400).json({ message: 'Aadhaar Number is required for athletes and coaches.' });
+    }
+
     const userExists = await User.findOne({ email });
 
     if (userExists) {
-      return res.status(400).json({ message: 'User already exists' });
+      return res.status(400).json({ message: 'User already exists with this email' });
+    }
+    
+    // Check if a user with that Aadhaar Number already exists to ensure it's not the same
+    if (aadhaarNumber) {
+        const aadhaarExists = await User.findOne({ aadhaarNumber });
+        if (aadhaarExists) {
+            return res.status(400).json({ message: 'A user with this Aadhaar Number already exists' });
+        }
     }
 
     const user = await User.create({
-      name, email, password, role, dateOfBirth, gender, height, weight, sports, address, state, aadhaarCardUrl, dobCertificateUrl, profilePhotoUrl, competitionVideoUrl
+      name, email, password, role, dateOfBirth, gender, height, weight, sports, address, state, aadhaarNumber, aadhaarCardUrl, dobCertificateUrl, profilePhotoUrl, competitionVideoUrl
     });
 
     if (user) {
@@ -94,6 +106,7 @@ exports.registerUser = async (req, res) => {
       res.status(400).json({ message: 'Invalid user data' });
     }
   } catch (error) {
+    console.error("Registration error:", error);
     res.status(500).json({ message: error.message });
   }
 };

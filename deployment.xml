@@ -1,0 +1,52 @@
+<!-- deployment.xml -->
+<mxGraphModel dx="1000" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+    <mxCell id="n1" value="&lt;b&gt;Client Node 1&lt;/b&gt;&lt;br&gt;«device» Smartphone" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+      <mxGeometry x="50" y="50" width="160" height="120" as="geometry" />
+    </mxCell>
+    <mxCell id="c1" value="«artifact»&lt;br&gt;Mobile App APK/IPA" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#ffffff;" vertex="1" parent="1">
+      <mxGeometry x="70" y="100" width="120" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="n2" value="&lt;b&gt;Client Node 2&lt;/b&gt;&lt;br&gt;«device» PC / Laptop" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+      <mxGeometry x="50" y="250" width="160" height="120" as="geometry" />
+    </mxCell>
+    <mxCell id="c2" value="«artifact»&lt;br&gt;Web Browser" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#ffffff;" vertex="1" parent="1">
+      <mxGeometry x="70" y="300" width="120" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="n3" value="&lt;b&gt;Server Node&lt;/b&gt;&lt;br&gt;«execution environment» AWS EC2" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+      <mxGeometry x="350" y="150" width="200" height="180" as="geometry" />
+    </mxCell>
+    <mxCell id="c3" value="«artifact»&lt;br&gt;Node.js Server" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#ffffff;" vertex="1" parent="1">
+      <mxGeometry x="375" y="210" width="150" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="c4" value="«artifact»&lt;br&gt;PM2 Runtime" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#ffffff;" vertex="1" parent="1">
+      <mxGeometry x="375" y="270" width="150" height="40" as="geometry" />
+    </mxCell>
+    <mxCell id="n4" value="&lt;b&gt;AI Node&lt;/b&gt;&lt;br&gt;«execution environment» Docker" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+      <mxGeometry x="650" y="50" width="180" height="120" as="geometry" />
+    </mxCell>
+    <mxCell id="c5" value="«artifact»&lt;br&gt;Python / MediaPipe" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#ffffff;" vertex="1" parent="1">
+      <mxGeometry x="665" y="100" width="150" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="n5" value="&lt;b&gt;Database Node&lt;/b&gt;&lt;br&gt;«database» MongoDB Atlas" style="shape=cube;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;darkOpacity=0.05;darkOpacity2=0.1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+      <mxGeometry x="650" y="250" width="180" height="120" as="geometry" />
+    </mxCell>
+    <mxCell id="c6" value="«artifact»&lt;br&gt;Athletes DB" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#ffffff;" vertex="1" parent="1">
+      <mxGeometry x="665" y="300" width="150" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="e1" value="HTTPS" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=none;" edge="1" parent="1" source="n1" target="n3">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e2" value="HTTPS" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=none;" edge="1" parent="1" source="n2" target="n3">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e3" value="TCP/IP" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=none;" edge="1" parent="1" source="n3" target="n4">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e4" value="TCP/IP (Mongoose)" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=none;" edge="1" parent="1" source="n3" target="n5">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+  </root>
+</mxGraphModel>

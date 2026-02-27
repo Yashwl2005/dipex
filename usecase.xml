@@ -1,0 +1,46 @@
+<!-- usecase.xml -->
+<mxGraphModel dx="1000" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+    <mxCell id="u1" value="Athlete" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+      <mxGeometry x="50" y="150" width="30" height="60" as="geometry" />
+    </mxCell>
+    <mxCell id="u2" value="Admin / Evaluator" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+      <mxGeometry x="650" y="150" width="30" height="60" as="geometry" />
+    </mxCell>
+    <mxCell id="u3" value="AI Subsystem" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+      <mxGeometry x="350" y="450" width="30" height="60" as="geometry" />
+    </mxCell>
+    <mxCell id="c1" value="Register &amp; Manage Profile" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+      <mxGeometry x="200" y="50" width="140" height="70" as="geometry" />
+    </mxCell>
+    <mxCell id="c2" value="Upload Fitness Video" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+      <mxGeometry x="200" y="170" width="140" height="70" as="geometry" />
+    </mxCell>
+    <mxCell id="c3" value="Review &amp; Approve Roster" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+      <mxGeometry x="450" y="150" width="140" height="70" as="geometry" />
+    </mxCell>
+    <mxCell id="c4" value="Process Video Feed &amp; Score" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+      <mxGeometry x="295" y="320" width="140" height="70" as="geometry" />
+    </mxCell>
+    <mxCell id="l1" style="edgeStyle=none;html=1;endArrow=none;" edge="1" parent="1" source="u1" target="c1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="l2" style="edgeStyle=none;html=1;endArrow=none;" edge="1" parent="1" source="u1" target="c2">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="l3" style="edgeStyle=none;html=1;endArrow=none;" edge="1" parent="1" source="u2" target="c3">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="l4" style="edgeStyle=none;html=1;endArrow=none;" edge="1" parent="1" source="u2" target="c1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="l5" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;" style="edgeStyle=none;html=1;endArrow=open;endSize=12;dashed=1;" edge="1" parent="1" source="c2" target="c4">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="l6" style="edgeStyle=none;html=1;endArrow=none;" edge="1" parent="1" source="u3" target="c4">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+  </root>
+</mxGraphModel>

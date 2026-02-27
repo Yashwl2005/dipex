@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxGraphModel dx="1400" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+
+  <!-- Web Browser Window -->
+  <mxCell id="web_frame" value="" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#cbd5e1;strokeWidth=1;fillColor=#f8fafc;shadow=1;" vertex="1" parent="1">
+    <mxGeometry x="50" y="50" width="1000" height="650" as="geometry" />
+  </mxCell>
+  
+  <!-- Browser Header -->
+  <mxCell id="web_header" value="&lt;span style=&quot;color:#ef4444;font-size:14px&quot;&gt;●&lt;/span&gt; &lt;span style=&quot;color:#eab308;font-size:14px&quot;&gt;●&lt;/span&gt; &lt;span style=&quot;color:#22c55e;font-size:14px&quot;&gt;●&lt;/span&gt; &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;span style=&quot;background:#f1f5f9;padding:4px 150px 4px 15px;border-radius:12px;color:#64748b;font-size:12px;&quot;&gt;🔒 https://admin.dipex-sports.com/dashboard&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cbd5e1;align=left;paddingLeft=15;" vertex="1" parent="1">
+    <mxGeometry x="50" y="50" width="1000" height="40" as="geometry" />
+  </mxCell>
+  
+  <!-- Sidebar -->
+  <mxCell id="web_sidebar" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0f172a;strokeColor=none;align=left;verticalAlign=top;" vertex="1" parent="1">
+    <mxGeometry x="50" y="90" width="220" height="610" as="geometry" />
+  </mxCell>
+  
+  <!-- Sidebar Logo -->
+  <mxCell id="sb_logo" value="&lt;b&gt;&lt;span style=&quot;font-size:22px;color:#38bdf8;&quot;&gt;⚡ DIPEX&lt;/span&gt;&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;color:#94a3b8;font-size:11px;letter-spacing:1px;&quot;&gt;ADMIN PANEL&lt;/span&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+    <mxGeometry x="70" y="110" width="180" height="40" as="geometry" />
+  </mxCell>
+
+  <!-- Sidebar Menu Items -->
+  <mxCell id="sb_m1" value="&lt;b&gt;&lt;span style=&quot;color:#ffffff;&quot;&gt;📊 Dashboard&lt;/span&gt;&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1e293b;strokeColor=none;align=left;paddingLeft=15;fontSize=14;" vertex="1" parent="1">
+    <mxGeometry x="65" y="190" width="190" height="40" as="geometry" />
+  </mxCell>
+  <mxCell id="sb_m2" value="&lt;span style=&quot;color:#cbd5e1;&quot;&gt;🏃 Athletes&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;align=left;paddingLeft=15;fontSize=14;" vertex="1" parent="1">
+    <mxGeometry x="65" y="240" width="190" height="40" as="geometry" />
+  </mxCell>
+  <mxCell id="sb_m3" value="&lt;span style=&quot;color:#cbd5e1;&quot;&gt;📹 Video Review&lt;/span&gt; &lt;span style=&quot;background:#ef4444;color:white;padding:2px 8px;border-radius:10px;font-size:11px;float:right;margin-right:10px;margin-top:2px;font-weight:bold;&quot;&gt;12&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;align=left;paddingLeft=15;fontSize=14;" vertex="1" parent="1">
+    <mxGeometry x="65" y="290" width="190" height="40" as="geometry" />
+  </mxCell>
+  <mxCell id="sb_m4" value="&lt;span style=&quot;color:#cbd5e1;&quot;&gt;🏆 Leaderboards&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;align=left;paddingLeft=15;fontSize=14;" vertex="1" parent="1">
+    <mxGeometry x="65" y="340" width="190" height="40" as="geometry" />
+  </mxCell>
+  <mxCell id="sb_m5" value="&lt;span style=&quot;color:#cbd5e1;&quot;&gt;📢 Announcements&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;align=left;paddingLeft=15;fontSize=14;" vertex="1" parent="1">
+    <mxGeometry x="65" y="390" width="190" height="40" as="geometry" />
+  </mxCell>
+  <mxCell id="sb_m6" value="&lt;span style=&quot;color:#64748b;&quot;&gt;⚙️ Settings&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;align=left;paddingLeft=15;fontSize=14;" vertex="1" parent="1">
+    <mxGeometry x="65" y="630" width="190" height="40" as="geometry" />
+  </mxCell>
+
+  <!-- Top Navigation Bar -->
+  <mxCell id="web_topnav" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#f1f5f9;borderBottom=1;align=right;paddingRight=20;" vertex="1" parent="1">
+    <mxGeometry x="270" y="90" width="780" height="70" as="geometry" />
+  </mxCell>
+  
+  <mxCell id="topnav_search" value="🔍 Search athletes, assessments, or IDs..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#e2e8f0;align=left;paddingLeft=15;fontColor=#94a3b8;fontSize=13;" vertex="1" parent="1">
+    <mxGeometry x="300" y="105" width="320" height="40" as="geometry" />
+  </mxCell>
+  
+  <mxCell id="topnav_profile" value="&lt;span style=&quot;font-size:20px;&quot;&gt;🔔&lt;/span&gt; &amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;span style=&quot;color:#e2e8f0&quot;&gt;|&lt;/span&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp; &lt;b style=&quot;color:#1e293b;&quot;&gt;Super Admin&lt;/b&gt; &lt;img src=&quot;https://cdn.iconscout.com/icon/free/png-256/avatar-370-456322.png&quot; width=&quot;36&quot; height=&quot;36&quot; style=&quot;vertical-align:middle;border-radius:18px;margin-left:12px;border:2px solid #e2e8f0;&quot;&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#334155;" vertex="1" parent="1">
+    <mxGeometry x="800" y="105" width="220" height="40" as="geometry" />
+  </mxCell>
+
+  <!-- Main Content Area Background -->
+  <mxCell id="main_bg" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=none;" vertex="1" parent="1">
+    <mxGeometry x="270" y="160" width="780" height="540" as="geometry" />
+  </mxCell>
+
+  <mxCell id="page_title" value="&lt;b style=&quot;color:#0f172a;font-size:24px;&quot;&gt;Overview&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;color:#64748b;font-size:14px;font-weight:normal;&quot;&gt;Welcome back! Here's the platform activity for today.&lt;/span&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+    <mxGeometry x="300" y="180" width="400" height="50" as="geometry" />
+  </mxCell>
+
+  <mxCell id="date_picker" value="&lt;span style=&quot;color:#475569;font-weight:500;&quot;&gt;📅 This Week ⌄&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#e2e8f0;align=center;fontSize=13;shadow=1;" vertex="1" parent="1">
+    <mxGeometry x="900" y="190" width="120" height="35" as="geometry" />
+  </mxCell>
+
+  <!-- Top Metric Cards -->
+  <mxCell id="wd_card1" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=none;shadow=1;" vertex="1" parent="1">
+    <mxGeometry x="300" y="260" width="220" height="110" as="geometry" />
+  </mxCell>
+  <mxCell id="c1_icon" value="🏃" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e0f2fe;strokeColor=none;fontSize=24;" vertex="1" parent="1">
+    <mxGeometry x="320" y="285" width="50" height="50" as="geometry" />
+  </mxCell>
+  <mxCell id="c1_text" value="&lt;span style=&quot;color:#64748b;font-size:13px;font-weight:600;text-transform:uppercase;&quot;&gt;Total Athletes&lt;/span&gt;&lt;br&gt;&lt;b&gt;&lt;span style=&quot;font-size:32px;color:#0f172a;&quot;&gt;2,845&lt;/span&gt;&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;lineHeight=1.2;" vertex="1" parent="1">
+    <mxGeometry x="390" y="285" width="120" height="50" as="geometry" />
+  </mxCell>
+
+  <mxCell id="wd_card2" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=none;shadow=1;" vertex="1" parent="1">
+    <mxGeometry x="550" y="260" width="220" height="110" as="geometry" />
+  </mxCell>
+  <mxCell id="c2_icon" value="📹" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fef08a;strokeColor=none;fontSize=24;" vertex="1" parent="1">
+    <mxGeometry x="570" y="285" width="50" height="50" as="geometry" />
+  </mxCell>
+  <mxCell id="c2_text" value="&lt;span style=&quot;color:#64748b;font-size:13px;font-weight:600;text-transform:uppercase;&quot;&gt;Pending Review&lt;/span&gt;&lt;br&gt;&lt;b&gt;&lt;span style=&quot;font-size:32px;color:#0f172a;&quot;&gt;38&lt;/span&gt;&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;lineHeight=1.2;" vertex="1" parent="1">
+    <mxGeometry x="640" y="285" width="120" height="50" as="geometry" />
+  </mxCell>
+
+  <mxCell id="wd_card3" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=none;shadow=1;" vertex="1" parent="1">
+    <mxGeometry x="800" y="260" width="220" height="110" as="geometry" />
+  </mxCell>
+  <mxCell id="c3_icon" value="✨" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dcfce3;strokeColor=none;fontSize=24;" vertex="1" parent="1">
+    <mxGeometry x="820" y="285" width="50" height="50" as="geometry" />
+  </mxCell>
+  <mxCell id="c3_text" value="&lt;span style=&quot;color:#64748b;font-size:13px;font-weight:600;text-transform:uppercase;&quot;&gt;Auto Approval Rate&lt;/span&gt;&lt;br&gt;&lt;b&gt;&lt;span style=&quot;font-size:32px;color:#0f172a;&quot;&gt;89%&lt;/span&gt;&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;lineHeight=1.2;" vertex="1" parent="1">
+    <mxGeometry x="890" y="285" width="120" height="50" as="geometry" />
+  </mxCell>
+
+  <!-- Main Data Table Container -->
+  <mxCell id="table_container" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=none;shadow=1;" vertex="1" parent="1">
+    <mxGeometry x="300" y="400" width="720" height="270" as="geometry" />
+  </mxCell>
+
+  <mxCell id="table_header_text" value="&lt;b style=&quot;color:#0f172a;font-size:16px;&quot;&gt;Attention Required: Recent Video Submissions&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+    <mxGeometry x="320" y="415" width="400" height="30" as="geometry" />
+  </mxCell>
+  
+  <mxCell id="filter_btn" value="&lt;span style=&quot;color:#475569;font-weight:500;&quot;&gt;View All ➔&lt;/span&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;align=right;fontSize=13;cursor=pointer;" vertex="1" parent="1">
+    <mxGeometry x="930" y="415" width="70" height="30" as="geometry" />
+  </mxCell>
+  
+  <mxCell id="table_line" value="" style="line;strokeWidth=1;html=1;strokeColor=#f1f5f9;" vertex="1" parent="1">
+    <mxGeometry x="300" y="450" width="720" height="10" as="geometry" />
+  </mxCell>
+
+  <!-- Beautiful Table Layout -->
+  <mxCell id="wd_table" value="&lt;table style=&quot;width:100%; border-collapse:collapse; text-align:left; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;&quot;&gt;
+    &lt;tr style=&quot;border-bottom:1px solid #e2e8f0; color:#64748b; font-size:12px; text-transform:uppercase; letter-spacing:0.5px;&quot;&gt;
+      &lt;th style=&quot;padding:12px 20px; font-weight:600;&quot;&gt;Athlete&lt;/th&gt;
+      &lt;th style=&quot;padding:12px 20px; font-weight:600;&quot;&gt;Assessment&lt;/th&gt;
+      &lt;th style=&quot;padding:12px 20px; font-weight:600;&quot;&gt;AI Confidence&lt;/th&gt;
+      &lt;th style=&quot;padding:12px 20px; font-weight:600;&quot;&gt;Score&lt;/th&gt;
+      &lt;th style=&quot;padding:12px 20px; font-weight:600;&quot;&gt;Status&lt;/th&gt;
+      &lt;th style=&quot;padding:12px 20px; text-align:right;&quot;&gt;Actions&lt;/th&gt;
+    &lt;/tr&gt;
+    
+    &lt;tr style=&quot;border-bottom:1px solid #f8fafc; color:#1e293b; font-size:14px; background-color:#ffffff;&quot;&gt;
+      &lt;td style=&quot;padding:16px 20px;&quot;&gt;
+        &lt;div style=&quot;display:flex;align-items:center;&quot;&gt;
+          &lt;img src=&quot;https://i.pravatar.cc/150?img=11&quot; width=&quot;32&quot; height=&quot;32&quot; style=&quot;border-radius:16px;margin-right:12px;&quot;&gt;
+          &lt;div&gt;&lt;b style=&quot;color:#0f172a;&quot;&gt;Yash Sharma&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;color:#64748b;font-size:12px;&quot;&gt;ID: #A-7492&lt;/span&gt;&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/td&gt;
+      &lt;td style=&quot;padding:16px 20px; color:#475569; font-weight:500;&quot;&gt;Vertical Jump&lt;/td&gt;
+      &lt;td style=&quot;padding:16px 20px;&quot;&gt;
+        &lt;div style=&quot;display:flex;align-items:center;&quot;&gt;
+          &lt;div style=&quot;background:#f1f5f9;width:80px;height:6px;border-radius:3px;margin-right:8px;&quot;&gt;
+            &lt;div style=&quot;background:#eab308;width:75%;height:100%;border-radius:3px;&quot;&gt;&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;span style=&quot;color:#64748b;font-size:12px;font-weight:500;&quot;&gt;75%&lt;/span&gt;
+        &lt;/div&gt;
+      &lt;/td&gt;
+      &lt;td style=&quot;padding:16px 20px; font-weight:600; font-size:15px;&quot;&gt;55 cm&lt;/td&gt;
+      &lt;td style=&quot;padding:16px 20px;&quot;&gt;&lt;span style=&quot;background:#fef08a;color:#854d0e;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;&quot;&gt;Needs Review&lt;/span&gt;&lt;/td&gt;
+      &lt;td style=&quot;padding:16px 20px; text-align:right;&quot;&gt;&lt;button style=&quot;background:#2563eb;color:white;border:none;padding:8px 16px;border-radius:6px;font-weight:500;font-size:13px;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,0.05);&quot;&gt;Review Video&lt;/button&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+
+    &lt;tr style=&quot;border-bottom:1px solid #f8fafc; color:#1e293b; font-size:14px; background-color:#ffffff;&quot;&gt;
+      &lt;td style=&quot;padding:16px 20px;&quot;&gt;
+        &lt;div style=&quot;display:flex;align-items:center;&quot;&gt;
+          &lt;img src=&quot;https://i.pravatar.cc/150?img=5&quot; width=&quot;32&quot; height=&quot;32&quot; style=&quot;border-radius:16px;margin-right:12px;&quot;&gt;
+          &lt;div&gt;&lt;b style=&quot;color:#0f172a;&quot;&gt;Aisha Singh&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;color:#64748b;font-size:12px;&quot;&gt;ID: #A-2281&lt;/span&gt;&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/td&gt;
+      &lt;td style=&quot;padding:16px 20px; color:#475569; font-weight:500;&quot;&gt;100m Sprint&lt;/td&gt;
+      &lt;td style=&quot;padding:16px 20px;&quot;&gt;
+        &lt;div style=&quot;display:flex;align-items:center;&quot;&gt;
+          &lt;div style=&quot;background:#f1f5f9;width:80px;height:6px;border-radius:3px;margin-right:8px;&quot;&gt;
+            &lt;div style=&quot;background:#22c55e;width:95%;height:100%;border-radius:3px;&quot;&gt;&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;span style=&quot;color:#64748b;font-size:12px;font-weight:500;&quot;&gt;95%&lt;/span&gt;
+        &lt;/div&gt;
+      &lt;/td&gt;
+      &lt;td style=&quot;padding:16px 20px; font-weight:600; font-size:15px;&quot;&gt;12.4s&lt;/td&gt;
+      &lt;td style=&quot;padding:16px 20px;&quot;&gt;&lt;span style=&quot;background:#dcfce3;color:#166534;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;&quot;&gt;Auto-Approved&lt;/span&gt;&lt;/td&gt;
+      &lt;td style=&quot;padding:16px 20px; text-align:right;&quot;&gt;&lt;button style=&quot;background:#ffffff;color:#475569;border:1px solid #cbd5e1;padding:7px 15px;border-radius:6px;font-weight:500;font-size:13px;cursor:pointer;&quot;&gt;View Details&lt;/button&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+
+    &lt;tr style=&quot;color:#1e293b; font-size:14px; background-color:#ffffff;&quot;&gt;
+      &lt;td style=&quot;padding:16px 20px;&quot;&gt;
+        &lt;div style=&quot;display:flex;align-items:center;&quot;&gt;
+          &lt;img src=&quot;https://i.pravatar.cc/150?img=12&quot; width=&quot;32&quot; height=&quot;32&quot; style=&quot;border-radius:16px;margin-right:12px;&quot;&gt;
+          &lt;div&gt;&lt;b style=&quot;color:#0f172a;&quot;&gt;Rahul Verma&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;color:#64748b;font-size:12px;&quot;&gt;ID: #A-9013&lt;/span&gt;&lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/td&gt;
+      &lt;td style=&quot;padding:16px 20px; color:#475569; font-weight:500;&quot;&gt;Pushups&lt;/td&gt;
+      &lt;td style=&quot;padding:16px 20px;&quot;&gt;
+        &lt;div style=&quot;display:flex;align-items:center;&quot;&gt;
+          &lt;div style=&quot;background:#f1f5f9;width:80px;height:6px;border-radius:3px;margin-right:8px;&quot;&gt;
+            &lt;div style=&quot;background:#ef4444;width:30%;height:100%;border-radius:3px;&quot;&gt;&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;span style=&quot;color:#64748b;font-size:12px;font-weight:500;&quot;&gt;30%&lt;/span&gt;
+        &lt;/div&gt;
+      &lt;/td&gt;
+      &lt;td style=&quot;padding:16px 20px; font-weight:600; font-size:15px;&quot;&gt;42 reps&lt;/td&gt;
+      &lt;td style=&quot;padding:16px 20px;&quot;&gt;&lt;span style=&quot;background:#fee2e2;color:#991b1b;padding:4px 12px;border-radius:12px;font-size:12px;font-weight:600;&quot;&gt;Form Error&lt;/span&gt;&lt;/td&gt;
+      &lt;td style=&quot;padding:16px 20px; text-align:right;&quot;&gt;&lt;button style=&quot;background:#ffffff;color:#475569;border:1px solid #cbd5e1;padding:7px 15px;border-radius:6px;font-weight:500;font-size:13px;cursor:pointer;&quot;&gt;View Details&lt;/button&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+    
+  &lt;/table&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=none;align=left;verticalAlign=top;" vertex="1" parent="1">
+    <mxGeometry x="300" y="460" width="720" height="200" as="geometry" />
+  </mxCell>
+  </root>
+</mxGraphModel>

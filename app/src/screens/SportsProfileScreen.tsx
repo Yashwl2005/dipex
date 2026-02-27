@@ -235,6 +235,10 @@ export default function SportsProfileScreen() {
                             // Let's also append the specific event as a standard field
                             formData.append('specificEvent', selectedEvent);
 
+                            if (registrationData.aadhaarNumber) {
+                                formData.append('aadhaarNumber', registrationData.aadhaarNumber);
+                            }
+
 
                             if (registrationData.aadhaarUri) {
                                 const adFileUrl = registrationData.aadhaarUri;

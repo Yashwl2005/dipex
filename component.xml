@@ -1,0 +1,67 @@
+<!-- component.xml -->
+<mxGraphModel dx="1000" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+    <mxCell id="p1" value="&lt;b&gt;Presentation Layer&lt;/b&gt;" style="swimlane;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+      <mxGeometry x="50" y="50" width="200" height="240" as="geometry" />
+    </mxCell>
+    <mxCell id="c1" value="«component»&lt;br&gt;Mobile App (React Native)" style="shape=module;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;fillColor=#ffffff;" vertex="1" parent="p1">
+      <mxGeometry x="25" y="40" width="150" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="c2" value="«component»&lt;br&gt;Web UI (React)" style="shape=module;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;fillColor=#ffffff;" vertex="1" parent="p1">
+      <mxGeometry x="25" y="140" width="150" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="a1" value="&lt;b&gt;API Layer (Node.js)&lt;/b&gt;" style="swimlane;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+      <mxGeometry x="350" y="50" width="200" height="340" as="geometry" />
+    </mxCell>
+    <mxCell id="c3" value="«component»&lt;br&gt;ExpressRouter" style="shape=module;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;fillColor=#ffffff;" vertex="1" parent="a1">
+      <mxGeometry x="25" y="40" width="150" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="c4" value="«component»&lt;br&gt;AuthController" style="shape=module;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;fillColor=#ffffff;" vertex="1" parent="a1">
+      <mxGeometry x="25" y="140" width="150" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="c5" value="«component»&lt;br&gt;SubmissionController" style="shape=module;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;fillColor=#ffffff;" vertex="1" parent="a1">
+      <mxGeometry x="25" y="240" width="150" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="pr1" value="&lt;b&gt;Processing Layer&lt;/b&gt;" style="swimlane;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+      <mxGeometry x="50" y="320" width="200" height="150" as="geometry" />
+    </mxCell>
+    <mxCell id="c6" value="«component»&lt;br&gt;PythonPoseDetector" style="shape=module;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;fillColor=#ffffff;" vertex="1" parent="pr1">
+      <mxGeometry x="25" y="60" width="150" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="s1" value="&lt;b&gt;Storage Layer&lt;/b&gt;" style="swimlane;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+      <mxGeometry x="650" y="50" width="180" height="240" as="geometry" />
+    </mxCell>
+    <mxCell id="c7" value="«component»&lt;br&gt;MongoDBCluster" style="shape=module;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;fillColor=#ffffff;" vertex="1" parent="s1">
+      <mxGeometry x="15" y="40" width="150" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="c8" value="«component»&lt;br&gt;CDN Content Storage" style="shape=module;align=center;verticalAlign=middle;whiteSpace=wrap;html=1;fillColor=#ffffff;" vertex="1" parent="s1">
+      <mxGeometry x="15" y="140" width="150" height="50" as="geometry" />
+    </mxCell>
+    <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=open;dashed=1;endSize=8;" edge="1" parent="1" source="c1" target="c3">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=open;dashed=1;endSize=8;" edge="1" parent="1" source="c2" target="c3">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=open;dashed=1;endSize=8;" edge="1" parent="1" source="c3" target="c4">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=open;dashed=1;endSize=8;" edge="1" parent="1" source="c3" target="c5">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=open;dashed=1;endSize=8;" edge="1" parent="1" source="c5" target="c6">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=open;dashed=1;endSize=8;" edge="1" parent="1" source="c4" target="c7">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=open;dashed=1;endSize=8;" edge="1" parent="1" source="c5" target="c7">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+    <mxCell id="e8" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=open;dashed=1;endSize=8;" edge="1" parent="1" source="c5" target="c8">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+  </root>
+</mxGraphModel>

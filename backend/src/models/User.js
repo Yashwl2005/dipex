@@ -31,6 +31,11 @@ const UserSchema = new mongoose.Schema({
   weight: { type: Number }, // in kg
   address: { type: String },
   state: { type: String },
+  aadhaarNumber: { 
+    type: String, 
+    unique: true,
+    sparse: true
+  },
   aadhaarCardUrl: { type: String },
   dobCertificateUrl: { type: String },
   profilePhotoUrl: { type: String },

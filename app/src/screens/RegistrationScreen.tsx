@@ -26,6 +26,7 @@ export default function RegistrationScreen() {
     const [showDatePicker, setShowDatePicker] = useState(false);
 
     // Document state
+    const [aadhaarNumber, setAadhaarNumber] = useState('');
     const [aadhaarUri, setAadhaarUri] = useState<string | null>(null);
     const [dobUri, setDobUri] = useState<string | null>(null);
     const [profilePhotoUri, setProfilePhotoUri] = useState<string | null>(null);
@@ -88,8 +89,13 @@ export default function RegistrationScreen() {
     };
 
     const handleNext = () => {
-        if (!name || !email || !password || !gender || !height || !weight || !stateRegion || !aadhaarUri || (!dob && !dobUri) || !profilePhotoUri) {
-            Alert.alert("Required Fields", "Please fill in all mandatory fields, including Height, Weight, Profile Photo, State/Region, and required documents.");
+        if (!name || !email || !password || !gender || !height || !weight || !stateRegion || !aadhaarNumber || !aadhaarUri || (!dob && !dobUri) || !profilePhotoUri) {
+            Alert.alert("Required Fields", "Please fill in all mandatory fields, including Height, Weight, Profile Photo, State/Region, Aadhaar Number, and required documents.");
+            return;
+        }
+
+        if (aadhaarNumber.length !== 12 || isNaN(Number(aadhaarNumber))) {
+            Alert.alert("Invalid Aadhaar", "Please enter a valid 12-digit Aadhaar number.");
             return;
         }
 
@@ -104,6 +110,7 @@ export default function RegistrationScreen() {
                 weight,
                 address,
                 state: stateRegion,
+                aadhaarNumber,
                 aadhaarUri,
                 dobUri,
                 profilePhotoUri,
@@ -296,6 +303,19 @@ export default function RegistrationScreen() {
 
                     {/* Document Upload section */}
                     <Text style={[styles.label, { marginTop: 10, fontSize: 16 }]}>Document Uploads</Text>
+
+                    <View style={styles.inputGroup}>
+                        <Text style={styles.label}>Aadhaar Number <Text style={styles.required}>*</Text></Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Enter 12-digit Aadhaar Number"
+                            placeholderTextColor={Colors.textPlaceholder}
+                            keyboardType="numeric"
+                            maxLength={12}
+                            value={aadhaarNumber}
+                            onChangeText={setAadhaarNumber}
+                        />
+                    </View>
 
                     <View style={styles.inputGroup}>
                         <Text style={styles.label}>Aadhaar Card <Text style={styles.required}>*</Text></Text>

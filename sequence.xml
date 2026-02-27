@@ -1,0 +1,38 @@
+<!-- sequence.xml -->
+<mxGraphModel dx="1000" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+    <mxCell id="dl1" style="edgeStyle=none;html=1;endArrow=none;dashed=1;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="100" y="90" as="sourcePoint" /><mxPoint x="100" y="450" as="targetPoint" /></mxGeometry></mxCell>
+    <mxCell id="dl2" style="edgeStyle=none;html=1;endArrow=none;dashed=1;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="250" y="90" as="sourcePoint" /><mxPoint x="250" y="450" as="targetPoint" /></mxGeometry></mxCell>
+    <mxCell id="dl3" style="edgeStyle=none;html=1;endArrow=none;dashed=1;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="400" y="90" as="sourcePoint" /><mxPoint x="400" y="450" as="targetPoint" /></mxGeometry></mxCell>
+    <mxCell id="dl4" style="edgeStyle=none;html=1;endArrow=none;dashed=1;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="550" y="90" as="sourcePoint" /><mxPoint x="550" y="450" as="targetPoint" /></mxGeometry></mxCell>
+    <mxCell id="dl5" style="edgeStyle=none;html=1;endArrow=none;dashed=1;" edge="1" parent="1"><mxGeometry relative="1" as="geometry"><mxPoint x="700" y="90" as="sourcePoint" /><mxPoint x="700" y="450" as="targetPoint" /></mxGeometry></mxCell>
+    <mxCell id="sq1" value="Athlete" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="50" y="50" width="100" height="40" as="geometry" /></mxCell>
+    <mxCell id="sq2" value="Mobile UI" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1"><mxGeometry x="200" y="50" width="100" height="40" as="geometry" /></mxCell>
+    <mxCell id="sq3" value="Node Backend" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1"><mxGeometry x="350" y="50" width="100" height="40" as="geometry" /></mxCell>
+    <mxCell id="sq4" value="Python AI" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1"><mxGeometry x="500" y="50" width="100" height="40" as="geometry" /></mxCell>
+    <mxCell id="sq5" value="Database" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1"><mxGeometry x="650" y="50" width="100" height="40" as="geometry" /></mxCell>
+    <mxCell id="call1" value="1. Click Upload" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;elbow=vertical;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry"><mxPoint x="100" y="120" as="sourcePoint" /><mxPoint x="250" y="120" as="targetPoint" /></mxGeometry>
+    </mxCell>
+    <mxCell id="call2" value="2. Send Video (Multipart)" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;elbow=vertical;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry"><mxPoint x="250" y="160" as="sourcePoint" /><mxPoint x="400" y="160" as="targetPoint" /></mxGeometry>
+    </mxCell>
+    <mxCell id="call3" value="3. Trigger Analysis" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;elbow=vertical;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry"><mxPoint x="400" y="200" as="sourcePoint" /><mxPoint x="550" y="200" as="targetPoint" /></mxGeometry>
+    </mxCell>
+    <mxCell id="call4" value="4. Return AI Score" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;edgeStyle=elbowEdgeStyle;elbow=vertical;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry"><mxPoint x="550" y="260" as="sourcePoint" /><mxPoint x="400" y="260" as="targetPoint" /></mxGeometry>
+    </mxCell>
+    <mxCell id="call5" value="5. Save to DB" style="html=1;verticalAlign=bottom;endArrow=block;edgeStyle=elbowEdgeStyle;elbow=vertical;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry"><mxPoint x="400" y="300" as="sourcePoint" /><mxPoint x="700" y="300" as="targetPoint" /></mxGeometry>
+    </mxCell>
+    <mxCell id="call6" value="6. DB Ack" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;edgeStyle=elbowEdgeStyle;elbow=vertical;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry"><mxPoint x="700" y="340" as="sourcePoint" /><mxPoint x="400" y="340" as="targetPoint" /></mxGeometry>
+    </mxCell>
+    <mxCell id="call7" value="7. Return Success Status" style="html=1;verticalAlign=bottom;endArrow=open;dashed=1;endSize=8;edgeStyle=elbowEdgeStyle;elbow=vertical;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry"><mxPoint x="400" y="380" as="sourcePoint" /><mxPoint x="250" y="380" as="targetPoint" /></mxGeometry>
+    </mxCell>
+  </root>
+</mxGraphModel>
