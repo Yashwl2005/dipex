@@ -5,8 +5,8 @@ import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTo
 import './Dashboard.css';
 import api from '../api';
 
-const StatCard = ({ title, value, badgeText, badgeType }) => (
-    <div className="card stat-card">
+const StatCard = ({ title, value, badgeText, badgeType, onClick }) => (
+    <div className={`card stat-card ${onClick ? 'cursor-pointer hover:shadow-lg transition-shadow' : ''}`} onClick={onClick}>
         <div className="stat-header">
             <span className="stat-title">{title}</span>
             <span className={`stat-badge badge-${badgeType}`}>{badgeText}</span>
@@ -56,10 +56,10 @@ export const Dashboard = () => {
 
             <div className="dashboard-grid">
                 {/* Top Stats */}
-                <StatCard title="Total Athletes Applied" value={stats.totalAthletes} badgeText="Global" badgeType="default" />
-                <StatCard title="Athletes Approved" value={stats.approvedAthletes} badgeText="Verified" badgeType="green" />
-                <StatCard title="Athletes Rejected" value={stats.rejectedAthletes} badgeText="Denied" badgeType="red" />
-                <StatCard title="Pending Review" value={stats.pendingAthletes} badgeText="Action Req" badgeType="yellow" />
+                <StatCard title="Total Athletes Applied" value={stats.totalAthletes} badgeText="Global" badgeType="default" onClick={() => window.location.href = '/athletes'} />
+                <StatCard title="Athletes Approved" value={stats.approvedAthletes} badgeText="Verified" badgeType="green" onClick={() => window.location.href = '/athletes?status=approved'} />
+                <StatCard title="Athletes Rejected" value={stats.rejectedAthletes} badgeText="Denied" badgeType="red" onClick={() => window.location.href = '/athletes?status=rejected'} />
+                <StatCard title="Pending Review" value={stats.pendingAthletes} badgeText="Action Req" badgeType="yellow" onClick={() => window.location.href = '/athletes?status=pending'} />
 
                 {/* Heatmap Widget */}
                 <div className="card heatmap-widget">

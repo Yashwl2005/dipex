@@ -146,6 +146,14 @@ exports.getShortlistedAthletes = async (req, res) => {
 
     const query = sportsFilter.length > 0 ? { role: 'athlete', sports: { $in: sportsFilter } } : { role: 'athlete' };
 
+    if (req.query.status) {
+      if (req.query.status === 'pending') {
+         query.evaluationStatus = { $in: ['pending', null, undefined] };
+      } else {
+         query.evaluationStatus = req.query.status;
+      }
+    }
+
     const athletes = await User.find(query)
       .sort({ overallScore: -1 })
       .limit(100);

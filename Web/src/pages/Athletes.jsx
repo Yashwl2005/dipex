@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { Users, Search, Filter, MoreVertical, Eye } from 'lucide-react';
 import './Dashboard.css'; // Reusing dashboard styles for consistency
@@ -7,6 +7,7 @@ import api from '../api';
 
 export const Athletes = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [athletes, setAthletes] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -15,8 +16,16 @@ export const Athletes = () => {
             try {
                 const sportsStr = localStorage.getItem('sports');
                 const sports = sportsStr ? JSON.parse(sportsStr).join(',') : '';
-                // The /admin/athletes route already exists and is filtered by sports
-                const res = await api.get(`/admin/athletes?sports=${sports}`);
+
+                const queryParams = new URLSearchParams(location.search);
+                const statusFilter = queryParams.get('status');
+
+                let endpoint = `/admin/athletes?sports=${sports}`;
+                if (statusFilter) {
+                    endpoint += `&status=${statusFilter}`;
+                }
+
+                const res = await api.get(endpoint);
                 setAthletes(res.data);
             } catch (err) {
                 console.error(err);
@@ -25,7 +34,7 @@ export const Athletes = () => {
             }
         };
         fetchAthletes();
-    }, []);
+    }, [location.search]);
 
     return (
         <Layout sidebarType="light">
